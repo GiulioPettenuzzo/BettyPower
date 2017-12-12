@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.google.android.gms.samples.vision.ocrreader"
+    android:installLocation="auto" >
+
+    <uses-feature android:name="android.hardware.camera" />
+
+    <uses-permission android:name="android.permission.CAMERA" />
+
+        <meta-data
+            android:name="com.google.android.gms.vision.DEPENDENCIES"
+            android:value="ocr" />
+
+        <activity
+            android:name="com.google.android.gms.samples.vision.ocrreader.MainActivity"
+            android:label="@string/title_activity_main" >
+
+        </activity>
+
+        <activity android:name="com.google.android.gms.samples.vision.ocrreader.OcrCaptureActivity"
+            android:screenOrientation="portrait"
+            android:label="Read Text" />
+
+</manifest>
