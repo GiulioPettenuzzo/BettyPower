@@ -11,11 +11,12 @@
 
 
     <com.renard.ocr.documents.creation.visualisation.OCRImageView
-            android:layout_below="@+id/toolbar"
-            android:id="@+id/progress_image"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_above="@+id/button_container"/>
+        android:id="@+id/progress_image"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/button_container"
+        android:layout_below="@+id/toolbar"
+        android:background="@color/backgrund_gray" />
 
     <LinearLayout
             android:id="@+id/button_container"

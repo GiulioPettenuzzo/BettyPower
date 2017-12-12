@@ -1,4 +1,4 @@
-include ':tess-two:tess-two'
+include ':tess-two:tess-two', ':volley', ':real-time-ocr'
 include ':app'
 
 

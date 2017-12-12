@@ -16,7 +16,11 @@
 
 package com.renard.ocr.documents.creation;
 
+import com.bettypower.entities.Match;
+import com.bettypower.threads.RealTimeFinderThread;
 import com.crashlytics.android.Crashlytics;
+import com.google.android.gms.samples.vision.ocrreader.OcrCaptureActivity;
+import com.google.android.gms.samples.vision.ocrreader.ui.camera.CameraSource;
 import com.renard.ocr.MonitoredActivity;
 import com.renard.ocr.R;
 import com.renard.ocr.TextFairyApplication;
@@ -94,6 +98,9 @@ public abstract class NewDocumentActivity extends MonitoredActivity {
     private final static String LOG_TAG = NewDocumentActivity.class.getSimpleName();
     public final static String EXTRA_NATIVE_PIX = "pix_pointer";
     private final static String IMAGE_LOAD_PROGRESS_TAG = "image_load_progress";
+    public static final String TEXT_BLOCK_OBJECT = "String";
+    public static final String STRING_BLOCK_OBJECT = "String_frame";
+
 
 
     private static final int PDF_PROGRESS_DIALOG_ID = 0;
@@ -112,6 +119,7 @@ public abstract class NewDocumentActivity extends MonitoredActivity {
     private final static int REQUEST_CODE_PICK_PHOTO = 1;
     final static int REQUEST_CODE_CROP_PHOTO = 2;
     protected final static int REQUEST_CODE_OCR = 3;
+    private static final int RC_OCR_CAPTURE = 9003;
 
     private static final String DATE_CAMERA_INTENT_STARTED_STATE = "com.renard.ocr.android.photo.TakePhotoActivity.dateCameraIntentStarted";
     private static final String STATE_RECEIVER_REGISTERED = "state_receiver_registered";
@@ -181,12 +189,13 @@ public abstract class NewDocumentActivity extends MonitoredActivity {
         }
     }
 
+
     protected void startCamera() {
         mAnalytics.startCamera();
         try {
             cameraPicUri = null;
             dateCameraIntentStarted = new Date();
-            Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+            Intent intent = new Intent(this,OcrCaptureActivity.class);
             // Create an image file name
             String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date());
             String imageFileName = "JPEG_" + timeStamp + "_";
@@ -381,12 +390,15 @@ public abstract class NewDocumentActivity extends MonitoredActivity {
         if (RESULT_OK == resultCode) {
             switch (requestCode) {
                 case REQUEST_CODE_CROP_PHOTO: {
-                    long nativePix = data.getLongExtra(EXTRA_NATIVE_PIX, 0);
+                    long nativePix = 0;
                     startOcrActivity(nativePix, false);
                     break;
                 }
                 case REQUEST_CODE_MAKE_PHOTO:
                     mCameraResult = new CameraResult(requestCode, resultCode, data, ImageSource.CAMERA);
+                    String result = data.getStringExtra(TEXT_BLOCK_OBJECT);
+                    TextFairyApplication application = (TextFairyApplication) getApplicationContext();
+                    application.setRealTimeOcrResult(result);
                     break;
                 case REQUEST_CODE_PICK_PHOTO:
                     mCameraResult = new CameraResult(requestCode, resultCode, data, ImageSource.PICK);
@@ -454,9 +466,11 @@ public abstract class NewDocumentActivity extends MonitoredActivity {
             if (skipCrop) {
                 startOcrActivity(nativePix, true);
             } else {
+                startOcrActivity(nativePix, true);
+                /**
                 Intent actionIntent = new Intent(this, CropImageActivity.class);
                 actionIntent.putExtra(NewDocumentActivity.EXTRA_NATIVE_PIX, nativePix);
-                startActivityForResult(actionIntent, NewDocumentActivity.REQUEST_CODE_CROP_PHOTO);
+                startActivityForResult(actionIntent, NewDocumentActivity.REQUEST_CODE_CROP_PHOTO);*/
             }
         } else {
             showFileError(pixLoadStatus);
@@ -965,7 +979,7 @@ public abstract class NewDocumentActivity extends MonitoredActivity {
                 if (mOcrText != null && i < mOcrText.size()) {
                     final String text = Html.toHtml(mOcrText.get(i));
                     values.put(Columns.OCR_TEXT, text);
-
+                    //TODO qui salva values
                 }
                 if (mTitle != null) {
                     values.put(Columns.TITLE, mTitle);

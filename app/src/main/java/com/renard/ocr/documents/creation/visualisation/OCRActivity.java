@@ -15,6 +15,11 @@
  */
 package com.renard.ocr.documents.creation.visualisation;
 
+import com.bettypower.SingleBetActivity;
+import com.bettypower.betMatchFinder.listeners.CompleteElaborationListener;
+import com.bettypower.entities.Match;
+import com.bettypower.entities.ParcelableMatch;
+import com.bettypower.util.HashMatchUtil;
 import com.googlecode.leptonica.android.Pix;
 import com.googlecode.leptonica.android.Pixa;
 import com.googlecode.tesseract.android.NativeBinding;
@@ -22,18 +27,22 @@ import com.googlecode.tesseract.android.OCR;
 import com.renard.ocr.MonitoredActivity;
 import com.renard.ocr.PermissionGrantedEvent;
 import com.renard.ocr.R;
+import com.renard.ocr.TextFairyApplication;
 import com.renard.ocr.documents.creation.visualisation.LayoutQuestionDialog.LayoutChoseListener;
 import com.renard.ocr.documents.creation.visualisation.LayoutQuestionDialog.LayoutKind;
 import com.renard.ocr.documents.viewing.DocumentContentProvider;
 import com.renard.ocr.documents.viewing.DocumentContentProvider.Columns;
 import com.renard.ocr.documents.viewing.grid.DocumentGridActivity;
 import com.renard.ocr.documents.viewing.single.DocumentActivity;
+import com.renard.ocr.util.ResourceUtils;
 import com.renard.ocr.util.Screen;
 import com.renard.ocr.util.Util;
 
 import android.Manifest;
+import android.app.Application;
 import android.content.ContentProviderClient;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Rect;
@@ -45,7 +54,9 @@ import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
 import android.support.v4.util.Pair;
+import android.text.Html;
 import android.text.format.DateFormat;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -73,6 +84,7 @@ public class OCRActivity extends MonitoredActivity implements LayoutChoseListene
     public static final String EXTRA_PARENT_DOCUMENT_ID = "parent_id";
     private static final String OCR_LANGUAGE = "ocr_language";
     public static final String EXTRA_USE_ACCESSIBILITY_MODE = "ACCESSIBILTY_MODE";
+    private static final String SCREEN_NAME = "Layout Question Dialog";
 
 
     @BindView(R.id.column_pick_completed)
@@ -91,7 +103,7 @@ public class OCRActivity extends MonitoredActivity implements LayoutChoseListene
     private Messenger mMessageReceiver = new Messenger(new ProgressActivityHandler());
     // if >=0 its the id of the parent document to which the current page shall be added
     private int mParentId = -1;
-
+    private static LayoutKind mLayout = LayoutKind.SIMPLE;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -123,7 +135,8 @@ public class OCRActivity extends MonitoredActivity implements LayoutChoseListene
             final Pix pixOrg = new Pix(nativePix);
             mOriginalHeight = pixOrg.getHeight();
             mOriginalWidth = pixOrg.getWidth();
-            askUserAboutDocumentLayout();
+            onLayoutChosen(mLayout,"Italian");
+            //askUserAboutDocumentLayout();
         }
     }
 
@@ -208,6 +221,7 @@ public class OCRActivity extends MonitoredActivity implements LayoutChoseListene
                     final Pixa texts = new Pixa(nativePixaText, 0, 0);
                     final Pixa images = new Pixa(nativePixaImages, 0, 0);
                     ArrayList<Rect> boxes = images.getBoxRects();
+                    //ArrayList<Rect> boxes = images.get;
                     ArrayList<RectF> scaledBoxes = new ArrayList<>(boxes.size());
                     float xScale = (1.0f * mPreviewWith) / mOriginalWidth;
                     float yScale = (1.0f * mPreviewHeight) / mOriginalHeight;
@@ -268,6 +282,7 @@ public class OCRActivity extends MonitoredActivity implements LayoutChoseListene
                     break;
                 }
                 case OCR.MESSAGE_END: {
+                    //TODO QUESTO CASE VIENE CHIAMATO QUANDO L'OCR è AL 99%, IL TESTO COMPLETO LO TROVI NELLA VARIABILE utf8String
                     saveDocument(mFinalPix, hocrString, utf8String, mAccuracy);
                     break;
                 }
@@ -280,16 +295,18 @@ public class OCRActivity extends MonitoredActivity implements LayoutChoseListene
 
     }
 
-    private void saveDocument(final Pix pix, final String hocrString, final String utf8String, final int accuracy) {
+    private ArrayList<Match> allMatch = new ArrayList<>();
+    File imageFile = null;
+    Uri documentUri = null;
 
+    private void saveDocument(final Pix pix, final String hocrString, final String utf8String, final int accuracy) {
         Util.startBackgroundJob(OCRActivity.this, "",
                 getText(R.string.saving_document).toString(), new Runnable() {
 
                     @Override
                     public void run() {
-                        File imageFile = null;
-                        Uri documentUri = null;
-
+                        imageFile = null;
+                        documentUri = null;
                         try {
                             imageFile = saveImage(pix);
                         } catch (IOException e) {
@@ -305,40 +322,59 @@ public class OCRActivity extends MonitoredActivity implements LayoutChoseListene
                                 }
                             });
                         }
+                        TextFairyApplication application = (TextFairyApplication) getApplicationContext();
+                        String correctResult = Html.fromHtml(utf8String).toString();
+                        application.resolver.setNormalResponse(correctResult);
+                        application.resolver.setCompleteElaborationListener(new CompleteElaborationListener() {
+                            @Override
+                            public void onElaborationComplete(ArrayList<Match> allMatchFound) {
+                                allMatch = allMatchFound;
+                                //TODO serve un metodo che trasformi in blob
 
-                        try {
+                                try {
+                                    HashMatchUtil utils = new HashMatchUtil();
+                                    String stringArrayMatch = utils.fromArrayToString(allMatch);
+                                    //ArrayList<Match> arrayFromString = utils.fromStringToArray(stringArrayMatch);
+                                    documentUri = saveDocumentToDB(imageFile, hocrString, stringArrayMatch);
+                                    if (imageFile != null) {
+                                        Util.createThumbnail(OCRActivity.this, imageFile, Integer.valueOf(documentUri.getLastPathSegment()));
+                                    }
+                                } catch (Exception e) {
+                                    e.printStackTrace();
 
-                            documentUri = saveDocumentToDB(imageFile, hocrString, utf8String);
-                            if (imageFile != null) {
-                                Util.createThumbnail(OCRActivity.this, imageFile, Integer.valueOf(documentUri.getLastPathSegment()));
-                            }
-                        } catch (RemoteException e) {
-                            e.printStackTrace();
+                                    runOnUiThread(new Runnable() {
 
-                            runOnUiThread(new Runnable() {
-
-                                @Override
-                                public void run() {
-                                    Toast.makeText(
-                                            getApplicationContext(),
-                                            getText(R.string.error_create_file),
-                                            Toast.LENGTH_LONG).show();
+                                        @Override
+                                        public void run() {
+                                            Toast.makeText(
+                                                    getApplicationContext(),
+                                                    getText(R.string.error_create_file),
+                                                    Toast.LENGTH_LONG).show();
+                                        }
+                                    });
+                                } finally {
+                                    recycleResultPix(pix);
+                                    if (documentUri != null && !isFinishing()) {
+                                        /**
+                                         Intent i;
+                                         i = new Intent(OCRActivity.this, DocumentActivity.class);
+                                         i.putExtra(DocumentActivity.EXTRA_ACCURACY, accuracy);
+                                         i.putExtra(DocumentActivity.EXTRA_LANGUAGE, mOcrLanguage);
+                                         i.setData(documentUri);
+                                         i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                         startActivity(i);
+                                         */
+                                        Intent intent = new Intent(OCRActivity.this, SingleBetActivity.class);
+                                        //intent.putExtra("testo_completo",utf8String);
+                                        intent.putParcelableArrayListExtra("all_match",allMatch);
+                                        startActivity(intent);
+                                        finish();
+                                        Screen.unlockOrientation(OCRActivity.this);
+                                    }
                                 }
-                            });
-                        } finally {
-                            recycleResultPix(pix);
-                            if (documentUri != null && !isFinishing()) {
-                                Intent i;
-                                i = new Intent(OCRActivity.this, DocumentActivity.class);
-                                i.putExtra(DocumentActivity.EXTRA_ACCURACY, accuracy);
-                                i.putExtra(DocumentActivity.EXTRA_LANGUAGE, mOcrLanguage);
-                                i.setData(documentUri);
-                                i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                                startActivity(i);
-                                finish();
-                                Screen.unlockOrientation(OCRActivity.this);
                             }
-                        }
+                        });
+
                     }
                 }, new Handler());
 
@@ -359,6 +395,7 @@ public class OCRActivity extends MonitoredActivity implements LayoutChoseListene
     private Uri saveDocumentToDB(File imageFile, String hocr, String plainText)
             throws RemoteException {
         ContentProviderClient client = null;
+
         try {
             ContentValues v = new ContentValues();
             if (imageFile != null) {
@@ -434,4 +471,6 @@ public class OCRActivity extends MonitoredActivity implements LayoutChoseListene
         mImageView.clear();
 
     }
+
+
 }

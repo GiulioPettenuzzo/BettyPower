@@ -289,6 +289,7 @@ public class DocumentActivity extends NewDocumentActivity implements LoaderManag
             return true;
         } else if (itemId == R.id.item_content) {
             Intent tocIndent = new Intent(this, TableOfContentsActivity.class);
+            //TODO
             Uri uri = Uri.parse(DocumentContentProvider.CONTENT_URI + "/" + getParentId());
             tocIndent.setData(uri);
             startActivityForResult(tocIndent, REQUEST_CODE_TABLE_OF_CONTENTS);

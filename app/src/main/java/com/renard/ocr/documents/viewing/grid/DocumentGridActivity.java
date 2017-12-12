@@ -15,9 +15,23 @@
  */
 package com.renard.ocr.documents.viewing.grid;
 
+import com.android.volley.DefaultRetryPolicy;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+import com.bettypower.SingleBetActivity;
+import com.bettypower.entities.PalimpsestMatch;
+import com.bettypower.entities.ParcelablePalimpsestMatch;
+import com.bettypower.entities.ParcelableTeam;
+import com.bettypower.unpacker.AllMatchesByPalimpsestURLUnpacker;
+import com.bettypower.unpacker.AllMatchesByPalimpsestUnpacker;
 import com.renard.ocr.HintDialog;
 import com.renard.ocr.PermissionGrantedEvent;
 import com.renard.ocr.R;
+import com.renard.ocr.TextFairyApplication;
 import com.renard.ocr.documents.creation.ImageSource;
 import com.renard.ocr.documents.creation.NewDocumentActivity;
 import com.renard.ocr.documents.creation.PixLoadStatus;
@@ -35,6 +49,7 @@ import com.renard.ocr.util.Util;
 
 import android.Manifest;
 import android.app.AlertDialog;
+import android.app.Application;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.ContentValues;
@@ -106,6 +121,7 @@ public class DocumentGridActivity extends NewDocumentActivity implements Documen
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        sendVolleyForPalimpsestMatch();
         setContentView(R.layout.activity_document_grid);
         initToolbar();
         initNavigationDrawer();
@@ -114,6 +130,224 @@ public class DocumentGridActivity extends NewDocumentActivity implements Documen
         if (savedInstanceState == null) {
             checkForImageIntent(getIntent());
         }
+    }
+
+    private void sendVolleyForPalimpsestMatch(){
+        final TextFairyApplication application = (TextFairyApplication) getApplicationContext();
+
+        RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
+        final StringRequest stringRequest = new StringRequest(Request.Method.GET, "http://www.betcalcio.it/home/home.asp?sid={592202F0-7763-4C6B-AFFD-02F9FEFD92B5}&idca=32&idpa=2",
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(final String response) {
+                        Log.i("primo volley", "uno");
+                        AllMatchesByPalimpsestURLUnpacker allMatchesByPalimpsestURLUnpacker = new AllMatchesByPalimpsestURLUnpacker(response);
+                        ArrayList<String> allUrl = allMatchesByPalimpsestURLUnpacker.getAllURL();
+
+                        //AllMatchesByPalimpsestUnpacker allMatchesByPalimpsestUnpacker = new AllMatchesByPalimpsestUnpacker(getApplicationContext(), currentURL, new AllMatchesByPalimpsestUnpacker.ResponseLoaderListener() {
+                        final AllMatchesByPalimpsestUnpacker allMatchesByPalimpsestUnpacker = new AllMatchesByPalimpsestUnpacker(getApplicationContext(), allUrl, new AllMatchesByPalimpsestUnpacker.ResponseLoaderListener() {
+
+                            @Override
+                            public void onFinishResponseLoading(ArrayList<PalimpsestMatch> allPalimpsestMatches) {
+                                allPalimpsestMatches = addPalimpsestForDebug(allPalimpsestMatches);
+                                allPalimpsestMatches = addSpanishPalimpsestForDebug(allPalimpsestMatches);
+                                allPalimpsestMatches = addReplatz(allPalimpsestMatches);
+                                allPalimpsestMatches = addFivePalimpsestForDebug(allPalimpsestMatches);
+                                allPalimpsestMatches = addFifteen(allPalimpsestMatches);
+                                allPalimpsestMatches = addBetter(allPalimpsestMatches);
+                                application.setAllPalimpsestMatch(allPalimpsestMatches);
+                                application.isPalimpsestMatchLoaded = true;
+                                if(application.allMatchLoadListener!=null)
+                                    application.allMatchLoadListener.onMatchLoaded(allPalimpsestMatches);
+
+                                Log.i("PALINSESTO NUMERO " ,String.valueOf(allPalimpsestMatches.size()));
+                                Toast toast = Toast.makeText(DocumentGridActivity.this, String.valueOf(allPalimpsestMatches.size()), Toast.LENGTH_SHORT);
+                                toast.show();
+                            }
+                        });
+
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.i("errore", error.toString());
+                Toast toast = Toast.makeText(DocumentGridActivity.this, "ERRORE VOLLEY", Toast.LENGTH_SHORT);
+                toast.show();
+            }
+        });
+        //stringRequest.setShouldCache(false);
+        stringRequest.setRetryPolicy(new DefaultRetryPolicy(DefaultRetryPolicy.DEFAULT_TIMEOUT_MS * 48,
+                0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+        queue.add(stringRequest);
+    }
+
+    private ArrayList<PalimpsestMatch> addPalimpsestForDebug(ArrayList<PalimpsestMatch> allPalimpsestMatch){
+        PalimpsestMatch paliOne = new ParcelablePalimpsestMatch(new ParcelableTeam("AMIENS"),new ParcelableTeam("OLYMPIQUE MARSIGLIA"),"27371","1050","17/09 13:00");
+        PalimpsestMatch paliTwo = new ParcelablePalimpsestMatch(new ParcelableTeam("RENNES"),new ParcelableTeam("NIZZA"),"27371","1034","17/09 16:15");
+        PalimpsestMatch paliTheree = new ParcelablePalimpsestMatch(new ParcelableTeam("ANGERS"),new ParcelableTeam("METZ"),"27371","1037","17/09 18:30");
+        PalimpsestMatch paliFour = new ParcelablePalimpsestMatch(new ParcelableTeam("PARIS SAINT-GERMAIN"),new ParcelableTeam("OLYMPIQUE LIONE"),"27371","1049","17/09 20:45");
+        PalimpsestMatch paliFive = new ParcelablePalimpsestMatch(new ParcelableTeam("NAPOLI"),new ParcelableTeam("BENEVENTO"),"27371","2512","17/09 15:00");
+        PalimpsestMatch paliSix = new ParcelablePalimpsestMatch(new ParcelableTeam("MILAN"),new ParcelableTeam("UDINESE"),"27371","2511","17/09 15:00");
+        PalimpsestMatch paliSeven = new ParcelablePalimpsestMatch(new ParcelableTeam("SPAL"),new ParcelableTeam("CAGLIARI"),"27371","2515","17/09 15:00");
+        PalimpsestMatch paliEight = new ParcelablePalimpsestMatch(new ParcelableTeam("TORINO"),new ParcelableTeam("SAMPDORIA"),"27371","2516","17/09 15:00");
+        PalimpsestMatch paliNine = new ParcelablePalimpsestMatch(new ParcelableTeam("CHIEVO VERONA"),new ParcelableTeam("ATALANTA"),"27371","2507","17/09 20:45");
+        PalimpsestMatch paliTen = new ParcelablePalimpsestMatch(new ParcelableTeam("GENOA"),new ParcelableTeam("LAZIO"),"27371","2510","17/09 12:00");
+
+        allPalimpsestMatch.add(paliOne);
+        allPalimpsestMatch.add(paliTwo);
+        allPalimpsestMatch.add(paliTheree);
+        allPalimpsestMatch.add(paliFour);
+        allPalimpsestMatch.add(paliFive);
+        allPalimpsestMatch.add(paliSix);
+        allPalimpsestMatch.add(paliSeven);
+        allPalimpsestMatch.add(paliEight);
+        allPalimpsestMatch.add(paliNine);
+        allPalimpsestMatch.add(paliTen);
+
+        return allPalimpsestMatch;
+
+    }
+
+    private ArrayList<PalimpsestMatch> addSpanishPalimpsestForDebug(ArrayList<PalimpsestMatch> allPalimpsestMatch){
+        PalimpsestMatch paliOne = new ParcelablePalimpsestMatch(new ParcelableTeam("HELLAS VERONA"),new ParcelableTeam("NAPOLES"),"1","33","19/08 20:45");
+        PalimpsestMatch paliTwo = new ParcelablePalimpsestMatch(new ParcelableTeam("JUVENTUS"),new ParcelableTeam("CAGLIARI"),"1234","435764","19/08 18:00");
+        PalimpsestMatch paliTheree = new ParcelablePalimpsestMatch(new ParcelableTeam("CROTONE"),new ParcelableTeam("AC MILAN"),"1","55","20/08 20:45");
+        PalimpsestMatch paliFour = new ParcelablePalimpsestMatch(new ParcelableTeam("BOLONIA"),new ParcelableTeam("TORINO"),"11","66","20/08 20:45");
+        PalimpsestMatch paliFive = new ParcelablePalimpsestMatch(new ParcelableTeam("INTER MILAN"),new ParcelableTeam("FIORENTINA"),"1111","77","20/08 20:45");
+        PalimpsestMatch paliSix = new ParcelablePalimpsestMatch(new ParcelableTeam("LAZIO"),new ParcelableTeam("SPAL"),"1111111","88","20/08 20:45");
+        PalimpsestMatch paliSeven = new ParcelablePalimpsestMatch(new ParcelableTeam("SAMPDORIA"),new ParcelableTeam("BENEVENTO"),"111","99","20/08 20:45");
+        PalimpsestMatch paliEight = new ParcelablePalimpsestMatch(new ParcelableTeam("ATALANTA"),new ParcelableTeam("ROMA"),"111","1010","20/08 18:00");
+        PalimpsestMatch paliNine = new ParcelablePalimpsestMatch(new ParcelableTeam("SASSUOLO"),new ParcelableTeam("GENOA"),"111","111","20/08 20:45");
+        PalimpsestMatch paliTen = new ParcelablePalimpsestMatch(new ParcelableTeam("UDINESE"),new ParcelableTeam("CHIEVO"),"1111","1122","20/08 20:45");
+
+        allPalimpsestMatch.add(paliOne);
+        allPalimpsestMatch.add(paliTwo);
+        allPalimpsestMatch.add(paliTheree);
+        allPalimpsestMatch.add(paliFour);
+        allPalimpsestMatch.add(paliFive);
+        allPalimpsestMatch.add(paliSix);
+        allPalimpsestMatch.add(paliSeven);
+        allPalimpsestMatch.add(paliEight);
+        allPalimpsestMatch.add(paliNine);
+        allPalimpsestMatch.add(paliTen);
+
+        return allPalimpsestMatch;
+
+    }
+
+
+
+    private ArrayList<PalimpsestMatch> addFivePalimpsestForDebug(ArrayList<PalimpsestMatch> allPalimpsestMatch){
+        PalimpsestMatch paliOne = new ParcelablePalimpsestMatch(new ParcelableTeam("REAL MADRID"),new ParcelableTeam("LEVANTE"),"27361","2856","09/09 13:00");
+        PalimpsestMatch paliTwo = new ParcelablePalimpsestMatch(new ParcelableTeam("VALENCIA"),new ParcelableTeam("ATLETICO MADRID"),"27361","2865","09/09 16:15");
+        PalimpsestMatch paliTheree = new ParcelablePalimpsestMatch(new ParcelableTeam("SIVIGLIA FC"),new ParcelableTeam("SD EIBAR"),"27361","2862","09/09 18:30");
+        PalimpsestMatch paliFour = new ParcelablePalimpsestMatch(new ParcelableTeam("BARCELLONA"),new ParcelableTeam("ESPANYOL BARCELLONA"),"27361","2860","09/09 20:45");
+        PalimpsestMatch paliFive = new ParcelablePalimpsestMatch(new ParcelableTeam("DEPORTIVO LA CORUNA"),new ParcelableTeam("REAL SOCIEDAD"),"27361","2857","10/09 12:00");
+
+        allPalimpsestMatch.add(paliOne);
+        allPalimpsestMatch.add(paliTwo);
+        allPalimpsestMatch.add(paliTheree);
+        allPalimpsestMatch.add(paliFour);
+        allPalimpsestMatch.add(paliFive);
+
+        return allPalimpsestMatch;
+
+    }
+
+    private ArrayList<PalimpsestMatch> addReplatz(ArrayList<PalimpsestMatch> allPalimpsestMatch){
+        PalimpsestMatch paliOne = new ParcelablePalimpsestMatch(new ParcelableTeam("JUVENTUS"),new ParcelableTeam("CAGLIARI"),"27331","4682","19/08 18:00");
+        PalimpsestMatch paliTwo = new ParcelablePalimpsestMatch(new ParcelableTeam("HELLAS VERONA"),new ParcelableTeam("NAPOLI"),"27331","4680","19/08 20:45");
+        PalimpsestMatch paliTheree = new ParcelablePalimpsestMatch(new ParcelableTeam("BOLOGNA"),new ParcelableTeam("TORINO"),"27331","4678","20/08 20:45");
+        PalimpsestMatch paliFour = new ParcelablePalimpsestMatch(new ParcelableTeam("INTER"),new ParcelableTeam("ACF FIORENTINA"),"27331","4681","20/08 20:45");
+        PalimpsestMatch paliFive = new ParcelablePalimpsestMatch(new ParcelableTeam("SASSUOLO"),new ParcelableTeam("GENOA"),"27331","4685","20/08 20:45");
+        PalimpsestMatch paliSix = new ParcelablePalimpsestMatch(new ParcelableTeam("UDINESE"),new ParcelableTeam("CHIEVO VERONA"),"27331","4686","20/08 20:45");
+        PalimpsestMatch paliSeven = new ParcelablePalimpsestMatch(new ParcelableTeam("SAMPDORIA"),new ParcelableTeam("BENEVENTO"),"27331","4712","20/08 20:45");
+        PalimpsestMatch paliEight = new ParcelablePalimpsestMatch(new ParcelableTeam("LAZIO"),new ParcelableTeam("SPAL"),"27331","4713","20/08 20:45");
+        PalimpsestMatch paliNine = new ParcelablePalimpsestMatch(new ParcelableTeam("ATALANTA"),new ParcelableTeam("ROMA"),"27331","4677","20/08 18:00");
+        PalimpsestMatch paliTen = new ParcelablePalimpsestMatch(new ParcelableTeam("CROTONE"),new ParcelableTeam("MILAN"),"27331","4679","21/08 20:45");
+        PalimpsestMatch paliEleven = new ParcelablePalimpsestMatch(new ParcelableTeam("BAYERN MONACO"),new ParcelableTeam("BAYERN LEVERKUSEN"),"27331","1760","18/08 20:30");
+        PalimpsestMatch paliTwelve = new ParcelablePalimpsestMatch(new ParcelableTeam("HOFFENHEIM"),new ParcelableTeam("WARDER BREMA"),"27331","1751","19/08 15:30");
+        PalimpsestMatch pailThirteen = new ParcelablePalimpsestMatch(new ParcelableTeam("AMBURGO"),new ParcelableTeam("AUGSBURG"),"27331","1769","19/08 15:30");
+        PalimpsestMatch paliFourteen = new ParcelablePalimpsestMatch(new ParcelableTeam("MAINZ 05"),new ParcelableTeam("HANNOVER"),"27331","1761","19/08 15:30");
+        PalimpsestMatch pailFifteen = new ParcelablePalimpsestMatch(new ParcelableTeam("WOLFSBURG"),new ParcelableTeam("BORUSSIA DORTMUND"),"27331","1763","19/08 15:30");
+
+
+        allPalimpsestMatch.add(paliOne);
+        allPalimpsestMatch.add(paliTwo);
+        allPalimpsestMatch.add(paliTheree);
+        allPalimpsestMatch.add(paliFour);
+        allPalimpsestMatch.add(paliFive);
+        allPalimpsestMatch.add(paliSix);
+        allPalimpsestMatch.add(paliSeven);
+        allPalimpsestMatch.add(paliEight);
+        allPalimpsestMatch.add(paliNine);
+        allPalimpsestMatch.add(paliTen);
+        allPalimpsestMatch.add(paliEleven);
+        allPalimpsestMatch.add(paliTwelve);
+        allPalimpsestMatch.add(pailThirteen);
+        allPalimpsestMatch.add(paliFourteen);
+        allPalimpsestMatch.add(pailFifteen);
+
+        return allPalimpsestMatch;
+    }
+
+    private ArrayList<PalimpsestMatch> addBetter(ArrayList<PalimpsestMatch> allPalimpsestMatch){
+        PalimpsestMatch paliOne = new ParcelablePalimpsestMatch(new ParcelableTeam("MELBOURNE CITY FC"),new ParcelableTeam("WELLINGTON PHOENIX"),"27421","3739","21/10 08:35");
+        PalimpsestMatch paliTwo = new ParcelablePalimpsestMatch(new ParcelableTeam("FC SKA-ENERGIYA KHABAROVSK"),new ParcelableTeam("UFA"),"27421","656","21/10 10:30");
+        PalimpsestMatch paliTheree = new ParcelablePalimpsestMatch(new ParcelableTeam("SYDNEY"),new ParcelableTeam("WESTERN SYDNEY"),"27421","3737","21/10 10:50");
+        PalimpsestMatch paliFour = new ParcelablePalimpsestMatch(new ParcelableTeam("FK TOSNO"),new ParcelableTeam("FC ROSTOV"),"27421","658","21/10 13:00");
+        PalimpsestMatch paliFive = new ParcelablePalimpsestMatch(new ParcelableTeam("LEVANTE"),new ParcelableTeam("GETAFE"),"27421","1463","21/10 13:00");
+        PalimpsestMatch paliSix = new ParcelablePalimpsestMatch(new ParcelableTeam("CHELSEA"),new ParcelableTeam("WATFORD FC"),"27421","554","21/10 13:30");
+        PalimpsestMatch paliSeven = new ParcelablePalimpsestMatch(new ParcelableTeam("CITTADELLA"),new ParcelableTeam("CREMONESE"),"27474","8651","26/11 15:00");
+        allPalimpsestMatch.add(paliOne);
+        allPalimpsestMatch.add(paliTwo);
+        allPalimpsestMatch.add(paliTheree);
+        allPalimpsestMatch.add(paliFour);
+        allPalimpsestMatch.add(paliFive);
+        allPalimpsestMatch.add(paliSix);
+        allPalimpsestMatch.add(paliSeven);
+        return allPalimpsestMatch;
+    }
+
+    private ArrayList<PalimpsestMatch> addFifteen(ArrayList<PalimpsestMatch> allPalimpsestMatch){
+        PalimpsestMatch paliOne = new ParcelablePalimpsestMatch(new ParcelableTeam("BAYER LEVERKUSEN"),new ParcelableTeam("FRIBURGO"),"27371","1533","17/09 15:30");
+        PalimpsestMatch paliTwo = new ParcelablePalimpsestMatch(new ParcelableTeam("BORUSSIA DORTMUND"),new ParcelableTeam("COLONIA"),"27371","1532","17/09 18:00");
+        PalimpsestMatch paliTheree = new ParcelablePalimpsestMatch(new ParcelableTeam("HOFFENHEIM"),new ParcelableTeam("HERTHA BERLINO"),"27371","1529","17/09 13:30");
+        PalimpsestMatch paliFour = new ParcelablePalimpsestMatch(new ParcelableTeam("REAL SOCIEDAD"),new ParcelableTeam("REAL MADRID"),"27371","2368","17/09 20:45");
+        PalimpsestMatch paliFive = new ParcelablePalimpsestMatch(new ParcelableTeam("GIRONA"),new ParcelableTeam("SIVIGLIA FC"),"27371","2374","17/09 16:15");
+        PalimpsestMatch paliSix = new ParcelablePalimpsestMatch(new ParcelableTeam("LAZIO"),new ParcelableTeam("SPAL"),"1111111","88","20/08 20:45");
+        PalimpsestMatch paliSeven = new ParcelablePalimpsestMatch(new ParcelableTeam("LAS PALMAS UD"),new ParcelableTeam("ATHLETIC BILBAO"),"27371","2375","17/09 18:30");
+        PalimpsestMatch paliEight = new ParcelablePalimpsestMatch(new ParcelableTeam("MONACO"),new ParcelableTeam("RACING STRASBURGO"),"27371","1035","16/09 17:00");
+        PalimpsestMatch paliNine = new ParcelablePalimpsestMatch(new ParcelableTeam("SASSUOLO"),new ParcelableTeam("JUVENTUS"),"27371","2514","17/09 12:30");
+        PalimpsestMatch paliTen = new ParcelablePalimpsestMatch(new ParcelableTeam("UDINESE"),new ParcelableTeam("CHIEVO"),"1111","1122","20/08 20:45");
+        PalimpsestMatch paliEleven = new ParcelablePalimpsestMatch(new ParcelableTeam("LAZIO"),new ParcelableTeam("SPAL"),"1111111","88","20/08 20:45");
+        PalimpsestMatch paliTwelve = new ParcelablePalimpsestMatch(new ParcelableTeam("SAMPDORIA"),new ParcelableTeam("BENEVENTO"),"111","99","20/08 20:45");
+        PalimpsestMatch pailThirteen = new ParcelablePalimpsestMatch(new ParcelableTeam("ATALANTA"),new ParcelableTeam("ROMA"),"111","1010","20/08 18:00");
+        PalimpsestMatch paliFourteen = new ParcelablePalimpsestMatch(new ParcelableTeam("SASSUOLO"),new ParcelableTeam("GENOA"),"111","111","20/08 20:45");
+        PalimpsestMatch pailFifteen = new ParcelablePalimpsestMatch(new ParcelableTeam("UDINESE"),new ParcelableTeam("CHIEVO"),"1111","1122","20/08 20:45");
+        PalimpsestMatch paliSixteen = new ParcelablePalimpsestMatch(new ParcelableTeam("ATLETICO MADRID"),new ParcelableTeam("BARCELLONA"),"27411","1829","14/10 20:45");
+        PalimpsestMatch pailSeventeen = new ParcelablePalimpsestMatch(new ParcelableTeam("ALAVES"),new ParcelableTeam("REAL SOCIEDAD"),"27411","1831","14/10 18:30");
+
+
+        allPalimpsestMatch.add(paliOne);
+        allPalimpsestMatch.add(paliTwo);
+        allPalimpsestMatch.add(paliTheree);
+        allPalimpsestMatch.add(paliFour);
+        allPalimpsestMatch.add(paliFive);
+        allPalimpsestMatch.add(paliSix);
+        allPalimpsestMatch.add(paliSeven);
+        allPalimpsestMatch.add(paliEight);
+        allPalimpsestMatch.add(paliNine);
+        allPalimpsestMatch.add(paliTen);
+        allPalimpsestMatch.add(paliEleven);
+        allPalimpsestMatch.add(paliTwelve);
+        allPalimpsestMatch.add(pailThirteen);
+        allPalimpsestMatch.add(paliFourteen);
+        allPalimpsestMatch.add(pailFifteen);
+        allPalimpsestMatch.add(paliSixteen);
+        allPalimpsestMatch.add(pailSeventeen);
+
+        return allPalimpsestMatch;
     }
 
     @Override
@@ -372,14 +606,14 @@ public class DocumentGridActivity extends NewDocumentActivity implements Documen
     }
 
     public class DocumentClickListener implements OnItemClickListener {
-
+//TODO qui è quando seleziono un item per vederne il contenuto
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             DocumentGridAdapter.DocumentViewHolder holder = (DocumentGridAdapter.DocumentViewHolder) view.getTag();
             if (sIsInSelectionMode) {
                 holder.gridElement.toggle();
             } else {
-                Intent i = new Intent(DocumentGridActivity.this, DocumentActivity.class);
+                Intent i = new Intent(DocumentGridActivity.this, SingleBetActivity.class);
                 long documentId = mDocumentAdapter.getItemId(position);
                 Uri uri = Uri.withAppendedPath(DocumentContentProvider.CONTENT_URI, String.valueOf(documentId));
                 i.setData(uri);
