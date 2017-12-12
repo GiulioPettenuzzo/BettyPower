@@ -1,0 +1,107 @@
+/**
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                    if (match.getAllHiddenResult().size() > 0 && isSelected.lastIndexOf(match) < 0) {
+                        if (clickCounter == 0) {
+                            originalHeight = holder.itemView.getHeight();
+                            clickCounter++;
+                        }
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                            elevation = holder.itemView.getElevation();
+                            holder.itemView.setElevation(50);
+                        }
+
+                        addLayouts(match.getAllHiddenResult(), holder);
+
+                        Log.i("height ", String.valueOf(holder.itemView.getHeight()));
+                        Animation a = new AlphaAnimation(1.00f, 0.00f); // Fade out
+                        a.setDuration(DURATION);
+                        a.setAnimationListener(new Animation.AnimationListener() {
+                            @Override
+                            public void onAnimationStart(Animation animation) {
+                            }
+
+                            @Override
+                            public void onAnimationEnd(Animation animation) {
+                                holder.hiddenResult.setVisibility(View.VISIBLE);
+                            }
+
+                            @Override
+                            public void onAnimationRepeat(Animation animation) {
+
+                            }
+                        });
+                        holder.hiddenResult.startAnimation(a);
+
+                        holder.hiddenResult.getViewTreeObserver().addOnGlobalLayoutListener(
+                                new ViewTreeObserver.OnGlobalLayoutListener() {
+                                    @Override
+                                    public void onGlobalLayout() {
+                                        // gets called after layout has been done but before display
+                                        // so we can get the height then hide the view
+
+                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                                            holder.hiddenResult.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                                        } else {
+                                            holder.hiddenResult.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+                                        }
+
+                                        hightValues[position] = holder.hiddenResult.getHeight();  // Ahaha!  Gotcha
+
+                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+                                            dropDownAnimation = ValueAnimator.ofInt(originalHeight, originalHeight + hightValues[position]); // These values in this method can be changed to expand however much you like
+                                            dropDownAnimation.setDuration(DURATION);
+                                            dropDownAnimation.setInterpolator(new AccelerateDecelerateInterpolator());
+                                            dropDownAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                                                @Override
+                                                public void onAnimationUpdate(ValueAnimator animation) {
+                                                    Integer value = null;
+                                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+                                                        value = (Integer) animation.getAnimatedValue();
+                                                    }
+                                                    holder.itemView.getLayoutParams().height = value.intValue();
+                                                    holder.hiddenResult.setVisibility(View.VISIBLE);
+                                                    if(holder.itemView.getLayoutParams().height==originalHeight+hightValues[position])
+                                                        holder.itemView.getLayoutParams().height = ConstraintLayout.LayoutParams.WRAP_CONTENT;
+
+                                                }
+                                            });
+                                            dropDownAnimation.start();
+                                        }
+                                    }
+
+                                });
+                        isSelected.add(match);
+
+                    } else if (isSelected.lastIndexOf(match) >= 0) {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                            dropDownAnimation = ValueAnimator.ofInt(originalHeight + hightValues[position], originalHeight);
+                            dropDownAnimation.setDuration(DURATION);
+                            dropDownAnimation.setInterpolator(new AccelerateDecelerateInterpolator());
+                            dropDownAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                                @Override
+                                public void onAnimationUpdate(ValueAnimator animation) {
+                                    Integer value = null;
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+                                        value = (Integer) animation.getAnimatedValue();
+                                    }
+                                    holder.itemView.getLayoutParams().height = value.intValue();
+                                    holder.hiddenResult.removeAllViews();
+                                    if(holder.itemView.getLayoutParams().height==originalHeight)
+                                        holder.itemView.getLayoutParams().height = ConstraintLayout.LayoutParams.WRAP_CONTENT;
+                                }
+                            });
+                            dropDownAnimation.start();
+                            holder.itemView.setElevation(elevation);
+                            hightValues[position] = 0;
+
+                        }
+                        else{
+                            holder.hiddenResult.removeAllViews();
+                        }
+                        isSelected.remove(match);
+                    }
+                }
+
+        });*/
