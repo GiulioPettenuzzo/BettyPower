@@ -68,7 +68,7 @@ public class SingleBetActivity extends AppCompatActivity {
     private SingleBetAdapter singleBetAdapter;
     private SwipeRefreshLayout swipeRefreshLayout;
     private FloatingActionButton refreshButton;
-//
+
     Unpacker unpacker;
     Toolbar toolbar;
     public ArrayList<Match> allMatch = new ArrayList<>();
