@@ -58,7 +58,7 @@ public class SingleBetAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     OutsideClicklistener outsideClicklistener;
     static Context context;
 
-    //normal constructor
+    //normal constructor...
     public SingleBetAdapter(Context context, ArrayList<Match> allMatches){
         this.context = context;
         this.allMatches = allMatches;
