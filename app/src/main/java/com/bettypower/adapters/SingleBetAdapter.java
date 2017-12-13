@@ -49,7 +49,7 @@ public class SingleBetAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     private ArrayList<Match> allMatches = new ArrayList<>();
     private ArrayList<Match> isSelected = new ArrayList<>();
     float elevation = 0;
-    private Uri uri;
+    private Uri uri;M
 
     private static final String ACTION_GOAL = "Goal";
     private static final String ACTION_YELLOWCARD = "Yellowcard";
