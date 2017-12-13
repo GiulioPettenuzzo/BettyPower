@@ -67,7 +67,7 @@ public class SingleBetAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     public SingleBetAdapter(Context context, ArrayList<Match> allMatches, ArrayList<Match> allSelectedMatch){
         this.context = context;
         this.allMatches = allMatches;
-        isSelected = allSelectedMatch;
+        isSelected = allSelectedMatch;m
     }
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
