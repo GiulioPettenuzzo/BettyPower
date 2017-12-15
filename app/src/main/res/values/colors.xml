@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    
-    <color name="dark_grey">#ff333333</color>
+    <color name="action_bar_edit_mode">#006249</color>
+    <color name="dark_grey">#34861b</color>
     <color name="document_grid_background">#dedede</color>
     <color name="primary">#FF004428</color>
     <color name="accent">#009e8c</color>

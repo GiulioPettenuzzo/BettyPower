@@ -75,7 +75,7 @@
     <string name="edit_dialog_title">Enter a title for your document</string>
     <string name="delete_error">Sorry, I could not delete this document</string>
     <string name="error_could_not_take_photo">Sorry, I could not read the photo</string>
-    <string name="empty"/>
+    <string name="empty" />
     <string name="cropping_image">Cropping image</string>
     <string name="error_title">Error</string>
     <string name="pdf_creation_message">Creating your PDF!</string>

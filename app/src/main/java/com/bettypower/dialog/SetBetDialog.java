@@ -67,7 +67,10 @@ public class SetBetDialog extends Dialog {
         saveTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                match.setQuote(showQuote.getText().toString());
+                if(showQuote.getHint()=="quota")
+                    match.setQuote(null);
+                else
+                    match.setQuote(showQuote.getText().toString());
                 match.setBet(showBet.getText().toString());
                 match.setBetKind(showBetKindTextView.getText().toString());
                 finishEdittingDialogListener.onEdittingDialogFinish(match);
@@ -146,11 +149,14 @@ public class SetBetDialog extends Dialog {
         selectQuotePicker.setMinValue(101);
         selectQuotePicker.setMaxValue(9999);
         selectQuotePicker.setWrapSelectorWheel(false);
-        if(match.getQuote()!=null){
+        if(match.getQuote()!=null && !match.getQuote().equals("")){
             selectQuotePicker.setValue(fromQuoteToNumber(match.getQuote()));
+            showQuote.setText(getQuoteFormat(selectQuotePicker.getValue()));
         }
         else{
             selectQuotePicker.setValue(200);
+            showQuote.setHint("quota");
+            showQuote.setHintTextColor(context.getResources().getColor(R.color.grey6));
         }
         selectQuotePicker.setFormatter(new com.shawnlin.numberpicker.NumberPicker.Formatter() {
             @Override
@@ -159,7 +165,6 @@ public class SetBetDialog extends Dialog {
                 return getQuoteFormat(value);
             }
         });
-        showQuote.setText(getQuoteFormat(selectQuotePicker.getValue()));
         selectQuotePicker.setOnValueChangedListener(new com.shawnlin.numberpicker.NumberPicker.OnValueChangeListener() {
             @Override
             public void onValueChange(com.shawnlin.numberpicker.NumberPicker picker, int oldVal, int newVal) {
@@ -177,14 +182,14 @@ public class SetBetDialog extends Dialog {
                 }
             }
         });
-        showQuote.setOnTouchListener(new View.OnTouchListener() {
+        showQuote.setOnClickListener(new View.OnClickListener() {
             @Override
-            public boolean onTouch(View v, MotionEvent event) {
+            public void onClick(View v) {
                 v.setFocusable(true);
                 v.setFocusableInTouchMode(true);
-                return false;
             }
         });
+
         showQuote.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {

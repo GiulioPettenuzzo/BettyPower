@@ -1,13 +1,16 @@
 package com.bettypower;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -16,6 +19,7 @@ import android.text.Html;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
@@ -55,6 +59,7 @@ import com.renard.ocr.R;
 import com.renard.ocr.TextFairyApplication;
 import com.renard.ocr.documents.viewing.DocumentContentProvider;
 import com.renard.ocr.documents.viewing.grid.DocumentGridActivity;
+import com.renard.ocr.documents.viewing.single.DocumentActivity;
 
 import java.util.ArrayList;
 
@@ -68,9 +73,9 @@ public class SingleBetActivity extends AppCompatActivity {
     private SingleBetAdapter singleBetAdapter;
     private SwipeRefreshLayout swipeRefreshLayout;
     private FloatingActionButton refreshButton;
+    private boolean editMode = false;
 
-    Unpacker unpacker;
-    Toolbar toolbar;
+    private Toolbar toolbar;
     public ArrayList<Match> allMatch = new ArrayList<>();
     public ArrayList<Match> allMatchSelected = new ArrayList<>();
     public ArrayList<String> allLogosURL = new ArrayList<>();
@@ -78,11 +83,14 @@ public class SingleBetActivity extends AppCompatActivity {
     private boolean isClicking = false;
     private boolean isAllLogoUploaded = true;
     private MatchesLoadListener allMatchLoadListener;
+    private Uri uri;
 
     private String url = "http://www.goalserve.com/updaters/soccerupdate.aspx";
     private String image_url = "http://www.fishtagram.it/loghi.html";
     private static final String ALL_MATCH_STATE = "save_all_match";
     private static final String ALL_MATCH_SELECTED_STATE = "all_match_selected_state";
+    private static final String EDIT_MODE = "edit_mode";
+    private static final String IMAGE_URI = "image_uri";
 
 
     @Override
@@ -102,6 +110,10 @@ public class SingleBetActivity extends AppCompatActivity {
             else{
                 singleBetAdapter = new SingleBetAdapter(getApplicationContext(),allMatch);
             }
+            if (savedInstanceState.containsKey(EDIT_MODE))
+                editMode = savedInstanceState.getBoolean(EDIT_MODE);
+            if(savedInstanceState.containsKey(EDIT_MODE))
+                uri = savedInstanceState.getParcelable(IMAGE_URI);
              singleBetAdapter.setHasStableIds(true);
              rVSingleBet.setAdapter(singleBetAdapter);
              singleBetAdapter.setOutsideClickListener(new ActivityClickListener());
@@ -123,6 +135,8 @@ public class SingleBetActivity extends AppCompatActivity {
         if(singleBetAdapter!=null&&singleBetAdapter.getSelectedMatch()!=null) {
             outState.putParcelableArrayList(ALL_MATCH_SELECTED_STATE, singleBetAdapter.getSelectedMatch());
         }
+        outState.putBoolean(EDIT_MODE,editMode);
+        outState.putParcelable(IMAGE_URI,uri);
         super.onSaveInstanceState(outState);
     }
 
@@ -177,102 +191,92 @@ public class SingleBetActivity extends AppCompatActivity {
                 R.color.toolbar_background_light);
 
     }
-/**
-    private void firstTimeMatchLoader(){
-        RequestQueue queue = Volley.newRequestQueue(this);
-        final StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        unpacker = new goalServeUnpacker(response);
-                        allMatch = unpacker.getAllMatches();
 
-                        ArrayList<Match> allMatches = new ArrayList<>();
-                        //da qui : SOLO LA PRIMA VOLTA CHE L'UTENTE REGISTRA LA SCHEDINA
-                        for (int i = 0; i <= 5; i++) {*/
-                            //TODO quando avrai inserito tutti i loghi non avrai piu bisogno di questo
-                            /**
-                             Team teamhome = new ParcelableTeam("barcellona");
-                             allMatch.get(i).setHomeTeam(teamhome);
-                             Team teamaway = new ParcelableTeam("realmadrid");
-                             allMatch.get(i).setAwayTeam(teamaway);
-                             */
-    /**
-     * Initialize the contents of the Activity's standard options menu.  You
-     * should place your menu items in to <var>menu</var>.
-     * <p>
-     * <p>This is only called once, the first time the options menu is
-     * displayed.  To update the menu every time it is displayed, see
-     * {@link #onPrepareOptionsMenu}.
-     * <p>
-     * <p>The default implementation populates the menu with standard system
-     * menu items.  These are placed in the {@link Menu#CATEGORY_SYSTEM} group so that
-     * they will be correctly ordered with application-defined menu items.
-     * Deriving classes should always call through to the base implementation.
-     * <p>
-     * <p>You can safely hold on to <var>menu</var> (and any items created
-     * from it), making modifications to it as desired, until the next
-     * time onCreateOptionsMenu() is called.
-     * <p>
-     * <p>When you add items to the menu, you can implement the Activity's
-     * {@link #onOptionsItemSelected} method to handle them there.
-     *
-     * @param menu The options menu in which you place your items.
-     * @return You must return true for the menu to be displayed;
-     * if you return false it will not be shown.
-     * @see #onPrepareOptionsMenu
-     * @see #onOptionsItemSelected
-     */
+    MenuItem switchMenuItem;
+    MenuItem shareMenuItem;
+    MenuItem editMenuItem;
+    MenuItem confirmMenuItem;
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.single_bet_action_menu, menu);
+        switchMenuItem = menu.findItem(R.id.switch_menu_item);
+        shareMenuItem = menu.findItem(R.id.share_menu_item);
+        editMenuItem = menu.findItem(R.id.edit_menu_item);
+        confirmMenuItem = menu.findItem(R.id.confirm);
+        if(editMode)
+            enableEditStyle();
         return super.onCreateOptionsMenu(menu);
     }
 
-    //TODO
-    /*
     @Override
-public boolean onOptionsItemSelected(MenuItem item) {
-    // Handle item selection
-    switch (item.getItemId()) {
-    case R.id.new_game:
-        newGame();
-        return true;
-    case R.id.help:
-        showHelp();
-        return true;
-    default:
-        return super.onOptionsItemSelected(item);
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.switch_menu_item:
+                Intent intent = new Intent(SingleBetActivity.this,SingleBetImageActivity.class);
+                intent.putExtra("image_uri",uri);
+                intent.putExtra("edit_mode",editMode);
+                startActivity(intent);
+                return true;
+            case R.id.share_menu_item:
+                Log.i("share_menu_item","share_menu_item");
+                return true;
+            case R.id.edit_menu_item:
+                enableEditStyle();
+                return true;
+            case R.id.confirm:
+                HashMatchUtil utils = new HashMatchUtil();
+                String stringArrayMatch = utils.fromArrayToString(allMatch);
+                ContentValues values = new ContentValues();
+                values.put(DocumentContentProvider.Columns.OCR_TEXT, stringArrayMatch);
+                getApplicationContext().getContentResolver().update(uri,values,null,null);
+                disableEditStyle();
+                return true;
+            case android.R.id.home:
+                Cursor c = getContentResolver().query(uri, new String[]{DocumentContentProvider.Columns.OCR_TEXT}, null, null, null);
+                c.moveToFirst();
+                String text = c.getString(c.getPosition());
+                HashMatchUtil util = new HashMatchUtil();
+                allMatch = util.fromStringToArray(text);
+                singleBetAdapter.setAllMatches(allMatch);
+                disableEditStyle();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
-}
-     */
-    /**
-                            allMatches.add(allMatch.get(i));
 
-                        }
-                        allMatch = allMatches;
-                        singleBetAdapter = new SingleBetAdapter(getApplicationContext(), allMatch);
-                        singleBetAdapter.setHasStableIds(true);
-                        rVSingleBet.setAdapter(singleBetAdapter);
-                        allMatchLoadListener.onMatchesLoaded();
-                        singleBetAdapter.setOutsideClickListener(new ActivityClickListener());
+    private void enableEditStyle(){
+        toolbar.setNavigationIcon(R.drawable.cross);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        editMenuItem.setVisible(false);
+        shareMenuItem.setVisible(false);
+        confirmMenuItem.setVisible(true);
+        editMode = true;
+        singleBetAdapter.setEditMode(true);
+        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.action_bar_edit_mode)));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            getWindow().setStatusBarColor(getResources().getColor(R.color.action_bar_edit_mode));
+        }
+    }
 
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Toast toast = Toast.makeText(getApplicationContext(),R.string.check_connection, Toast.LENGTH_SHORT);
-                toast.show();
-                refreshButton.setVisibility(View.VISIBLE);
-                Log.i("errore", error.toString());
+    private void disableEditStyle(){
+        toolbar.setNavigationIcon(null);
+        getSupportActionBar().setDisplayShowTitleEnabled(true);
+        editMenuItem.setVisible(true);
+        shareMenuItem.setVisible(true);
+        confirmMenuItem.setVisible(false);
+        editMode = false;
+        singleBetAdapter.setEditMode(false);
+        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.primary)));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            getWindow().setStatusBarColor(getResources().getColor(R.color.primary));
+        }
+    }
 
-            }
-        });
-        stringRequest.setShouldCache(false);
+    //TODO
 
-        queue.add(stringRequest);
-    }*/
 
     private void firstTimeMatchLoader(){
         Intent intent = getIntent();
@@ -280,7 +284,7 @@ public boolean onOptionsItemSelected(MenuItem item) {
         final TextFairyApplication application = (TextFairyApplication) getApplicationContext();
 
         allMatch = intent.getParcelableArrayListExtra("all_match");
-        Uri uri = intent.getData();
+        uri = intent.getData();
         if(allMatch == null){
             Cursor c = getContentResolver().query(uri, new String[]{DocumentContentProvider.Columns.OCR_TEXT}, null, null, null);
             c.moveToFirst();
@@ -294,142 +298,6 @@ public boolean onOptionsItemSelected(MenuItem item) {
         rVSingleBet.setAdapter(singleBetAdapter);
         allMatchLoadListener.onMatchesLoaded();
         singleBetAdapter.setOutsideClickListener(new ActivityClickListener());
-    }
-    private ArrayList<Match> addBetter(ArrayList<Match> allPalimpsestMatch){
-        Match paliOne = new ParcelableMatch(new ParcelableTeam("Melbourne City FC"),new ParcelableTeam("Wellington Phoenix"));
-        paliOne.setTime("21/10 08:35");
-        paliOne.setHomeResult("1");
-        paliOne.setAwayResult("0");
-        paliOne.setBet("GOAL");
-        HiddenResult hiddenResultOne = new ParcelableHiddenResult("Matthew Ridenton","68'","Yellowcard",1);
-        HiddenResult hiddenResultTwo = new ParcelableHiddenResult("Ross McCormack","69'","Goal",0);
-        HiddenResult hiddenResultThree = new ParcelableHiddenResult("Ross McCormack","81'","Yellowcard",0);
-        ArrayList<HiddenResult> result = new ArrayList<>();
-        result.add(hiddenResultOne);
-        result.add(hiddenResultTwo);
-        result.add(hiddenResultThree);
-        paliOne.setAllHiddenResult(result);
-
-        Match paliTwo = new ParcelableMatch(new ParcelableTeam("FC Ska-Energiya Khabarovsk"),new ParcelableTeam("UFA"));
-        paliTwo.setTime("21/10 10:30");
-        paliTwo.setHomeResult("2");
-        paliTwo.setAwayResult("2");
-        paliTwo.setBet("NO GOAL");
-        HiddenResult hiddenResultFour = new ParcelableHiddenResult("Aleksandr Dimidko","11'","Goal",0);
-        HiddenResult hiddenResultFive = new ParcelableHiddenResult("Pavel Alikin","30'","Yellowcard",1);
-        HiddenResult hiddenResultSix = new ParcelableHiddenResult("Denys Dedechko","39'","Goal",0);
-        HiddenResult hiddenResultSeven = new ParcelableHiddenResult("Denis Tumasyan","44'","Yellowcard",1);
-        HiddenResult hiddenResultEight = new ParcelableHiddenResult("Vyacheslav Krotov","54'","Goal",1);
-        HiddenResult hiddenResultNine = new ParcelableHiddenResult("Bojan Jokić","56'","Yellowcard",1);
-        HiddenResult hiddenResultTen = new ParcelableHiddenResult("Giorgi Navalovski","63'","Yellowcard",0);
-        HiddenResult hiddenResultEleven = new ParcelableHiddenResult("Vyacheslav Krotov","72'","Goal",1);
-        HiddenResult hiddenResultTwelve = new ParcelableHiddenResult("Konstantin Savichev","89'","Redcard",0);
-        ArrayList<HiddenResult> resultTwo = new ArrayList<>();
-        result.add(hiddenResultFour);
-        result.add(hiddenResultFive);
-        result.add(hiddenResultSix);
-        result.add(hiddenResultSeven);
-        result.add(hiddenResultEight);
-        result.add(hiddenResultNine);
-        result.add(hiddenResultTen);
-        result.add(hiddenResultEleven);
-        result.add(hiddenResultTwelve);
-        paliTwo.setAllHiddenResult(result);
-
-        Match paliTheree = new ParcelableMatch(new ParcelableTeam("Sydney"),new ParcelableTeam("Western Sydney"));
-        paliTheree.setTime("21/10 10:50");
-        paliTheree.setHomeResult("2");
-        paliTheree.setAwayResult("2");
-        paliTheree.setBet("1X");
-        ArrayList<HiddenResult> resultThree = new ArrayList<>();
-        HiddenResult hiddenResultFourTeen = new ParcelableHiddenResult("Oriol Riera","3'","Goal",1);
-        HiddenResult hiddenResultThirteen = new ParcelableHiddenResult("Bobô","38'","Goal",0);
-        HiddenResult hiddenResultSixTeen = new ParcelableHiddenResult("Brendan Hamill","30'","Goal",1);
-        HiddenResult hiddenResultFifteen = new ParcelableHiddenResult("Joshua Brillante","61'","Goal",0);
-        resultThree.add(hiddenResultThirteen);
-        resultThree.add(hiddenResultFourTeen);
-        resultThree.add(hiddenResultSixTeen);
-        resultThree.add(hiddenResultFifteen);
-        paliTheree.setAllHiddenResult(resultThree);
-
-        Match paliFour = new ParcelableMatch(new ParcelableTeam("FK Tonso"),new ParcelableTeam("FC Rostov"));
-        paliFour.setTime("21/10 13:00");
-        paliFour.setHomeResult("1");
-        paliFour.setAwayResult("1");
-        paliFour.setBet("OVER 2,5");
-        ArrayList<HiddenResult> resultFour = new ArrayList<>();
-        HiddenResult hiddenResultTwenty = new ParcelableHiddenResult("Yevgeni Markov","17'","Goal",0);
-        HiddenResult hiddenResultTwentyOne = new ParcelableHiddenResult("Yevgeni Chernov","21'","Yellowcard",0);
-        HiddenResult hiddenResultTwentyTwo = new ParcelableHiddenResult("Sergei Pesyakov","33'","Yellowcard",1);
-        HiddenResult hiddenResultTwentyThree = new ParcelableHiddenResult("Nuno Miguel Monteiro Rocha","33'","Yellowcard",0);
-        HiddenResult hiddenResultTwentyFour = new ParcelableHiddenResult("Sverrir Ingi Ingason","56'","Goal",1);
-        HiddenResult hiddenResultTwentyFive = new ParcelableHiddenResult("Rade Dugalić","72'","Yellowcard",0);
-        resultFour.add(hiddenResultTwenty);
-        resultFour.add(hiddenResultTwentyOne);
-        resultFour.add(hiddenResultTwentyTwo);
-        resultFour.add(hiddenResultTwentyThree);
-        resultFour.add(hiddenResultTwentyFour);
-        resultFour.add(hiddenResultTwentyFive);
-        paliFour.setAllHiddenResult(resultFour);
-
-        Match paliFive = new ParcelableMatch(new ParcelableTeam("Levante"),new ParcelableTeam("Getafe"));
-        paliFive.setTime("21/10 13:00");
-        paliFive.setHomeResult("1");
-        paliFive.setAwayResult("1");
-        paliFive.setBet("2");
-        ArrayList<HiddenResult> resultFive = new ArrayList<>();
-        HiddenResult hiddenResultThirty = new ParcelableHiddenResult("Mauro Arambarri","5'","Yellowcard",1);
-        HiddenResult hiddenResultThirtyOne = new ParcelableHiddenResult("Cala","14'","Yellowcard",1);
-        HiddenResult hiddenResultThirtyTwo = new ParcelableHiddenResult("Jefferson Lerma","42'","Yellowcard",0);
-        HiddenResult hiddenResultThirtyThree = new ParcelableHiddenResult("Fayçal Fajr","58'","Goal",1);
-        HiddenResult hiddenResultThirtyFour = new ParcelableHiddenResult("José Luis Morales Nogales","62'","Goal",0);
-        HiddenResult hiddenResultThirtySix = new ParcelableHiddenResult("Francisco Portillo","90'","Redcard",1);
-        resultFive.add(hiddenResultThirty);
-        resultFive.add(hiddenResultThirtyOne);
-        resultFive.add(hiddenResultThirtyTwo);
-        resultFive.add(hiddenResultThirtyThree);
-        resultFive.add(hiddenResultThirtyFour);
-        resultFive.add(hiddenResultThirtySix);
-        paliFive.setAllHiddenResult(resultFive);
-
-
-
-        Match paliSix = new ParcelableMatch(new ParcelableTeam("Chelsea"),new ParcelableTeam("Wataford FC"));
-        paliSix.setTime("21/10 13:30");
-        paliSix.setHomeResult("4");
-        paliSix.setAwayResult("2");
-        paliSix.setBet("1");
-        ArrayList<HiddenResult> resultSix = new ArrayList<>();
-        HiddenResult hiddenResultFourty = new ParcelableHiddenResult("José Holebas","12'","Yellowcard",1);
-        HiddenResult hiddenResultFourtyOne = new ParcelableHiddenResult("Pedro","12'","Goal",0);
-        HiddenResult hiddenResultFourtyTwo = new ParcelableHiddenResult("Adrian Mariappa","19'","Yellowcard",1);
-        HiddenResult hiddenResultFourtyThree = new ParcelableHiddenResult("Antonio Rüdiger","23'","Yellowcard",0);
-        HiddenResult hiddenResultFourtyFour = new ParcelableHiddenResult("Abdoulaye Doucouré","45+2'","Goal",1);
-        HiddenResult hiddenResultFourtySix = new ParcelableHiddenResult("Roberto Pereyra","49'","Goal",1);
-        HiddenResult hiddenResultFourtySeven = new ParcelableHiddenResult("Álvaro Morata","56'","Yellowcard",0);
-        HiddenResult hiddenResultFourtyEight = new ParcelableHiddenResult("Michy Batshuayi","71'","Goal",0);
-        HiddenResult hiddenResultFourtyNinet = new ParcelableHiddenResult("César Azpilicueta","87'","Goal",0);
-        HiddenResult hiddenResultFourtyTen = new ParcelableHiddenResult("Michy Batshuayi","90'","Goal",0);
-        resultSix.add(hiddenResultFourty);
-        resultSix.add(hiddenResultFourtyOne);
-        resultSix.add(hiddenResultFourtyTwo);
-        resultSix.add(hiddenResultFourtyThree);
-        resultSix.add(hiddenResultFourtyFour);
-        resultSix.add(hiddenResultFourtySix);
-        resultSix.add(hiddenResultFourtySeven);
-        resultSix.add(hiddenResultFourtyEight);
-        resultSix.add(hiddenResultFourtyNinet);
-        resultSix.add(hiddenResultFourtyTen);
-        paliSix.setAllHiddenResult(resultSix);
-
-
-        allPalimpsestMatch.add(paliOne);
-        allPalimpsestMatch.add(paliTwo);
-        allPalimpsestMatch.add(paliTheree);
-        allPalimpsestMatch.add(paliFour);
-        allPalimpsestMatch.add(paliFive);
-        allPalimpsestMatch.add(paliSix);
-        return allPalimpsestMatch;
     }
 
     //TODO CLICK LISTENER CALLBACK

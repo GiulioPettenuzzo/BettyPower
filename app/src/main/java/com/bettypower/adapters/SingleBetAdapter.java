@@ -48,7 +48,8 @@ public class SingleBetAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
      */
     private ArrayList<Match> allMatches = new ArrayList<>();
     private ArrayList<Match> isSelected = new ArrayList<>();
-    float elevation = 0;
+    private float elevation = 0;
+    private boolean editMode = false;
     private Uri uri;
 
     private static final String ACTION_GOAL = "Goal";
@@ -67,7 +68,7 @@ public class SingleBetAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     public SingleBetAdapter(Context context, ArrayList<Match> allMatches, ArrayList<Match> allSelectedMatch){
         this.context = context;
         this.allMatches = allMatches;
-        isSelected = allSelectedMatch;m
+        isSelected = allSelectedMatch;
     }
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -87,12 +88,19 @@ public class SingleBetAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     @Override
     public void onViewRecycled(final RecyclerView.ViewHolder holder) {
         super.onViewRecycled(holder);
-        SingleBetAdapter.ViewHolder viewHolder = (SingleBetAdapter.ViewHolder) holder;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            viewHolder.itemView.setElevation(elevation);
+        switch (holder.getItemViewType()) {
+            case 0:
+                SingleBetAdapter.ViewHolder viewHolder = (SingleBetAdapter.ViewHolder) holder;
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                     viewHolder.itemView.setElevation(elevation);
+                }
+                viewHolder.hiddenResult.removeAllViews();
+                Log.i("sto", "reciclando");
+                break;
+            case 1:
+                SingleBetAdapter.LastItemViewHolder lastItemViewHolder = (SingleBetAdapter.LastItemViewHolder) holder;
+                break;
         }
-        viewHolder.hiddenResult.removeAllViews();
-        Log.i("sto", "reciclando");
     }
 
     /**
@@ -109,13 +117,19 @@ public class SingleBetAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     @Override
     public void onViewAttachedToWindow(RecyclerView.ViewHolder holder) {
         super.onViewAttachedToWindow(holder);
-        if(holder.getItemViewType() == 0) {
-            SingleBetAdapter.ViewHolder viewHolder = (SingleBetAdapter.ViewHolder) holder;
-            if (viewHolder.isSelected) {
-                viewHolder.dropDownImageView.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_keyboard_arrow_up_black_24px));
-            } else {
-                viewHolder.dropDownImageView.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_keyboard_arrow_down_black_24px));
-            }
+        switch (holder.getItemViewType()) {
+            case 0:
+                SingleBetAdapter.ViewHolder viewHolder = (SingleBetAdapter.ViewHolder) holder;
+                    if (viewHolder.isSelected) {
+                      viewHolder.dropDownImageView.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_keyboard_arrow_up_black_24px));
+                     } else {
+                     viewHolder.dropDownImageView.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_keyboard_arrow_down_black_24px));
+                     }
+                break;
+            case 1:
+                SingleBetAdapter.LastItemViewHolder lastItemViewHolder = (SingleBetAdapter.LastItemViewHolder) holder;
+                break;
+
         }
     }
 
@@ -170,7 +184,31 @@ public class SingleBetAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
                     }
                 }
 
-                outsideClicklistener.onItemClicked(context,viewHolder,match,isSelected);
+                if(editMode){
+                    viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            SetBetDialog selectBetDialog = new SetBetDialog(context,match);
+                            selectBetDialog.show();
+                            selectBetDialog.setFinishEdittingDialogListener(new SetBetDialog.FinishEdittingDialogListener() {
+                                @Override
+                                public void onEdittingDialogFinish(Match editMatch) {
+                                    viewHolder.bet.setText(editMatch.getBet());
+                                    viewHolder.betKind.setText(editMatch.getBetKind());
+                                    viewHolder.quote.setText(editMatch.getQuote());
+                                    match.setBetKind(editMatch.getBetKind());
+                                    match.setBet(editMatch.getBet());
+                                    match.setQuote(editMatch.getQuote());
+                                }
+                            });
+                        }
+                    });
+                }
+                else {
+                    outsideClicklistener.onItemClicked(context, viewHolder, match, isSelected);
+                }
+                break;
+                /*
                 viewHolder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
                     @Override
                     public boolean onLongClick(View v) {
@@ -197,7 +235,9 @@ public class SingleBetAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
                     }
                 });
                 break;
+                */
             case 1:
+                SingleBetAdapter.LastItemViewHolder lastItemViewHolder = (SingleBetAdapter.LastItemViewHolder) holder;
                 break;
         }
 
@@ -333,6 +373,11 @@ public class SingleBetAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
 
     public void setUri(Uri uri){
         this.uri = uri;
+    }
+
+    public void setEditMode(boolean editMode){
+        this.editMode = editMode;
+        notifyDataSetChanged();
     }
 
     public interface OutsideClicklistener{
