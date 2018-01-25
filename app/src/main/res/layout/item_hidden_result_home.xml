@@ -15,9 +15,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="8dp"
-        android:layout_marginStart="8dp"
         android:text="Lionel Messi "
-        android:textColor="@color/Tekt_dark_lighter"
+        android:textColor="@color/common_plus_signin_btn_text_light_focused"
         android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toRightOf="@+id/action_time"
@@ -41,27 +40,25 @@
         android:id="@+id/action_time"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginLeft="6dp"
         android:background="@android:color/background_light"
         android:text="90'"
         android:textColor="@android:color/darker_gray"
         android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toRightOf="@+id/home_action"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginLeft="6dp"
-        android:layout_marginStart="6dp" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/action_result"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginRight="4dp"
         android:text="[1:0]"
         android:textColor="@color/Tekt_dark_lighter"
-        android:textSize="20sp"
-        app:layout_constraintTop_toTopOf="parent"
+        android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="parent"
-        android:layout_marginRight="4dp"
         app:layout_constraintRight_toRightOf="parent"
-        android:layout_marginEnd="4dp" />
+        app:layout_constraintTop_toTopOf="parent" />
 
 </android.support.constraint.ConstraintLayout>

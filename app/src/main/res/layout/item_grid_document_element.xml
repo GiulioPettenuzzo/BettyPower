@@ -1,54 +1,107 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.renard.ocr.documents.viewing.grid.CheckableGridElement xmlns:android="http://schemas.android.com/apk/res/android"
-                                                            android:layout_width="wrap_content"
-                                                            android:layout_height="wrap_content"
-                                                            android:layout_gravity="center" >
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center">
 
     <RelativeLayout
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="5dp"
+        android:layout_marginLeft="3dp"
+        android:layout_marginRight="3dp"
         android:background="@drawable/dropshadow"
-        android:paddingBottom="@dimen/dropshadow_padding_bottom"
-        android:paddingLeft="@dimen/dropshadow_padding_left"
-        android:paddingRight="@dimen/dropshadow_padding_right"
-        android:paddingTop="@dimen/dropshadow_padding_top">
+        android:elevation="0dp">
 
         <TextView
             android:id="@+id/title"
             style="@style/DocumentCaptionText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
             android:layout_alignParentBottom="true"
+            android:layout_gravity="center"
             android:gravity="center_vertical|center_horizontal"
             android:maxLines="1" />
 
-        <ImageView
-            android:id="@+id/thumb"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" 
-            android:contentDescription="@string/empty"/>
+        <android.support.constraint.ConstraintLayout
+            android:id="@+id/bet_information"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/cardview_light_background">
+
+            <ImageView
+                android:id="@+id/thumb"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@android:color/transparent"
+                android:contentDescription="@string/empty"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/daily_information"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:text="Oggi 3 partite, 2 in corso"
+                android:textColor="@color/blu_facebook"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="@+id/importo_pagamento"
+                app:layout_constraintTop_toBottomOf="@+id/importo_pagamento" />
+
+            <TextView
+                android:id="@+id/importo_pagamento"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/importo_scommesso"
+                android:text="Totale vincita 150€"
+                android:textColor="@color/Tekt_dark_lighter"
+                app:layout_constraintBottom_toTopOf="@+id/daily_information"
+                app:layout_constraintStart_toEndOf="@+id/thumb"
+                app:layout_constraintTop_toBottomOf="@+id/importo_scommesso" />
+
+            <TextView
+                android:id="@+id/importo_scommesso"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/event_number"
+                android:text="Importo scommesso 2,00€"
+                android:textColor="@color/Tekt_dark_lighter"
+                android:textColorLink="@color/title_colour_transparent"
+                app:layout_constraintBottom_toTopOf="@+id/importo_pagamento"
+                app:layout_constraintStart_toEndOf="@+id/thumb"
+                app:layout_constraintTop_toBottomOf="@+id/event_number" />
+
+            <TextView
+                android:id="@+id/event_number"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                android:text="Numero avvenimenti 5"
+                android:textColor="@color/Text_dark"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toTopOf="@+id/importo_scommesso"
+                app:layout_constraintStart_toEndOf="@+id/thumb"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_chainStyle="spread_inside" />
+        </android.support.constraint.ConstraintLayout>
 
         <TextView
             android:id="@+id/date"
             style="@style/DocumentDateText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="4dp"
             android:layout_alignParentBottom="false"
             android:layout_toLeftOf="@+id/page_number"
+            android:background="@color/material_grey_transparent"
             android:gravity="center_vertical"
-            android:maxLines="1" />
-        <TextView
-            android:id="@+id/page_number"
-            style="@style/DocumentDateText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:maxLines="1"
             android:padding="4dp"
-            android:layout_alignParentBottom="false"
-            android:layout_alignParentRight="true"
-            android:gravity="center_vertical"
-            android:maxLines="1" />
-        </RelativeLayout>
+            android:textColor="@color/Tekt_dark_lighter" />
+
+    </RelativeLayout>
 
 </com.renard.ocr.documents.viewing.grid.CheckableGridElement>

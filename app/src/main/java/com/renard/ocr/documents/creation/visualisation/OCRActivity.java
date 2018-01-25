@@ -17,6 +17,7 @@ package com.renard.ocr.documents.creation.visualisation;
 
 import com.bettypower.SingleBetActivity;
 import com.bettypower.betMatchFinder.listeners.CompleteElaborationListener;
+import com.bettypower.entities.Bet;
 import com.bettypower.entities.Match;
 import com.bettypower.entities.ParcelableMatch;
 import com.bettypower.util.HashMatchUtil;
@@ -327,9 +328,10 @@ public class OCRActivity extends MonitoredActivity implements LayoutChoseListene
                         application.resolver.setNormalResponse(correctResult);
                         application.resolver.setCompleteElaborationListener(new CompleteElaborationListener() {
                             @Override
-                            public void onElaborationComplete(ArrayList<Match> allMatchFound) {
-                                allMatch = allMatchFound;
+                            public void onElaborationComplete(Bet bet) {
+                                allMatch = bet.getArrayMatch();
                                 //TODO serve un metodo che trasformi in blob
+                                //TODO SALVARE TUTTA LA BET
 
                                 try {
                                     HashMatchUtil utils = new HashMatchUtil();
@@ -366,7 +368,8 @@ public class OCRActivity extends MonitoredActivity implements LayoutChoseListene
                                          */
                                         Intent intent = new Intent(OCRActivity.this, SingleBetActivity.class);
                                         //intent.putExtra("testo_completo",utf8String);
-                                        intent.putParcelableArrayListExtra("all_match",allMatch);
+                                        intent.putExtra("all_match",bet);
+                                        intent.setData(documentUri);
                                         startActivity(intent);
                                         finish();
                                         Screen.unlockOrientation(OCRActivity.this);

@@ -3,6 +3,7 @@ package com.bettypower;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.database.Cursor;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
@@ -10,12 +11,11 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.text.Html;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -23,9 +23,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
-
-import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -33,33 +32,22 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.bettypower.adapters.SingleBetAdapter;
-import com.bettypower.betMatchFinder.listeners.CompleteElaborationListener;
+import com.bettypower.dialog.SetBetDialog;
+import com.bettypower.entities.Bet;
 import com.bettypower.entities.HiddenResult;
 import com.bettypower.entities.Match;
-import com.bettypower.entities.PalimpsestMatch;
 import com.bettypower.entities.ParcelableHiddenResult;
 import com.bettypower.entities.ParcelableMatch;
-import com.bettypower.entities.ParcelablePalimpsestMatch;
 import com.bettypower.entities.ParcelableTeam;
+import com.bettypower.entities.SingleBet;
 import com.bettypower.listeners.ExpandCollapseClickListener;
-import com.bettypower.listeners.HidingScrollListener;
 import com.bettypower.listeners.PreLoadingLinearLayoutManager;
-import com.bettypower.matchFinder.*;
-import com.bettypower.matchFinder.MatchFinder;
 import com.bettypower.threads.LoadImageThread;
-import com.bettypower.threads.NormalFinderThread;
-import com.bettypower.threads.RealTimeFinderThread;
 import com.bettypower.threads.RefreshResultThread;
-import com.bettypower.unpacker.AllMatchesByPalimpsestURLUnpacker;
-import com.bettypower.unpacker.AllMatchesByPalimpsestUnpacker;
-import com.bettypower.unpacker.Unpacker;
-import com.bettypower.unpacker.goalServeUnpacker;
 import com.bettypower.util.HashMatchUtil;
+import com.bettypower.util.touchHelper.ItemTouchHelperCallback;
 import com.renard.ocr.R;
-import com.renard.ocr.TextFairyApplication;
 import com.renard.ocr.documents.viewing.DocumentContentProvider;
-import com.renard.ocr.documents.viewing.grid.DocumentGridActivity;
-import com.renard.ocr.documents.viewing.single.DocumentActivity;
 
 import java.util.ArrayList;
 
@@ -76,17 +64,18 @@ public class SingleBetActivity extends AppCompatActivity {
     private boolean editMode = false;
 
     private Toolbar toolbar;
+    private Bet bet;
     public ArrayList<Match> allMatch = new ArrayList<>();
     public ArrayList<Match> allMatchSelected = new ArrayList<>();
     public ArrayList<String> allLogosURL = new ArrayList<>();
-    public ArrayList<PalimpsestMatch> allPalimpsestMatch = new ArrayList<>();
     private boolean isClicking = false;
     private boolean isAllLogoUploaded = true;
     private MatchesLoadListener allMatchLoadListener;
+    private ItemTouchHelper itemTouchHelper;
     private Uri uri;
 
-    private String url = "http://www.goalserve.com/updaters/soccerupdate.aspx";
-    private String image_url = "http://www.fishtagram.it/loghi.html";
+    private static final String MATCH_URL = "http://www.goalserve.com/updaters/soccerupdate.aspx";
+    private static final String IMAGE_URL = "http://www.fishtagram.it/loghi.html";
     private static final String ALL_MATCH_STATE = "save_all_match";
     private static final String ALL_MATCH_SELECTED_STATE = "all_match_selected_state";
     private static final String EDIT_MODE = "edit_mode";
@@ -102,21 +91,29 @@ public class SingleBetActivity extends AppCompatActivity {
 
         //AllMatchesByPalimpsestUnpacker allMatchesByPalimpsestUnpacker = new AllMatchesByPalimpsestUnpacker(getApplicationContext());
         if(savedInstanceState!=null && savedInstanceState.containsKey(ALL_MATCH_STATE)){
-            allMatch = savedInstanceState.getParcelableArrayList(ALL_MATCH_STATE);
+            bet = savedInstanceState.getParcelable(ALL_MATCH_STATE);
+            if (bet != null) {
+                allMatch = bet.getArrayMatch();
+            }
             if(savedInstanceState.containsKey(ALL_MATCH_SELECTED_STATE)){
                 allMatchSelected = savedInstanceState.getParcelableArrayList(ALL_MATCH_SELECTED_STATE);
-                singleBetAdapter = new SingleBetAdapter(getApplicationContext(),allMatch,allMatchSelected);
+                singleBetAdapter = new SingleBetAdapter(SingleBetActivity.this,bet,allMatchSelected);
             }
             else{
-                singleBetAdapter = new SingleBetAdapter(getApplicationContext(),allMatch);
+                singleBetAdapter = new SingleBetAdapter(SingleBetActivity.this,bet);
             }
-            if (savedInstanceState.containsKey(EDIT_MODE))
+            if (savedInstanceState.containsKey(EDIT_MODE)) {
                 editMode = savedInstanceState.getBoolean(EDIT_MODE);
-            if(savedInstanceState.containsKey(EDIT_MODE))
+                singleBetAdapter.setEditMode(editMode);
+            }
+            if(savedInstanceState.containsKey(IMAGE_URI)) {
                 uri = savedInstanceState.getParcelable(IMAGE_URI);
-             singleBetAdapter.setHasStableIds(true);
-             rVSingleBet.setAdapter(singleBetAdapter);
-             singleBetAdapter.setOutsideClickListener(new ActivityClickListener());
+                singleBetAdapter.setUri(uri);
+            }
+            //singleBetAdapter.setHasStableIds(true);
+            rVSingleBet.setAdapter(singleBetAdapter);
+            singleBetAdapter.setOutsideClickListener(new ActivityClickListener());
+            singleBetAdapter.setDialogListener(new DialogClickListener());
         } else {
             setMatchLoadListener(new MatchLoadListener());
             firstTimeMatchLoader();
@@ -129,15 +126,15 @@ public class SingleBetActivity extends AppCompatActivity {
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
-        if(allMatch!=null) {
-            outState.putParcelableArrayList(ALL_MATCH_STATE, allMatch);
+        super.onSaveInstanceState(outState);
+        if(bet!=null) {
+            outState.putParcelable(ALL_MATCH_STATE, bet);
         }
         if(singleBetAdapter!=null&&singleBetAdapter.getSelectedMatch()!=null) {
             outState.putParcelableArrayList(ALL_MATCH_SELECTED_STATE, singleBetAdapter.getSelectedMatch());
         }
         outState.putBoolean(EDIT_MODE,editMode);
         outState.putParcelable(IMAGE_URI,uri);
-        super.onSaveInstanceState(outState);
     }
 
     /**
@@ -146,13 +143,12 @@ public class SingleBetActivity extends AppCompatActivity {
     private void setRecyclerAndManager(){
         rVSingleBet = (RecyclerView) findViewById(R.id.rv_single_bet);
         rVSingleBet.setHasFixedSize(true);
-        rVSingleBet.setItemViewCacheSize(25);
+        rVSingleBet.setItemViewCacheSize(10);
         rVSingleBet.setDrawingCacheEnabled(true);
         rVSingleBet.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
         rVLayoutManager = new PreLoadingLinearLayoutManager(this);
         rVLayoutManager.setPages(0);
         rVLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
-        rVSingleBet.setLayoutManager(rVLayoutManager);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         toolbar.bringToFront();
@@ -166,8 +162,7 @@ public class SingleBetActivity extends AppCompatActivity {
             }
         });
         refreshButton.setVisibility(View.GONE);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && Build.VERSION.SDK_INT <= Build.VERSION_CODES.N) {
             //this will load all the item only if the window's position is in the beginning or in the end
             rVSingleBet.setOnScrollChangeListener(new View.OnScrollChangeListener() {
                 @Override
@@ -175,21 +170,20 @@ public class SingleBetActivity extends AppCompatActivity {
                     rVLayoutManager.setPages(0);
 
                     if(rVLayoutManager.findFirstVisibleItemPosition()==0||
-                            rVLayoutManager.findLastVisibleItemPosition()==allMatch.size()-1){
-                        rVLayoutManager.setPages(2);
+                            rVLayoutManager.findLastVisibleItemPosition()==allMatch.size()){
+                        rVLayoutManager.setPages(3);
                     }
 
                 }
             });
         }
-
         swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeContainer);
         swipeRefreshLayout.setProgressViewOffset(false, 250, 350);
         swipeRefreshLayout.setColorSchemeResources(
                 R.color.toolbar_background_dark,
                 R.color.toolbar_background,
                 R.color.toolbar_background_light);
-
+        rVSingleBet.setLayoutManager(rVLayoutManager);
     }
 
     MenuItem switchMenuItem;
@@ -226,21 +220,30 @@ public class SingleBetActivity extends AppCompatActivity {
                 enableEditStyle();
                 return true;
             case R.id.confirm:
-                HashMatchUtil utils = new HashMatchUtil();
-                String stringArrayMatch = utils.fromArrayToString(allMatch);
-                ContentValues values = new ContentValues();
-                values.put(DocumentContentProvider.Columns.OCR_TEXT, stringArrayMatch);
-                getApplicationContext().getContentResolver().update(uri,values,null,null);
+                Thread saveModification = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        singleBetAdapter.setEditModeConfirm();
+                        HashMatchUtil utils = new HashMatchUtil();
+                        String stringArrayMatch = utils.fromArrayToString(allMatch);
+                        bet.setSistema(false);
+                        for (Match currentMatch:allMatch
+                                ) {
+                            if(currentMatch.isFissa()) {
+                                bet.setSistema(true);
+                                break;
+                            }
+                        }
+                        ContentValues values = new ContentValues();
+                        values.put(DocumentContentProvider.Columns.OCR_TEXT, stringArrayMatch);
+                        getApplicationContext().getContentResolver().update(uri,values,null,null);
+                    }
+                });
+                saveModification.start();
                 disableEditStyle();
                 return true;
             case android.R.id.home:
-                Cursor c = getContentResolver().query(uri, new String[]{DocumentContentProvider.Columns.OCR_TEXT}, null, null, null);
-                c.moveToFirst();
-                String text = c.getString(c.getPosition());
-                HashMatchUtil util = new HashMatchUtil();
-                allMatch = util.fromStringToArray(text);
-                singleBetAdapter.setAllMatches(allMatch);
-                disableEditStyle();
+                new Thread(new DelateModificationAndEditModeThread()).start();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -255,10 +258,18 @@ public class SingleBetActivity extends AppCompatActivity {
         confirmMenuItem.setVisible(true);
         editMode = true;
         singleBetAdapter.setEditMode(true);
+        singleBetAdapter.setOutsideClickListener(null);
+
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.action_bar_edit_mode)));
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             getWindow().setStatusBarColor(getResources().getColor(R.color.action_bar_edit_mode));
         }
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        rVSingleBet.setOnScrollListener(null);
+        swipeRefreshLayout.setEnabled( false );
+        ItemTouchHelperCallback myItemTouchHelper = new ItemTouchHelperCallback(singleBetAdapter);
+        itemTouchHelper = new ItemTouchHelper(myItemTouchHelper);
+        itemTouchHelper.attachToRecyclerView(rVSingleBet);
     }
 
     private void disableEditStyle(){
@@ -269,10 +280,25 @@ public class SingleBetActivity extends AppCompatActivity {
         confirmMenuItem.setVisible(false);
         editMode = false;
         singleBetAdapter.setEditMode(false);
+        singleBetAdapter.setOutsideClickListener(new ActivityClickListener());
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.primary)));
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             getWindow().setStatusBarColor(getResources().getColor(R.color.primary));
         }
+        InputMethodManager imm = (InputMethodManager) SingleBetActivity.this.getSystemService(SingleBetActivity.this.INPUT_METHOD_SERVICE);
+        //Find the currently focused view, so we can grab the correct window token from it.
+        View view = SingleBetActivity.this.getCurrentFocus();
+        //If no view currently has focus, create a new one, just so we can grab a window token from it
+        if (view == null) {
+            view = new View(SingleBetActivity.this);
+        }
+        if (imm != null) {
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
+        rVSingleBet.setOnScrollListener(new HidingScrollListener());
+        swipeRefreshLayout.setEnabled( true );
+        itemTouchHelper.attachToRecyclerView(null);
     }
 
     //TODO
@@ -280,24 +306,123 @@ public class SingleBetActivity extends AppCompatActivity {
 
     private void firstTimeMatchLoader(){
         Intent intent = getIntent();
-        final String result = intent.getStringExtra("testo_completo");
-        final TextFairyApplication application = (TextFairyApplication) getApplicationContext();
+        //final String result = intent.getStringExtra("testo_completo");
+       // final TextFairyApplication application = (TextFairyApplication) getApplicationContext();
 
-        allMatch = intent.getParcelableArrayListExtra("all_match");
+        //allMatch = intent.getParcelableArrayListExtra("all_match");
+       // bet = intent.getExtras().getParcelable("all_match");
+        bet = intent.getParcelableExtra("all_match");
         uri = intent.getData();
-        if(allMatch == null){
-            Cursor c = getContentResolver().query(uri, new String[]{DocumentContentProvider.Columns.OCR_TEXT}, null, null, null);
-            c.moveToFirst();
-            String text = c.getString(c.getPosition());
-            HashMatchUtil util = new HashMatchUtil();
-            allMatch = util.fromStringToArray(text);
+        if(bet == null){
+
+            Thread loadMatchesFromMemory = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    Cursor c = getContentResolver().query(uri, new String[]{DocumentContentProvider.Columns.OCR_TEXT,DocumentContentProvider.Columns.IMPORTO_PAGAMENTO,DocumentContentProvider.Columns.IMPORTO_SCOMMESSO,DocumentContentProvider.Columns.ERROR_NUMBER}, null, null, null);
+                    c.moveToFirst();
+                    String text = c.getString(c.getPosition());
+                    HashMatchUtil util = new HashMatchUtil();
+                    allMatch = util.fromStringToArray(text);
+                    bet = new SingleBet(allMatch);
+                    for (Match currentMatch:allMatch
+                         ) {
+                        //NEXT LINE FOR TEST
+                        //currentMatch.setAllHiddenResult(getHiddenResultForTest());
+                        if(currentMatch.isFissa()) {
+                            bet.setSistema(true);
+                            break;
+                        }
+                    }
+                    //NEXT LINE FOR TEST
+                    bet.setArrayMatch(allMatch);
+                    bet.setPuntata(c.getString(c.getColumnIndex(DocumentContentProvider.Columns.IMPORTO_SCOMMESSO)));
+                    bet.setVincita(c.getString(c.getColumnIndex(DocumentContentProvider.Columns.IMPORTO_PAGAMENTO)));
+                    bet.setErrors(c.getString(c.getColumnIndex(DocumentContentProvider.Columns.ERROR_NUMBER)));
+                    c.close();
+                    singleBetAdapter = new SingleBetAdapter(SingleBetActivity.this,bet);
+                    //singleBetAdapter.setHasStableIds(true);
+                    singleBetAdapter.setUri(uri);
+                    singleBetAdapter.setOutsideClickListener(new ActivityClickListener());
+                    singleBetAdapter.setDialogListener(new DialogClickListener());
+                    rVSingleBet.setAdapter(singleBetAdapter);
+                    //allMatchLoadListener.onMatchesLoaded();
+
+                }
+            });
+            loadMatchesFromMemory.start();
+
+          /*  bet = betForTest();
+            allMatch = bet.getArrayMatch();
+            for (Match currentMatch:allMatch) {
+                currentMatch.setAllHiddenResult(getHiddenResultForTest());
+            }
+            singleBetAdapter = new SingleBetAdapter(SingleBetActivity.this, bet);
+            singleBetAdapter.setHasStableIds(true);
+            singleBetAdapter.setUri(uri);
+            rVSingleBet.setAdapter(singleBetAdapter);
+            allMatchLoadListener.onMatchesLoaded();
+            singleBetAdapter.setOutsideClickListener(new ActivityClickListener());
+            singleBetAdapter.setDialogListener(new DialogClickListener());*/
+        //    ContentValues values = new ContentValues();
+     //       values.put(DocumentContentProvider.Columns.EVENT_NUMBER,String.valueOf(allMatch.size()));
+//            getApplicationContext().getContentResolver().update(uri,values,null,null);
         }
-        singleBetAdapter = new SingleBetAdapter(SingleBetActivity.this, allMatch);
-        singleBetAdapter.setUri(uri);
-        singleBetAdapter.setHasStableIds(true);
-        rVSingleBet.setAdapter(singleBetAdapter);
-        allMatchLoadListener.onMatchesLoaded();
-        singleBetAdapter.setOutsideClickListener(new ActivityClickListener());
+        else{
+            allMatch = bet.getArrayMatch();
+            for (Match currentMatch:allMatch) {
+                currentMatch.setAllHiddenResult(getHiddenResultForTest());
+            }
+            singleBetAdapter = new SingleBetAdapter(SingleBetActivity.this, bet);
+            //singleBetAdapter.setHasStableIds(true);
+            singleBetAdapter.setUri(uri);
+            rVSingleBet.setAdapter(singleBetAdapter);
+            allMatchLoadListener.onMatchesLoaded();
+            singleBetAdapter.setOutsideClickListener(new ActivityClickListener());
+            singleBetAdapter.setDialogListener(new DialogClickListener());
+            ContentValues values = new ContentValues();
+            values.put(DocumentContentProvider.Columns.EVENT_NUMBER,String.valueOf(allMatch.size()));
+            getApplicationContext().getContentResolver().update(uri,values,null,null);
+
+        }
+    }
+
+    /**
+     * Take care of popping the fragment back stack or finishing the activity
+     * as appropriate.
+     */
+    @Override
+    public void onBackPressed() {
+        if(editMode){
+            new Thread(new DelateModificationAndEditModeThread()).start();
+        }else {
+            super.onBackPressed();
+        }
+    }
+
+    private Bet betForTest(){
+        ArrayList<Match> allMatch = new ArrayList<>();
+        for(int i = 0; i<20;i++){
+            Match match = new ParcelableMatch(new ParcelableTeam("milan " + i),new ParcelableTeam(("milan " + i)));
+            match.setHomeResult("1");
+            match.setAwayResult("1");
+            match.setTime("deso dio/can");
+            allMatch.add(match);
+        }
+
+        Bet bet = new SingleBet(allMatch);
+        return bet;
+    }
+
+    private ArrayList<HiddenResult> getHiddenResultForTest(){
+        ArrayList<HiddenResult> result = new ArrayList<>();
+        for(int i = 0;i<20;i++){
+            HiddenResult hiddenResultHome = new ParcelableHiddenResult("Christiano Ronaldo",String.valueOf(i*10),ParcelableHiddenResult.ACTION_GOAL,ParcelableHiddenResult.HOME_TEAM);
+            HiddenResult hiddenResultAway = new ParcelableHiddenResult("Lionel Messi",String.valueOf(i*10 + 5),ParcelableHiddenResult.ACTION_YELLOWCARD,ParcelableHiddenResult.AWAY_TEAM);
+            hiddenResultHome.setResult("[1:1]");
+            result.add(hiddenResultHome);
+            result.add(hiddenResultAway);
+        }
+        return result;
     }
 
     //TODO CLICK LISTENER CALLBACK
@@ -317,7 +442,8 @@ public class SingleBetActivity extends AppCompatActivity {
                     holder.itemView.setOnClickListener(null);
                     swipeRefreshLayout.setEnabled(false);
                     rVLayoutManager.setScrollEnabled(false);
-                    isClicking = true;                         }
+                    isClicking = true;
+                }
 
                 @Override
                 public void onClickEnds() {
@@ -330,14 +456,32 @@ public class SingleBetActivity extends AppCompatActivity {
         }
     }
 
+    private class DialogClickListener implements SingleBetAdapter.DialogListener{
+
+        @Override
+        public void onCreateDialog(final Match match) {
+            SetBetDialog selectBetDialog = new SetBetDialog(SingleBetActivity.this,match);
+            selectBetDialog.show();
+            selectBetDialog.setFinishEdittingDialogListener(new SetBetDialog.FinishEdittingDialogListener() {
+                @Override
+                public void onEdittingDialogFinish(Match editMatch) {
+                    match.setBetKind(editMatch.getBetKind());
+                    match.setBet(editMatch.getBet());
+                    match.setQuote(editMatch.getQuote());
+                    singleBetAdapter.notifyDataSetChanged();
+                }
+            });
+        }
+    }
+
     public void loadAllLogosExecutor(){
         RequestQueue imageQueue = Volley.newRequestQueue(getApplicationContext());
-        StringRequest imageRequest = new StringRequest(Request.Method.GET, image_url,
+        StringRequest imageRequest = new StringRequest(Request.Method.GET, IMAGE_URL,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
                         LoadImageThread loadImageThread = new
-                                LoadImageThread(response,allMatch,allLogosURL,singleBetAdapter);
+                                LoadImageThread(response,allMatch,allLogosURL,getApplicationContext());
                         loadImageThread.setOnLoadLogoListener(new LoadImageThread.LoadLogoListener() {
                             @Override
                             public void onLoadLogoFinish(final Match match) {
@@ -389,7 +533,6 @@ public class SingleBetActivity extends AppCompatActivity {
     }
 
     private class MatchLoadListener implements  MatchesLoadListener{
-
         @Override
         public void onMatchesLoaded() {
             loadAllLogosExecutor();
@@ -409,8 +552,7 @@ public class SingleBetActivity extends AppCompatActivity {
                 //TODO salvare questa variabile nello stesso posto delle schedine in modo che resti sempre salvata
                 isAllLogoUploaded=true;
             }
-
-            StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+            StringRequest stringRequest = new StringRequest(Request.Method.GET, MATCH_URL,
                     new Response.Listener<String>() {
                         @Override
                         public void onResponse(String response) {
@@ -422,7 +564,7 @@ public class SingleBetActivity extends AppCompatActivity {
                                         @Override
                                         public void run() {
                                             singleBetAdapter.setAllMatches(allMatch);
-                                            rVLayoutManager.setPages(2);
+                                           // rVLayoutManager.setPages(2);
                                             swipeRefreshLayout.setRefreshing(false);
                                         }
                                     });
@@ -440,6 +582,7 @@ public class SingleBetActivity extends AppCompatActivity {
             });
             stringRequest.setShouldCache(false);
             queue.add(stringRequest);
+
         }
     }
 
@@ -456,7 +599,38 @@ public class SingleBetActivity extends AppCompatActivity {
 
         @Override
         public void onShow() {
-                toolbar.animate().translationY(0).setInterpolator(new DecelerateInterpolator(2));
+            toolbar.animate().translationY(0).setInterpolator(new DecelerateInterpolator(2));
+        }
+    }
+
+    private class DelateModificationAndEditModeThread implements Runnable{
+        @Override
+        public void run() {
+            Cursor c = getContentResolver().query(uri, new String[]{DocumentContentProvider.Columns.OCR_TEXT}, null, null, null);
+            String text= "";
+            if (c != null) {
+                c.moveToFirst();
+                text = c.getString(c.getPosition());
+                c.close();
+            }
+            HashMatchUtil util = new HashMatchUtil();
+            allMatch = util.fromStringToArray(text);
+            bet.setSistema(false);
+            for (Match currentMatch:allMatch
+                    ) {
+                if(currentMatch.isFissa()) {
+                    bet.setSistema(true);
+                    break;
+                }
+            }
+            rVSingleBet.post(new Runnable() {
+                @Override
+                public void run() {
+                    singleBetAdapter.setAllMatches(allMatch);
+                    bet.setArrayMatch(allMatch);
+                    disableEditStyle();
+                }
+            });
         }
     }
 }

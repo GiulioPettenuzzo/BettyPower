@@ -13,12 +13,8 @@ public interface Team extends Parcelable{
      *
      * @return the name of the team
      */
-    public String getName();
+    String getName();
 
-    public void setName(String name);
-
-    public void setBitmapLogo(Bitmap bitmap);
-
-    public Bitmap getBitmapLogo();
+    void setName(String name);
 
 }

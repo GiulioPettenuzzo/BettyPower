@@ -22,7 +22,9 @@ public class ParcelableMatch implements Match {
     private String betKind;
     private String resultHomeTeam;
     private String resultAwayTeam;
+    private boolean fissa;
     private ArrayList<HiddenResult> allHiddenResult = new ArrayList<>();
+
 
     public ParcelableMatch(Team homeTeam, Team awayTeam){
         this.homeTeam = homeTeam;
@@ -122,6 +124,16 @@ public class ParcelableMatch implements Match {
         this.resultAwayTeam = result;
     }
 
+    @Override
+    public void setFissa(boolean fissa) {
+        this.fissa = fissa;
+    }
+
+    @Override
+    public boolean isFissa() {
+        return fissa;
+    }
+
     public ArrayList<HiddenResult> getAllHiddenResult(){
         return allHiddenResult;
     }
@@ -170,6 +182,8 @@ public class ParcelableMatch implements Match {
         bet = source.readString();
         betKind = source.readString();
         quote = source.readString();
+        fissa = (Boolean) source.readValue(getClass().getClassLoader());
+        allHiddenResult = source.readArrayList(ParcelableHiddenResult.class.getClassLoader());
     }
 
     @Override
@@ -187,5 +201,7 @@ public class ParcelableMatch implements Match {
         dest.writeString(bet);
         dest.writeString(betKind);
         dest.writeString(quote);
+        dest.writeValue(fissa);
+        dest.writeList(allHiddenResult);
     }
 }

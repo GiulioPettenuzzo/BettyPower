@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="action_bar_edit_mode">#006249</color>
-    <color name="dark_grey">#34861b</color>
+    <color name="dark_grey">#9d34861b</color>
     <color name="document_grid_background">#dedede</color>
     <color name="primary">#FF004428</color>
     <color name="accent">#009e8c</color>
@@ -20,16 +20,25 @@
 
     <color name="text_background">@color/document_grid_background</color>
 
-    <color name="colorPrimary">#3F51B5</color>
+    <color name="colorPrimary">#006249</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
-    <color name="backgrund_gray">#dedede</color>
+    <color name="backgrund_gray">#e0dedede</color>
     <color name="item_background">#ffffff</color>
-    <color name="toolbar_background">#005F4E</color>
+    <color name="toolbar_background">#98005f4e</color>
     <color name="toolbar_background_light">#006249</color>
     <color name="toolbar_background_dark">#004428</color>
     <color name="Tekt_dark_lighter">#4e5365</color>
     <color name="Text_dark">#323641</color>
     <color name="green_for_dialog">#63c417</color>
+    <color name="blu_facebook">#4266b2</color>
+    <color name="title_colour_transparent">#9f40af08</color>
+    <color name="title_opacity">#8f006249</color>
+    <color name="dark_op">#a8323641</color>
+    <color name="primary_op">#ae004428</color>
+    <color name="dark_lither_op">#eb4e5365</color>
+    <color name="grey_op">#d3dedede</color>
+    <color name="material_grey_transparent">#e7fafafa</color>
+    <color name="line_separator">#eaeaea</color>
 
 </resources>

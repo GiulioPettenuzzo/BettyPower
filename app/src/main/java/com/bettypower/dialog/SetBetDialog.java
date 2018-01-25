@@ -67,7 +67,7 @@ public class SetBetDialog extends Dialog {
         saveTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(showQuote.getHint()=="quota")
+                if(showQuote.getText()==null || showQuote.getText().equals(""))
                     match.setQuote(null);
                 else
                     match.setQuote(showQuote.getText().toString());
@@ -172,7 +172,7 @@ public class SetBetDialog extends Dialog {
             }
         });
         showQuote.getBackground().mutate().setColorFilter(context.getResources().getColor(R.color.primary), PorterDuff.Mode.SRC_ATOP);
-        showQuote.clearFocus();
+        //showQuote.clearFocus();
 
         showQuote.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override

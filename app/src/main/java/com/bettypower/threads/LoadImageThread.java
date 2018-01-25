@@ -12,6 +12,7 @@ import com.bettypower.unpacker.LogoUnpacker;
 import com.bettypower.adapters.SingleBetAdapter;
 import com.bettypower.entities.Match;
 import com.bettypower.unpacker.LogoUnpacker;
+import com.bettypower.util.ImageHelper;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -27,14 +28,13 @@ public class LoadImageThread extends Thread {
     String response;
     ArrayList<Match> allMatch;
     ArrayList<String> allLogosURL;
-    SingleBetAdapter singleBetAdapter;
     LoadLogoListener loadLogoListener;
 
-    public LoadImageThread(String response, ArrayList<Match> allMatch,ArrayList<String> allLogosURL, SingleBetAdapter singleBetAdapter){
+    public LoadImageThread(String response, ArrayList<Match> allMatch,ArrayList<String> allLogosURL,Context context){
         this.response = response;
         this.allMatch = allMatch;
-        this.singleBetAdapter = singleBetAdapter;
         this.allLogosURL = allLogosURL;
+        this.context = context;
     }
 
     public void setOnLoadLogoListener(LoadLogoListener loadLogoListener){
@@ -93,18 +93,26 @@ public class LoadImageThread extends Thread {
              }*/
 
             try {
+                ImageHelper imageHelper = new ImageHelper(context);
                 homeBitmap = new DownloadImageTask()
                         .execute("http://fishtagram.it/football_logos/barcellona.png").get();
+                imageHelper.
+                        setFileName(match.getHomeTeam().getName() + ".png").
+                        setDirectoryName("logo_images").setExternal(false).
+                        save(homeBitmap);
+
                 awayBitmap = new DownloadImageTask()
                         .execute("http://fishtagram.it/football_logos/realmadrid.png").get();
+                imageHelper.
+                        setFileName(match.getAwayTeam().getName() + ".png").
+                        setDirectoryName("logo_images").setExternal(false).
+                        save(awayBitmap);
+
             } catch (InterruptedException e) {
                 e.printStackTrace();
             } catch (ExecutionException e) {
                 e.printStackTrace();
             }
-            match.getHomeTeam().setBitmapLogo(homeBitmap);
-            match.getAwayTeam().setBitmapLogo(awayBitmap);
-
             loadLogoListener.onLoadLogoFinish(match);
         }
     }

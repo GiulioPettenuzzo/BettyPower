@@ -45,16 +45,6 @@ public class ParcelableTeam implements Team {
     }
 
     @Override
-    public void setBitmapLogo(Bitmap bitmap) {
-        this.bitmap = bitmap;
-    }
-
-    @Override
-    public Bitmap getBitmapLogo() {
-        return bitmap;
-    }
-
-    @Override
     public int describeContents() {
         return 0;
     }

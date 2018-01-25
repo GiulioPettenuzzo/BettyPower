@@ -25,7 +25,9 @@ import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
+import android.support.constraint.ConstraintLayout;
 import android.text.format.DateFormat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,11 +35,14 @@ import android.widget.AbsListView;
 import android.widget.CursorAdapter;
 import android.widget.TextView;
 
+import com.bettypower.util.touchHelper.ItemTouchHelperAdapter;
 import com.renard.ocr.documents.viewing.DocumentContentProvider;
 import com.renard.ocr.R;
 import com.renard.ocr.documents.viewing.grid.CheckableGridElement.OnCheckedChangeListener;
 import com.renard.ocr.documents.viewing.DocumentContentProvider.Columns;
 import com.renard.ocr.util.Util;
+
+import org.w3c.dom.Text;
 
 /**
  * adapter for the document grid view
@@ -46,11 +51,12 @@ import com.renard.ocr.util.Util;
  */
 public class DocumentGridAdapter extends CursorAdapter implements OnCheckedChangeListener {
 
+
 	public interface OnCheckedChangeListener {
 		void onCheckedChanged(final Set<Integer> checkedIds);
 	}
 
-	private final static String[] PROJECTION = { Columns.ID, Columns.TITLE, Columns.OCR_TEXT, Columns.CREATED, Columns.PHOTO_PATH,Columns.CHILD_COUNT };
+	private final static String[] PROJECTION = { Columns.ID, Columns.TITLE, Columns.OCR_TEXT, Columns.CREATED, Columns.PHOTO_PATH,Columns.CHILD_COUNT,Columns.EVENT_NUMBER,Columns.IMPORTO_SCOMMESSO,Columns.IMPORTO_PAGAMENTO };
 
 	private Set<Integer> mSelectedDocuments = new HashSet<Integer>();
 	private LayoutInflater mInflater;
@@ -61,6 +67,9 @@ public class DocumentGridAdapter extends CursorAdapter implements OnCheckedChang
 	private int mIndexTitle;
 	private int mIndexID;
 	private int mChildCountID;
+	private int mEventNumber;
+	private int mTotaleImportoScommesso;
+	private int mTotaleImportoPagamento;
 	private OnCheckedChangeListener mCheckedChangeListener = null;
 
 	static class DocumentViewHolder {
@@ -71,11 +80,19 @@ public class DocumentGridAdapter extends CursorAdapter implements OnCheckedChang
 		public int documentId;
 		public boolean updateThumbnail;
 		CrossFadeDrawable transition;
+		private TextView eventNumberTextView;
+		private TextView totaleImportoScommesso;
+		private TextView totaleImportoPagamento;
+		private TextView dailyInformations;
 
 		DocumentViewHolder(View v) {
 			gridElement = (CheckableGridElement) v;
 			date = (TextView) v.findViewById(R.id.date);
 			mPageNumber = (TextView) v.findViewById(R.id.page_number);
+			eventNumberTextView = (TextView) v.findViewById(R.id.event_number);
+			totaleImportoScommesso = (TextView) v.findViewById(R.id.importo_scommesso);
+			totaleImportoPagamento = (TextView) v.findViewById(R.id.importo_pagamento);
+			dailyInformations = (TextView) v.findViewById(R.id.daily_information);
 		}
 
 	}
@@ -89,11 +106,14 @@ public class DocumentGridAdapter extends CursorAdapter implements OnCheckedChang
 		mElementLayoutId = elementLayout;
 		mActivity = activity;
 		mInflater = LayoutInflater.from(activity);
-		final Cursor c = getCursor();
+		Cursor c = getCursor();
 		mIndexCreated = c.getColumnIndex(Columns.CREATED);
 		mIndexID = c.getColumnIndex(Columns.ID);
 		mIndexTitle = c.getColumnIndex(Columns.TITLE);
 		mChildCountID = c.getColumnIndex(Columns.CHILD_COUNT);
+		mEventNumber = c.getColumnIndex(Columns.EVENT_NUMBER);
+		mTotaleImportoPagamento = c.getColumnIndex(Columns.IMPORTO_PAGAMENTO);
+		mTotaleImportoScommesso = c.getColumnIndex(Columns.IMPORTO_SCOMMESSO);
 		mCheckedChangeListener = listener;
 	}
 
@@ -128,7 +148,33 @@ public class DocumentGridAdapter extends CursorAdapter implements OnCheckedChang
 				holder.updateThumbnail = false;
 			}
 		}
+
+		String eventNumber = cursor.getString(mEventNumber);
+		//Log.i("event number",eventNumber);
+		String importoPagamento = cursor.getString(mTotaleImportoPagamento);
+	//	Log.i("importo pagamento",importoPagamento);
+		String importoScommesso = cursor.getString(mTotaleImportoScommesso);
+	//	Log.i("importo scommesso",importoScommesso);
+
+
+		if(eventNumber!=null){
+			holder.eventNumberTextView.setText(context.getResources().getString(R.string.number_avveniments) + " " +eventNumber);
+		}else{
+			holder.eventNumberTextView.setText(context.getResources().getString(R.string.number_avveniments) + " " + context.getResources().getString(R.string.field_undefined));
+		}
+		if(importoScommesso!=null){
+			holder.totaleImportoScommesso.setText(context.getResources().getString(R.string.totale_importo_scommesso) + " " +importoScommesso);
+		}else{
+			holder.totaleImportoScommesso.setText(context.getResources().getString(R.string.totale_importo_scommesso) + " " + context.getResources().getString(R.string.field_undefined));
+		}
+		if(importoPagamento!=null){
+			holder.totaleImportoPagamento.setText(context.getResources().getString(R.string.totale_vincita) + " " +importoPagamento);
+		}else{
+			holder.totaleImportoPagamento.setText(context.getResources().getString(R.string.totale_vincita) + " " + context.getResources().getString(R.string.field_undefined));
+		}
 		holder.gridElement.setCheckedNoAnimate(isSelected);
+		if(!mSelectedDocuments.contains(documentId))
+			holder.gridElement.setChecked(false);
 	};
 	
 	@Override

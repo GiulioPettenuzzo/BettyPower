@@ -1,5 +1,13 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
 <resources>
+    <string name="delate_match_dialog_question">Devo aver sbagliato a leggere questa partita \n Mi dispiace! \n Sei sicuro di volerla eliminare?</string>
+    <string name="delete_match_dialog_title">Eliminare </string>
+    <string name="confirm">CONFERMA</string>
+    <string name="annulla">ANNULLA</string>
+    <string name="totale_importo_scommesso">Importo scommesso:</string>
+    <string name="field_undefined">no def.</string>
+    <string name="totale_vincita">Totale vincita:</string>
+    <string name="sistema_errori">Errori:</string>
     <string name="dialog_illustration_set_bet">Seleziona quello che hai scommesso su </string>
     <string name="current_year">2017</string>
     <string name="next_year">2018</string>

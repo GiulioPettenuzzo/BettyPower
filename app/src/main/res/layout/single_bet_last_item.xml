@@ -5,18 +5,22 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginBottom="5dp"
-    android:layout_marginEnd="8dp"
-    android:layout_marginStart="8dp"
+    android:layout_marginEnd="3dp"
+    android:layout_marginStart="3dp"
     android:layout_marginTop="5dp"
-    android:background="@color/toolbar_background_light">
+    android:background="@color/toolbar_background_light"
+    android:descendantFocusability="beforeDescendants"
+    android:focusableInTouchMode="true">
 
     <EditText
         android:id="@+id/vincita_edit_text"
         android:layout_width="50dp"
-        android:layout_height="29dp"
+        android:layout_height="wrap_content"
         android:backgroundTint="@color/cardview_light_background"
         android:ems="10"
-        android:inputType="number"
+        android:inputType="numberDecimal"
+        android:textSize="16sp"
+        android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="@+id/vincita"
         app:layout_constraintStart_toEndOf="@+id/vincita"
         app:layout_constraintTop_toTopOf="@+id/vincita" />
@@ -60,10 +64,12 @@
     <EditText
         android:id="@+id/puntata_edit_text"
         android:layout_width="50dp"
-        android:layout_height="29dp"
+        android:layout_height="wrap_content"
         android:backgroundTint="@color/cardview_light_background"
         android:ems="10"
-        android:inputType="number"
+        android:inputType="numberDecimal"
+        android:textSize="16sp"
+        android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="@+id/puntata"
         app:layout_constraintStart_toEndOf="@+id/puntata"
         app:layout_constraintTop_toTopOf="@+id/puntata" />
@@ -71,13 +77,16 @@
     <EditText
         android:id="@+id/errors_edit_text"
         android:layout_width="50dp"
-        android:layout_height="31dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
         android:backgroundTint="@color/cardview_light_background"
         android:ems="10"
         android:inputType="number"
+        android:textSize="16sp"
+        android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="@+id/errors_text_view"
         app:layout_constraintStart_toEndOf="@+id/errors_text_view"
-        app:layout_constraintTop_toTopOf="@+id/errors_text_view" />
+        app:layout_constraintTop_toBottomOf="@+id/vincita" />
 
     <CheckBox
         android:id="@+id/checkBox"
@@ -94,35 +103,34 @@
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toEndOf="@+id/errors_edit_text"
         app:layout_constraintTop_toTopOf="@+id/errors_edit_text"
-        app:layout_constraintVertical_bias="0.888" />
+        app:layout_constraintVertical_bias="0.49" />
 
     <TextView
         android:id="@+id/errors_text_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:text="Errori: "
         android:textColor="@color/cardview_light_background"
         android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/number_match_win" />
+        app:layout_constraintTop_toBottomOf="@+id/vincita"
+        android:layout_marginLeft="8dp" />
 
     <TextView
         android:id="@+id/number_match_win"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="12dp"
         android:text="Esiti vinti: 3"
         android:textColor="@color/cardview_light_background"
+        app:layout_constraintBottom_toBottomOf="@+id/number_match_lost"
         app:layout_constraintEnd_toStartOf="@+id/number_match_lost"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintHorizontal_chainStyle="spread_inside"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/vincita" />
+        app:layout_constraintTop_toBottomOf="@+id/errors_text_view" />
 
     <TextView
         android:id="@+id/number_match_lost"
@@ -131,26 +139,29 @@
         android:layout_marginTop="8dp"
         android:text="Esiti persi: 2"
         android:textColor="@color/cardview_light_background"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/match_not_finished"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/number_match_win"
-        app:layout_constraintTop_toBottomOf="@+id/vincita" />
+        app:layout_constraintTop_toTopOf="@+id/errors_edit_text"
+        app:layout_constraintVertical_bias="1.0" />
 
     <TextView
         android:id="@+id/match_not_finished"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
         android:layout_marginTop="8dp"
         android:text="Esiti in corso 1"
         android:textColor="@color/cardview_light_background"
+        app:layout_constraintBottom_toBottomOf="@+id/number_match_lost"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/number_match_lost"
-        app:layout_constraintTop_toBottomOf="@+id/vincita" />
+        app:layout_constraintTop_toBottomOf="@+id/puntata"
+        app:layout_constraintVertical_bias="1.0" />
 
     <TextView
-        android:id="@+id/textView5"
+        android:id="@+id/book_maker_text_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"

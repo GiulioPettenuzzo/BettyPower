@@ -1,5 +1,6 @@
 package com.bettypower.betMatchFinder.listeners;
 
+import com.bettypower.entities.Bet;
 import com.bettypower.entities.Match;
 
 import java.util.ArrayList;
@@ -9,5 +10,5 @@ import java.util.ArrayList;
  */
 
 public interface CompleteElaborationListener {
-    void onElaborationComplete(ArrayList<Match> allMatchFound);
+    void onElaborationComplete(Bet bet);
 }

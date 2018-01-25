@@ -1,15 +1,32 @@
 package com.bettypower.entities;
 
+import android.os.Parcelable;
+
+import java.util.ArrayList;
+
 /**
  * Created by giuliopettenuzzo on 13/10/17.
  */
 
-public interface Bet {
+public interface Bet extends Parcelable{
+    ArrayList<Match> getArrayMatch();
+    void setArrayMatch(ArrayList<Match> allMatches);
 
-    String getBet();
-    void setBet(String bet);
+    String getBookMaker();
+    void setBookMaker(String bookMaker);
 
-    String getQuote();
-    void setQuote(String bet);
+    String getDate();
+    void setDate(String date);
 
+    String getPuntata();
+    void setPuntata(String puntata);
+
+    String getVincita();
+    void setVincita(String vincita);
+
+    String getErrors();
+    void setErrors(String errors);
+
+    boolean isSistema();
+    void setSistema(boolean isSistema);
 }

@@ -49,6 +49,11 @@ public class DocumentContentProvider extends ContentProvider {
         public static final String PDF_URI = "pdf_uri";
         public static final String CHILD_COUNT = "child_count";
         public static final String OCR_LANG = "ocr_lang";
+
+        public static final String EVENT_NUMBER = "event_number";
+        public static final String IMPORTO_SCOMMESSO = "importo_scommesso";
+        public static final String IMPORTO_PAGAMENTO = "importo_pagamento";
+        public static final String ERROR_NUMBER = "error_number";
     }
 
     private static final UriMatcher sUriMatcher;
@@ -64,13 +69,19 @@ public class DocumentContentProvider extends ContentProvider {
     private static class DBHelper extends SQLiteOpenHelper {
 
         private static final String TABLE_NAME = "documents";
-        private static final int DATABASE_VERSION = 12;
+        private static final int DATABASE_VERSION = 1;
 
         private static final String TABLE_CREATE = "CREATE TABLE " + TABLE_NAME + " (" + Columns.ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " + Columns.PARENT_ID
                 + " INTEGER DEFAULT -1, " + Columns.CREATED + " INTEGER, " + Columns.TITLE + " TEXT, " + Columns.PHOTO_PATH + " TEXT, " + Columns.PDF_URI + " TEXT, "
-                + Columns.HOCR_TEXT + " TEXT, " + Columns.OCR_LANG + " TEXT, " + Columns.CHILD_COUNT + " INTEGER DEFAULT 0, " + Columns.OCR_TEXT + " TEXT);";
+                + Columns.HOCR_TEXT + " TEXT, " + Columns.OCR_LANG + " TEXT, " + Columns.CHILD_COUNT + " INTEGER DEFAULT 0, " + Columns.OCR_TEXT + " TEXT, " + Columns.EVENT_NUMBER + " TEXT, "
+                + Columns.IMPORTO_SCOMMESSO + " TEXT, " + Columns.ERROR_NUMBER + " TEXT, " + Columns.IMPORTO_PAGAMENTO + " TEXT);";
 
         private static final String ADD_OCR_LANG_COLUMN ="ALTER TABLE " + TABLE_NAME + " ADD COLUMN " + Columns.OCR_LANG + " TEXT;";
+        private static final String ADD_MATCH_NUMBER_COLUMN ="ALTER TABLE " + TABLE_NAME + " ADD COLUMN " + Columns.EVENT_NUMBER + " TEXT;";
+        private static final String ADD_IMPORTO_SCOMMESSO_COLUMN ="ALTER TABLE " + TABLE_NAME + " ADD COLUMN " + Columns.IMPORTO_SCOMMESSO + " TEXT;";
+        private static final String ADD_ERROR_NUMBER_COLUMN ="ALTER TABLE " + TABLE_NAME + " ADD COLUMN " + Columns.ERROR_NUMBER + " TEXT;";
+        private static final String ADD_IMPORTO_PAGAMENTO_COLUMN ="ALTER TABLE " + TABLE_NAME + " ADD COLUMN " + Columns.IMPORTO_PAGAMENTO + " TEXT;";
+
 
         private static final String DATABASE_NAME = "Transactions";
 
@@ -87,8 +98,12 @@ public class DocumentContentProvider extends ContentProvider {
         public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
             Log.w(TAG, "Upgrading database from version " + oldVersion + " to " + newVersion + ", which will destroy all old data");
 
-            if (oldVersion<=11){
-                db.execSQL(ADD_OCR_LANG_COLUMN);
+            if (oldVersion<=0){
+                //db.execSQL(ADD_OCR_LANG_COLUMN);
+                db.execSQL(ADD_MATCH_NUMBER_COLUMN);
+                db.execSQL(ADD_IMPORTO_SCOMMESSO_COLUMN);
+                db.execSQL(ADD_ERROR_NUMBER_COLUMN);
+                db.execSQL(ADD_IMPORTO_PAGAMENTO_COLUMN);
             }
         }
 

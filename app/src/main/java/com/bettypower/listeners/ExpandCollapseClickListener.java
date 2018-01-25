@@ -53,7 +53,8 @@ public class ExpandCollapseClickListener implements View.OnClickListener {
     public void onClick(View v) {
         if (match.getAllHiddenResult()!= null&&match.getAllHiddenResult().size()>0&&isSelected.lastIndexOf(match) < 0) {
             clickStat.onClickStart();
-            holder.isSelected = true;
+            holder.isItemSelected = true;
+            holder.lineSeparator.setVisibility(View.VISIBLE);
 
             SingleBetAdapter.addLayouts(match.getAllHiddenResult(), holder);
 
@@ -108,22 +109,23 @@ public class ExpandCollapseClickListener implements View.OnClickListener {
                             dropDownAnimation.setDuration(DURATION);
                             dropDownAnimation.setInterpolator(new AccelerateDecelerateInterpolator());
                             dropDownAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                                    @Override
-                                    public void onAnimationUpdate(ValueAnimator animation) {
-                                        Integer value = null;
-                                        value = (Integer) animation.getAnimatedValue();
-                                        holder.itemView.getLayoutParams().height = value;
-                                        holder.hiddenResult.setVisibility(View.VISIBLE);
-                                        if(holder.itemView.getLayoutParams().height==originalHeight+hidenResultHeight) {
-                                            holder.itemView.getLayoutParams().height = ConstraintLayout.LayoutParams.WRAP_CONTENT;
-                                            holder.itemView.requestLayout();
-                                            clickStat.onClickEnds();
-                                        }
+                                @Override
+                                public void onAnimationUpdate(ValueAnimator animation) {
+                                    Integer value = null;
+                                    value = (Integer) animation.getAnimatedValue();
+                                    holder.itemView.getLayoutParams().height = value;
+                                    holder.hiddenResult.setVisibility(View.VISIBLE);
+                                    if(holder.itemView.getLayoutParams().height>=originalHeight+hidenResultHeight) {
+                                        //holder.itemView.getLayoutParams().height = ConstraintLayout.LayoutParams.WRAP_CONTENT;
+                                        holder.itemView.setMinimumHeight(value);
+                                        holder.itemView.requestLayout();
+                                        clickStat.onClickEnds();
                                     }
-                                });
-                                holder.itemView.clearAnimation();
+                                }
+                            });
+                            holder.itemView.clearAnimation();
 
-                                dropDownAnimation.start();
+                            dropDownAnimation.start();
 
                         }
 
@@ -132,7 +134,7 @@ public class ExpandCollapseClickListener implements View.OnClickListener {
 
         } else if (isSelected.lastIndexOf(match) >= 0) {
             clickStat.onClickStart();
-            holder.isSelected = false;
+            holder.isItemSelected = false;
             holder.dropDownImageView.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_keyboard_arrow_up_black_24px));
             Thread x = new Thread(new Runnable() {
                 @Override
@@ -164,23 +166,25 @@ public class ExpandCollapseClickListener implements View.OnClickListener {
             hidenResultHeight = holder.hiddenResult.getHeight();
             originalHeight = holder.itemView.getHeight()-hidenResultHeight;
 
+
             dropDownAnimation = ValueAnimator.ofInt(originalHeight + hidenResultHeight, originalHeight);
             dropDownAnimation.setDuration(300);
             dropDownAnimation.setInterpolator(new AccelerateDecelerateInterpolator());
             dropDownAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                    @Override
-                    public void onAnimationUpdate(ValueAnimator animation) {
-                        Integer value = null;
-                        value = (Integer) animation.getAnimatedValue();
-                        holder.itemView.getLayoutParams().height = value;
-                        Log.i("rate", String.valueOf(value));
-                        holder.hiddenResult.removeAllViews();
-                        if(holder.itemView.getLayoutParams().height==originalHeight) {
-                            holder.itemView.getLayoutParams().height = ConstraintLayout.LayoutParams.WRAP_CONTENT;
-                            clickStat.onClickEnds();
-                        }
+                @Override
+                public void onAnimationUpdate(ValueAnimator animation) {
+                    Integer value = null;
+                    value = (Integer) animation.getAnimatedValue();
+                    holder.itemView.getLayoutParams().height = value;
+                    Log.i("rate", String.valueOf(value));
+                    holder.hiddenResult.removeAllViews();
+                    if(holder.itemView.getLayoutParams().height==originalHeight) {
+                        holder.itemView.getLayoutParams().height = ConstraintLayout.LayoutParams.WRAP_CONTENT;
+                        holder.lineSeparator.setVisibility(View.GONE);
+                        clickStat.onClickEnds();
                     }
-                });
+                }
+            });
             holder.itemView.clearAnimation();
             dropDownAnimation.start();
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {

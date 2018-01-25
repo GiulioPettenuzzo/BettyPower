@@ -4,6 +4,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
 /**
+ * used to hide the toolbar when the user is scrolling down and show the toolbar when the user is scrolling up
  * Created by giuliopettenuzzo on 21/07/17.
  */
 
@@ -12,8 +13,6 @@ public abstract class HidingScrollListener extends RecyclerView.OnScrollListener
     private int scrolledDistance = 0;
     private boolean controlsVisible = true;
 
-    public HidingScrollListener(){
-    }
     @Override
     public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
         super.onScrolled(recyclerView, dx, dy);

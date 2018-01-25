@@ -39,7 +39,6 @@ public class AllMatchesByPalimpsestUnpacker {
         this.allURL = allURL;
         this.responseLoaderListener = responseLoaderListener;
         this.queue =  Volley.newRequestQueue(context);
-
         sendSingleVolleyRequest(allURL.get(allURL.size()-1));
     }
 

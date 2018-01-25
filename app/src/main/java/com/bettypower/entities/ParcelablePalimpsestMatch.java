@@ -170,6 +170,16 @@ public class ParcelablePalimpsestMatch implements PalimpsestMatch {
     }
 
     @Override
+    public void setFissa(boolean fissa) {
+
+    }
+
+    @Override
+    public boolean isFissa() {
+        return false;
+    }
+
+    @Override
     public ArrayList<HiddenResult> getAllHiddenResult() {
         return null;
     }

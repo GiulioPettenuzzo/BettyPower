@@ -34,6 +34,8 @@ public class RefreshResultThread extends Thread{
 
     @Override
     public void run() {
+        //TODO FARE UNA VOLTA FATTO IL SERVER
+        /*
         Unpacker unpacker = new goalServeUnpacker(response);
         allMatchOnGoalServe = unpacker.getAllMatches();
         for (Match savedMatch:allSavedMatch
@@ -49,7 +51,7 @@ public class RefreshResultThread extends Thread{
                     break;
                 }
             }
-        }
+        }*/
         loadingListener.onFinishLoading();
     }
 

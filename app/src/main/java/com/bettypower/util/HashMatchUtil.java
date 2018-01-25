@@ -1,6 +1,10 @@
 package com.bettypower.util;
 
+import android.content.Intent;
+
+import com.bettypower.entities.HiddenResult;
 import com.bettypower.entities.Match;
+import com.bettypower.entities.ParcelableHiddenResult;
 import com.bettypower.entities.ParcelableMatch;
 import com.bettypower.entities.ParcelableTeam;
 
@@ -44,7 +48,23 @@ public class HashMatchUtil {
                 result = result + " " + currentmatch.getQuote() + " " + SEPARATOR;
 
             result = result + " " + currentmatch.getHomeResult() + " " + SEPARATOR;
-            result = result + " " + currentmatch.getAwayResult() + " " + MATCH_SEPARATOR + " ";
+            result = result + " " + currentmatch.getAwayResult() + " " + SEPARATOR;
+            if(currentmatch.isFissa())
+                result = result + " true " + SEPARATOR;
+            else
+                result = result + " false " + SEPARATOR;
+            for (HiddenResult currentHiddenResult:currentmatch.getAllHiddenResult()
+                 ) {
+                result = result + " " + currentHiddenResult.getActionTeam() + " " + SEPARATOR;
+                result = result + " " + currentHiddenResult.getAction() + " " + SEPARATOR;
+                result = result + " " + currentHiddenResult.getPlayerName() + " " + SEPARATOR;
+                if(currentHiddenResult.getResult()!=null && !currentHiddenResult.getResult().equals(""))
+                    result = result + " " + currentHiddenResult.getResult() + " " + SEPARATOR;
+                else
+                    result = result + " NULL " + SEPARATOR;
+                result = result + " " + currentHiddenResult.getTime() + " " + SEPARATOR;
+            }
+            result = result + " " +  MATCH_SEPARATOR + " ";
         }
         return result;
     }
@@ -129,9 +149,54 @@ public class HashMatchUtil {
             String awayResult = word;
             match.setAwayResult(awayResult);
 
-            result.add(match);
+            token.nextToken();
+
+            word = token.nextToken();
+            String isFissa = word;
+            if(isFissa.equals("true")){
+                match.setFissa(true);
+            }else{
+                match.setFissa(false);
+            }
 
             token.nextToken();
+            ArrayList<HiddenResult> allHiddenResult = new ArrayList<>();
+            while(!word.equals(MATCH_SEPARATOR)){
+                word = token.nextToken();
+                if(word.equals(MATCH_SEPARATOR)){
+                    break;
+                }
+                String actionTeam = word;
+                token.nextToken();
+
+                word = token.nextToken();
+                String action = word;
+                token.nextToken();
+
+                word = token.nextToken();
+                String playerName = word;
+                while(!word.equals(SEPARATOR)) {
+                    word = token.nextToken();
+                    if(!word.equals(SEPARATOR))
+                        playerName = playerName + " " + word;
+                }
+
+                word = token.nextToken();
+                String resultMatchHidden = word;
+                token.nextToken();
+
+                word = token.nextToken();
+                String timeHidden = word;
+                HiddenResult hiddenResult = new ParcelableHiddenResult(playerName,timeHidden,action, Integer.parseInt(actionTeam));
+                if(!resultMatchHidden.equals("NULL"))
+                    hiddenResult.setResult(resultMatchHidden);
+                allHiddenResult.add(hiddenResult);
+                word = token.nextToken();
+            }
+            match.setAllHiddenResult(allHiddenResult);
+            result.add(match);
+
+           // token.nextToken();
         }
         return result;
     }

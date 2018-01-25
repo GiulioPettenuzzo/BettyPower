@@ -9,11 +9,13 @@ import com.bettypower.betMatchFinder.listeners.RealTimeElaborationListener;
 import com.bettypower.betMatchFinder.listeners.StaticElaborationListener;
 import com.bettypower.betMatchFinder.threads.RealTimeThread;
 import com.bettypower.betMatchFinder.threads.StaticThread;
+import com.bettypower.entities.Bet;
 import com.bettypower.entities.Comparator.PalimpsestMatchByPalimpsestComparator;
 import com.bettypower.entities.Match;
 import com.bettypower.entities.PalimpsestMatch;
 import com.bettypower.entities.ParcelableMatch;
 import com.bettypower.entities.ParcelableTeam;
+import com.bettypower.entities.SingleBet;
 import com.bettypower.entities.Team;
 import com.bettypower.matchFinder.ResponseResolver;
 import com.renard.ocr.TextFairyApplication;
@@ -139,7 +141,8 @@ public class Resolver {
                 allMatchFound.add(match);
             }
         }
-        completeElaborationListener.onElaborationComplete(allMatchFound);
+        Bet bet = new SingleBet(allMatchFound);
+        completeElaborationListener.onElaborationComplete(bet);
     }
 
     /**

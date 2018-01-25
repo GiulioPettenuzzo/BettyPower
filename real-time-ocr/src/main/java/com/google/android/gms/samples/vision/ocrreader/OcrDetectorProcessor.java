@@ -105,6 +105,7 @@ public class OcrDetectorProcessor implements Detector.Processor<TextBlock> {
              ) {
             result = result + " " + currentText;
         }
+        Log.i("real-time",result);
         return result;
     }
 }

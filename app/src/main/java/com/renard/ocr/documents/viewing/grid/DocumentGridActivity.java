@@ -28,6 +28,7 @@ import com.bettypower.entities.ParcelablePalimpsestMatch;
 import com.bettypower.entities.ParcelableTeam;
 import com.bettypower.unpacker.AllMatchesByPalimpsestURLUnpacker;
 import com.bettypower.unpacker.AllMatchesByPalimpsestUnpacker;
+import com.bettypower.util.touchHelper.ItemTouchHelperCallback;
 import com.renard.ocr.HintDialog;
 import com.renard.ocr.PermissionGrantedEvent;
 import com.renard.ocr.R;
@@ -72,7 +73,10 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.view.ActionMode;
+import android.support.v7.widget.CardView;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -104,6 +108,7 @@ public class DocumentGridActivity extends NewDocumentActivity implements Documen
     private static final String LOG_TAG = DocumentGridActivity.class.getSimpleName();
     private DocumentGridAdapter mDocumentAdapter;
     private GridView mGridView;
+
     private static final int MESSAGE_UPDATE_THUMNAILS = 1;
     private static final int DELAY_SHOW_THUMBNAILS = 550;
     private static final String SAVE_STATE_KEY = "selection";
@@ -143,7 +148,6 @@ public class DocumentGridActivity extends NewDocumentActivity implements Documen
                         Log.i("primo volley", "uno");
                         AllMatchesByPalimpsestURLUnpacker allMatchesByPalimpsestURLUnpacker = new AllMatchesByPalimpsestURLUnpacker(response);
                         ArrayList<String> allUrl = allMatchesByPalimpsestURLUnpacker.getAllURL();
-
                         //AllMatchesByPalimpsestUnpacker allMatchesByPalimpsestUnpacker = new AllMatchesByPalimpsestUnpacker(getApplicationContext(), currentURL, new AllMatchesByPalimpsestUnpacker.ResponseLoaderListener() {
                         final AllMatchesByPalimpsestUnpacker allMatchesByPalimpsestUnpacker = new AllMatchesByPalimpsestUnpacker(getApplicationContext(), allUrl, new AllMatchesByPalimpsestUnpacker.ResponseLoaderListener() {
 
@@ -818,7 +822,8 @@ public class DocumentGridActivity extends NewDocumentActivity implements Documen
         final int[] outNum = new int[1];
         final int columnWidth = Util.determineThumbnailSize(this, outNum);
         mGridView.setColumnWidth(columnWidth);
-        mGridView.setNumColumns(outNum[0]);
+       // mGridView.setNumColumns(outNum[0]);
+        mGridView.setNumColumns(1);
         final View emptyView = findViewById(R.id.empty_view);
         mGridView.setEmptyView(emptyView);
     }

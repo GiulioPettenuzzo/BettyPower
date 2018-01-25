@@ -10,6 +10,7 @@ import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -22,6 +23,9 @@ public class SingleBetImageActivity extends AppCompatActivity {
 
     private MenuItem shareImage;
     private boolean editMode;
+    Bitmap myBitmap;
+    Intent intent;
+    ImageView imageView;
 
     private static final String EDIT_MODE = "edit_mode";
     private static final String IMAGE_URI = "image_uri";
@@ -30,22 +34,35 @@ public class SingleBetImageActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_single_bet_image);
-        ImageView imageView = (ImageView) findViewById(R.id.single_bet_image);
-        Intent intent = getIntent();
-        Uri uri = intent.getParcelableExtra(IMAGE_URI);
+        imageView = (ImageView) findViewById(R.id.single_bet_image);
+        intent = getIntent();
         if(savedInstanceState!=null && savedInstanceState.containsKey(EDIT_MODE)){
             editMode = savedInstanceState.getBoolean(EDIT_MODE);
         }
         else {
             editMode = intent.getBooleanExtra(EDIT_MODE, false);
         }
-        Cursor c = getContentResolver().query(uri, new String[]{DocumentContentProvider.Columns.PHOTO_PATH}, null, null, null);
-        if (c != null) {
-            c.moveToFirst();
-            Bitmap myBitmap = BitmapFactory.decodeFile(c.getString(c.getPosition()));
-            imageView.setImageBitmap(myBitmap);
-            c.close();
-        }
+        Thread loadBitmap = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Uri uri = intent.getParcelableExtra(IMAGE_URI);
+                Cursor c = getContentResolver().query(uri, new String[]{DocumentContentProvider.Columns.PHOTO_PATH}, null, null, null);
+                if (c != null) {
+                    c.moveToFirst();
+                    myBitmap = BitmapFactory.decodeFile(c.getString(c.getPosition()));
+                    c.close();
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            imageView.setImageBitmap(myBitmap);
+                        }
+                    });
+                }
+            }
+        });
+        loadBitmap.start();
+
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar2);
         setSupportActionBar(toolbar);
         toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_48px);
@@ -66,8 +83,12 @@ public class SingleBetImageActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
             case android.R.id.home:
-                finish();
+                //finish();
+                //return true;
+                this.dispatchKeyEvent(new KeyEvent (KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_BACK));
+                this.dispatchKeyEvent(new KeyEvent (KeyEvent.ACTION_UP, KeyEvent.KEYCODE_BACK));
                 return true;
+
             case R.id.share_image:
                 //TODO
                 return true;

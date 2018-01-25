@@ -46,6 +46,10 @@ public interface Match extends Parcelable {
 
      void setAwayResult(String result);
 
+     void setFissa(boolean fissa);
+
+     boolean isFissa();
+
      ArrayList<HiddenResult> getAllHiddenResult();
 
      void setAllHiddenResult(ArrayList<HiddenResult> allHiddenResult);
