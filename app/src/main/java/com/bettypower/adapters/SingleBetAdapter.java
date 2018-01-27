@@ -30,7 +30,9 @@ import android.widget.TextView;
 import com.bettypower.HiddenResultLayout;
 import com.bettypower.SingleBetActivity;
 import com.bettypower.adapters.helpers.CorrectionToUserWatcher;
+import com.bettypower.adapters.helpers.ExpandCollapseClickExecutor;
 import com.bettypower.dialog.DeleteMatchDialog;
+import com.bettypower.dialog.SetBetDialog;
 import com.bettypower.entities.Bet;
 import com.bettypower.entities.HiddenResult;
 import com.bettypower.entities.Match;
@@ -65,9 +67,6 @@ public class SingleBetAdapter extends RecyclerView.Adapter implements ItemTouchH
 
     private static final int ELEVATION = 0;
 
-
-    private OutsideClicklistener outsideClicklistener;
-    private DialogListener dialogListener;
     private static Context context;
     private Uri uri;
     private ImageHelper imageHelper;
@@ -112,9 +111,6 @@ public class SingleBetAdapter extends RecyclerView.Adapter implements ItemTouchH
                 viewHolder.awayLogo.setImageBitmap(null);
                 viewHolder.homeLogo.setImageBitmap(null);
                 viewHolder.hiddenResult.removeAllViews();
-                viewHolder.fissaCheckBox.setOnCheckedChangeListener(null);
-                viewHolder.itemView.setOnClickListener(null);
-                Log.i("sto", "reciclando");
                 break;
             case 1:
                 SingleBetAdapter.LastItemViewHolder lastItemViewHolder = (SingleBetAdapter.LastItemViewHolder) holder;
@@ -255,7 +251,6 @@ public class SingleBetAdapter extends RecyclerView.Adapter implements ItemTouchH
                 allMatches.remove(position);
                 notifyItemChanged(allMatches.size()+1);
                 notifyItemRemoved(position);
-
             }
 
             @Override
@@ -274,10 +269,14 @@ public class SingleBetAdapter extends RecyclerView.Adapter implements ItemTouchH
         deleteMatchDialog.show();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         public View itemView;
         public View lineSeparator;
+        public ImageView dropDownImageView;
+        public LinearLayout hiddenResult;
+        public boolean isItemSelected = false;
+
         TextView homeTeam;
         TextView awayTeam;
         TextView homeScores;
@@ -288,16 +287,10 @@ public class SingleBetAdapter extends RecyclerView.Adapter implements ItemTouchH
         TextView quote;
         CheckBox fissaCheckBox;
         TextView fissaTextView;
-        public ImageView dropDownImageView;
         ImageView homeLogo;
         ImageView awayLogo;
-
-        public LinearLayout hiddenResult;
         ConstraintLayout normalResult;
         Match match;
-
-        public boolean isItemSelected = false;
-
 
         private ViewHolder(View itemView) {
             super(itemView);
@@ -318,7 +311,7 @@ public class SingleBetAdapter extends RecyclerView.Adapter implements ItemTouchH
             quote = (TextView) itemView.findViewById(R.id.quote);
             fissaCheckBox = (CheckBox) itemView.findViewById(R.id.fissa_check_box);
             fissaTextView = (TextView) itemView.findViewById(R.id.fissa_text_view);
-            lineSeparator = (View) itemView.findViewById(R.id.separator_line);
+            lineSeparator = itemView.findViewById(R.id.separator_line);
             ConstraintSet set = new ConstraintSet();
             set.clone(normalResult);
             set.constrainWidth(homeTeam.getId(),ConstraintLayout.LayoutParams.MATCH_CONSTRAINT);
@@ -326,7 +319,21 @@ public class SingleBetAdapter extends RecyclerView.Adapter implements ItemTouchH
 
             set.applyTo(normalResult);
 
-
+            //questo layout ha due click listener, uno per l'edit mode e uno per l'expande collapse,
+            //vanno messi qui...
+            //in piu il click listener delle check box
+            itemView.setOnClickListener(this);
+            fissaCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    if(isChecked){
+                        match.setFissa(true);
+                    }
+                    else{
+                        match.setFissa(false);
+                    }
+                }
+            });
             fissaCheckBox.setVisibility(View.GONE);
             fissaTextView.setVisibility(View.GONE);
         }
@@ -343,22 +350,10 @@ public class SingleBetAdapter extends RecyclerView.Adapter implements ItemTouchH
             betKind.setText(match.getBetKind());
             quote.setText(match.getQuote());
 
-            Picasso.with(context).load("file:"+context.getDir("logo_images", Context.MODE_PRIVATE).getPath()+"/"+match.getHomeTeam().getName() + ".png").into(homeLogo);
-            if(homeLogo.getDrawable()==null) {
-                homeLogo.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_shield_with_castle_inside));
-            }
-            Picasso.with(context).load("file:"+context.getDir("logo_images", Context.MODE_PRIVATE).getPath()+"/"+match.getAwayTeam().getName() + ".png").into(awayLogo);
-            if(awayLogo.getDrawable()==null) {
-                awayLogo.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_eagle_shield));
-            }
+            Picasso.with(context).load("file:"+context.getDir("logo_images", Context.MODE_PRIVATE).getPath()+"/"+match.getHomeTeam().getName() + ".png").error(context.getResources().getDrawable(R.drawable.ic_shield_with_castle_inside)).into(homeLogo);
+            Picasso.with(context).load("file:"+context.getDir("logo_images", Context.MODE_PRIVATE).getPath()+"/"+match.getAwayTeam().getName() + ".png").error(context.getResources().getDrawable(R.drawable.ic_eagle_shield)).into(awayLogo);
 
             if(editMode){
-                itemView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        dialogListener.onCreateDialog(match);
-                    }
-                });
                 lineSeparator.setVisibility(View.GONE);
                 dropDownImageView.setVisibility(View.VISIBLE);
                 dropDownImageView.setImageDrawable(context.getResources().getDrawable(R.drawable.edit_black));
@@ -373,17 +368,6 @@ public class SingleBetAdapter extends RecyclerView.Adapter implements ItemTouchH
                 if(singleBet.isSistema()){
                     fissaCheckBox.setVisibility(View.VISIBLE);
                     fissaTextView.setVisibility(View.GONE);
-                    fissaCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                        @Override
-                        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                            if(isChecked){
-                                match.setFissa(true);
-                            }
-                            else{
-                                match.setFissa(false);
-                            }
-                        }
-                    });
                     if(match.isFissa()){
                         fissaCheckBox.setChecked(true);
                     }
@@ -394,7 +378,6 @@ public class SingleBetAdapter extends RecyclerView.Adapter implements ItemTouchH
                     fissaCheckBox.setVisibility(View.GONE);
                 }
             }else{
-                outsideClicklistener.onItemClicked(context,this, match, isSelected);
                 dropDownImageView.setVisibility(View.VISIBLE);
                 hiddenResult.setVisibility(View.VISIBLE);
                 hiddenResult.getLayoutParams().height = ConstraintLayout.LayoutParams.WRAP_CONTENT;
@@ -402,7 +385,6 @@ public class SingleBetAdapter extends RecyclerView.Adapter implements ItemTouchH
                 if(match.isFissa()){
                     fissaTextView.setVisibility(View.VISIBLE);
                     fissaCheckBox.setChecked(true);
-                    Log.i("fissa",String.valueOf(allMatches.lastIndexOf(match)));
                 }
                 else{
                     fissaCheckBox.setChecked(false);
@@ -434,6 +416,45 @@ public class SingleBetAdapter extends RecyclerView.Adapter implements ItemTouchH
             }
         }
 
+        private boolean isClicking = false; //used for disable the expandCollapseExecutor when he is already operating
+        /**
+         * Called when a view has been clicked.
+         *
+         * @param v The view that was clicked.
+         */
+        @Override
+        public void onClick(View v) {
+            if(!editMode && !isClicking) {
+                ExpandCollapseClickExecutor expandCollapseClickExecutor = new ExpandCollapseClickExecutor(context, ViewHolder.this, match, isSelected);
+                expandCollapseClickExecutor.setCickStat(new ExpandCollapseClickExecutor.ClickStat() {
+                    @Override
+                    public void onClickStart() {
+                        isClicking = true;
+                        expandCollapseClickMode.onClickStart();
+                    }
+
+                    @Override
+                    public void onClickEnds() {
+                        isClicking = false;
+                        expandCollapseClickMode.onClickEnds();
+                    }
+                });
+                expandCollapseClickExecutor.onClick();
+            }
+            if(editMode) {
+                SetBetDialog selectBetDialog = new SetBetDialog(context, match);
+                selectBetDialog.setFinishEdittingDialogListener(new SetBetDialog.FinishEdittingDialogListener() {
+                    @Override
+                    public void onEdittingDialogFinish(Match editMatch) {
+                        match.setBetKind(editMatch.getBetKind());
+                        match.setBet(editMatch.getBet());
+                        match.setQuote(editMatch.getQuote());
+                        notifyItemChanged(allMatches.lastIndexOf(match));
+                    }
+                });
+                selectBetDialog.show();
+            }
+        }
     }
 
     public class LastItemViewHolder extends RecyclerView.ViewHolder{
@@ -472,7 +493,7 @@ public class SingleBetAdapter extends RecyclerView.Adapter implements ItemTouchH
             numberMatchLostTextView = (TextView) itemView.findViewById(R.id.number_match_lost);
             numberMatchNotFinished = (TextView) itemView.findViewById(R.id.match_not_finished);
             bookMakerTextView = (TextView) itemView.findViewById(R.id.book_maker_text_view);
-            if(singleBet.getErrors()!=null) {
+          /*  if(singleBet.getErrors()!=null) {
                 String tmp = context.getResources().getString(R.string.sistema_errori) + " " + singleBet.getErrors();
                 errorsEditText.setText(singleBet.getErrors());
                 errorsTextView.setText(tmp);
@@ -505,7 +526,7 @@ public class SingleBetAdapter extends RecyclerView.Adapter implements ItemTouchH
                 sistemaCheckBox.setChecked(true);
             else
                 sistemaCheckBox.setChecked(false);
-            sistemaCheckBox.setOnCheckedChangeListener(new CheckedChangeListener());
+            sistemaCheckBox.setOnCheckedChangeListener(new CheckedChangeListener());*/
             setTextEdit();
 
         }
@@ -577,14 +598,17 @@ public class SingleBetAdapter extends RecyclerView.Adapter implements ItemTouchH
                     if(singleBet.getPuntata()!=null) {
                         String tmp = context.getResources().getString(R.string.totale_importo_scommesso) + " " + singleBet.getPuntata() + "€";
                         puntataTextView.setText(tmp);
+                        puntataEditText.setText(singleBet.getPuntata());
                     }
                     if(singleBet.getVincita()!=null) {
                         String tmp = context.getResources().getString(R.string.totale_vincita) + " " + singleBet.getVincita()+ "€";
                         vincitaTextView.setText(tmp);
+                        vincitaEditText.setText(singleBet.getVincita());
                     }
                     if(singleBet.getErrors()!=null) {
                         String tmp = context.getResources().getString(R.string.sistema_errori) + " " + singleBet.getErrors();
                         errorsTextView.setText(tmp);
+                        errorsEditText.setText(singleBet.getErrors());
                     }
 
                 }
@@ -722,6 +746,23 @@ public class SingleBetAdapter extends RecyclerView.Adapter implements ItemTouchH
 
             return euro;
         }
+
+        private class CheckedChangeListener implements CheckBox.OnCheckedChangeListener{
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if(isChecked){
+                    singleBet.setSistema(true);
+                    notifyDataSetChanged();
+                }else{
+                    singleBet.setSistema(false);
+                    for (Match currentMatch:allMatches
+                            ) {
+                        currentMatch.setFissa(false);
+                    }
+                    notifyDataSetChanged();
+                }
+            }
+        }
     }
 
     public void setUri(Uri uri){
@@ -737,36 +778,9 @@ public class SingleBetAdapter extends RecyclerView.Adapter implements ItemTouchH
         editModeConfirm = true;
     }
 
-    public void setOutsideClickListener(OutsideClicklistener outsideClickListener){
-        this.outsideClicklistener = outsideClickListener;
-    }
+    private ExpandCollapseClickExecutor.ClickStat expandCollapseClickMode;
 
-    public void setDialogListener(DialogListener dialogListener){
-        this.dialogListener = dialogListener;
-    }
-
-    public interface OutsideClicklistener{
-        void onItemClicked(Context context, SingleBetAdapter.ViewHolder holder, Match match, ArrayList<Match> isSelected);
-    }
-
-    public interface DialogListener{
-        void onCreateDialog(Match match);
-    }
-
-    private class CheckedChangeListener implements CheckBox.OnCheckedChangeListener{
-        @Override
-        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-            if(isChecked){
-                singleBet.setSistema(true);
-                notifyDataSetChanged();
-            }else{
-                singleBet.setSistema(false);
-                for (Match currentMatch:allMatches
-                        ) {
-                    currentMatch.setFissa(false);
-                }
-                notifyDataSetChanged();
-            }
-        }
+    public void setExpandCollapseClickMode(ExpandCollapseClickExecutor.ClickStat expandCollapseClickMode){
+        this.expandCollapseClickMode = expandCollapseClickMode;
     }
 }

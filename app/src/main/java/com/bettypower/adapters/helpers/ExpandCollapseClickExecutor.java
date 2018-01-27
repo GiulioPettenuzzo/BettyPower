@@ -1,4 +1,4 @@
-package com.bettypower.listeners;
+package com.bettypower.adapters.helpers;
 
 import android.animation.ValueAnimator;
 import android.content.Context;
@@ -15,42 +15,40 @@ import com.bettypower.adapters.SingleBetAdapter;
 import com.bettypower.entities.Match;
 import com.renard.ocr.R;
 
-
 import java.util.ArrayList;
 
 /**
- * Created by giuliopettenuzzo on 11/07/17.
+ * Class that provide the expand and collapse view when item is clicked and also the animation
+ * Created by giuliopettenuzzo on 27/01/18.
  */
 
-public class ExpandCollapseClickListener implements View.OnClickListener {
-    SingleBetAdapter.ViewHolder holder;
-    Match match;
-    ArrayList<Match> isSelected;
-    //private static int clickCounter = 0;
+public class ExpandCollapseClickExecutor {
+    private SingleBetAdapter.ViewHolder holder;
+    private Match match;
+    private ArrayList<Match> isSelected;
     private int originalHeight = 0;
     private float elevation = 0;
     private int hidenResultHeight = 0;
     private ValueAnimator dropDownAnimation;
-    Context context;
+    private Context context;
 
-    private ClickStat clickStat;
+    private ExpandCollapseClickExecutor.ClickStat clickStat;
 
 
     private final static int DURATION = 300;
 
 
-    public ExpandCollapseClickListener(Context context, SingleBetAdapter.ViewHolder holder, Match match, ArrayList<Match> isSelected){
+    public ExpandCollapseClickExecutor(Context context, SingleBetAdapter.ViewHolder holder, Match match, ArrayList<Match> isSelected){
         this.holder = holder;
         this.match = match;
         this.isSelected = isSelected;
         this.context = context;
     }
-    public void setCickStat(ClickStat clickStat){
+    public void setCickStat(ExpandCollapseClickExecutor.ClickStat clickStat){
         this.clickStat = clickStat;
     }
 
-    @Override
-    public void onClick(View v) {
+    public void onClick() {
         if (match.getAllHiddenResult()!= null&&match.getAllHiddenResult().size()>0&&isSelected.lastIndexOf(match) < 0) {
             clickStat.onClickStart();
             holder.isItemSelected = true;
@@ -68,7 +66,7 @@ public class ExpandCollapseClickListener implements View.OnClickListener {
             Thread x = new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    RotateAnimation rotate = new RotateAnimation(0,180,Animation.RELATIVE_TO_SELF,0.5f,Animation.RELATIVE_TO_SELF,0.5f);
+                    RotateAnimation rotate = new RotateAnimation(0,180, Animation.RELATIVE_TO_SELF,0.5f,Animation.RELATIVE_TO_SELF,0.5f);
                     holder.dropDownImageView.setAnimation(rotate);
                     rotate.setDuration(DURATION);
                     rotate.setFillEnabled(true);
@@ -111,12 +109,10 @@ public class ExpandCollapseClickListener implements View.OnClickListener {
                             dropDownAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                                 @Override
                                 public void onAnimationUpdate(ValueAnimator animation) {
-                                    Integer value = null;
-                                    value = (Integer) animation.getAnimatedValue();
+                                    Integer value = (Integer) animation.getAnimatedValue();
                                     holder.itemView.getLayoutParams().height = value;
                                     holder.hiddenResult.setVisibility(View.VISIBLE);
                                     if(holder.itemView.getLayoutParams().height>=originalHeight+hidenResultHeight) {
-                                        //holder.itemView.getLayoutParams().height = ConstraintLayout.LayoutParams.WRAP_CONTENT;
                                         holder.itemView.setMinimumHeight(value);
                                         holder.itemView.requestLayout();
                                         clickStat.onClickEnds();
@@ -173,8 +169,7 @@ public class ExpandCollapseClickListener implements View.OnClickListener {
             dropDownAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                 @Override
                 public void onAnimationUpdate(ValueAnimator animation) {
-                    Integer value = null;
-                    value = (Integer) animation.getAnimatedValue();
+                    Integer value = (Integer) animation.getAnimatedValue();
                     holder.itemView.getLayoutParams().height = value;
                     Log.i("rate", String.valueOf(value));
                     holder.hiddenResult.removeAllViews();
@@ -202,3 +197,4 @@ public class ExpandCollapseClickListener implements View.OnClickListener {
         void onClickEnds();
     }
 }
+

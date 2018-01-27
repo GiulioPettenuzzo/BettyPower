@@ -1,7 +1,6 @@
 package com.bettypower;
 
 import android.content.ContentValues;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.database.Cursor;
@@ -32,6 +31,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.bettypower.adapters.SingleBetAdapter;
+import com.bettypower.adapters.helpers.ExpandCollapseClickExecutor;
 import com.bettypower.dialog.SetBetDialog;
 import com.bettypower.entities.Bet;
 import com.bettypower.entities.HiddenResult;
@@ -40,7 +40,6 @@ import com.bettypower.entities.ParcelableHiddenResult;
 import com.bettypower.entities.ParcelableMatch;
 import com.bettypower.entities.ParcelableTeam;
 import com.bettypower.entities.SingleBet;
-import com.bettypower.listeners.ExpandCollapseClickListener;
 import com.bettypower.listeners.PreLoadingLinearLayoutManager;
 import com.bettypower.threads.LoadImageThread;
 import com.bettypower.threads.RefreshResultThread;
@@ -112,8 +111,8 @@ public class SingleBetActivity extends AppCompatActivity {
             }
             //singleBetAdapter.setHasStableIds(true);
             rVSingleBet.setAdapter(singleBetAdapter);
-            singleBetAdapter.setOutsideClickListener(new ActivityClickListener());
-            singleBetAdapter.setDialogListener(new DialogClickListener());
+            singleBetAdapter.setExpandCollapseClickMode(new ExpandCollapseItemClickModeListener());
+            //singleBetAdapter.setDialogListener(new DialogClickListener());
         } else {
             setMatchLoadListener(new MatchLoadListener());
             firstTimeMatchLoader();
@@ -258,7 +257,6 @@ public class SingleBetActivity extends AppCompatActivity {
         confirmMenuItem.setVisible(true);
         editMode = true;
         singleBetAdapter.setEditMode(true);
-        singleBetAdapter.setOutsideClickListener(null);
 
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.action_bar_edit_mode)));
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -280,7 +278,6 @@ public class SingleBetActivity extends AppCompatActivity {
         confirmMenuItem.setVisible(false);
         editMode = false;
         singleBetAdapter.setEditMode(false);
-        singleBetAdapter.setOutsideClickListener(new ActivityClickListener());
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.primary)));
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             getWindow().setStatusBarColor(getResources().getColor(R.color.primary));
@@ -340,13 +337,9 @@ public class SingleBetActivity extends AppCompatActivity {
                     bet.setErrors(c.getString(c.getColumnIndex(DocumentContentProvider.Columns.ERROR_NUMBER)));
                     c.close();
                     singleBetAdapter = new SingleBetAdapter(SingleBetActivity.this,bet);
-                    //singleBetAdapter.setHasStableIds(true);
                     singleBetAdapter.setUri(uri);
-                    singleBetAdapter.setOutsideClickListener(new ActivityClickListener());
-                    singleBetAdapter.setDialogListener(new DialogClickListener());
+                    singleBetAdapter.setExpandCollapseClickMode(new ExpandCollapseItemClickModeListener());
                     rVSingleBet.setAdapter(singleBetAdapter);
-                    //allMatchLoadListener.onMatchesLoaded();
-
                 }
             });
             loadMatchesFromMemory.start();
@@ -373,12 +366,10 @@ public class SingleBetActivity extends AppCompatActivity {
                 currentMatch.setAllHiddenResult(getHiddenResultForTest());
             }
             singleBetAdapter = new SingleBetAdapter(SingleBetActivity.this, bet);
-            //singleBetAdapter.setHasStableIds(true);
             singleBetAdapter.setUri(uri);
             rVSingleBet.setAdapter(singleBetAdapter);
             allMatchLoadListener.onMatchesLoaded();
-            singleBetAdapter.setOutsideClickListener(new ActivityClickListener());
-            singleBetAdapter.setDialogListener(new DialogClickListener());
+            singleBetAdapter.setExpandCollapseClickMode(new ExpandCollapseItemClickModeListener());
             ContentValues values = new ContentValues();
             values.put(DocumentContentProvider.Columns.EVENT_NUMBER,String.valueOf(allMatch.size()));
             getApplicationContext().getContentResolver().update(uri,values,null,null);
@@ -430,47 +421,20 @@ public class SingleBetActivity extends AppCompatActivity {
      * this is what doing during the animation click item:
      *
      */
-    private class ActivityClickListener implements SingleBetAdapter.OutsideClicklistener{
+    private class ExpandCollapseItemClickModeListener implements ExpandCollapseClickExecutor.ClickStat{
 
         @Override
-        public void onItemClicked(Context context, final SingleBetAdapter.ViewHolder holder, Match match, ArrayList<Match> isSelected) {
-            final ExpandCollapseClickListener expandCollapseClickListener = new ExpandCollapseClickListener(context,holder,match,isSelected);
-            holder.itemView.setOnClickListener(expandCollapseClickListener);
-            expandCollapseClickListener.setCickStat(new ExpandCollapseClickListener.ClickStat() {
-                @Override
-                public void onClickStart() {
-                    holder.itemView.setOnClickListener(null);
-                    swipeRefreshLayout.setEnabled(false);
-                    rVLayoutManager.setScrollEnabled(false);
-                    isClicking = true;
-                }
-
-                @Override
-                public void onClickEnds() {
-                    holder.itemView.setOnClickListener(expandCollapseClickListener);
-                    swipeRefreshLayout.setEnabled(true);
-                    rVLayoutManager.setScrollEnabled(true);
-                    isClicking = false;
-                }
-            });
+        public void onClickStart() {
+            swipeRefreshLayout.setEnabled(false);
+            rVLayoutManager.setScrollEnabled(false);
+            isClicking = true;
         }
-    }
-
-    private class DialogClickListener implements SingleBetAdapter.DialogListener{
 
         @Override
-        public void onCreateDialog(final Match match) {
-            SetBetDialog selectBetDialog = new SetBetDialog(SingleBetActivity.this,match);
-            selectBetDialog.show();
-            selectBetDialog.setFinishEdittingDialogListener(new SetBetDialog.FinishEdittingDialogListener() {
-                @Override
-                public void onEdittingDialogFinish(Match editMatch) {
-                    match.setBetKind(editMatch.getBetKind());
-                    match.setBet(editMatch.getBet());
-                    match.setQuote(editMatch.getQuote());
-                    singleBetAdapter.notifyDataSetChanged();
-                }
-            });
+        public void onClickEnds() {
+            swipeRefreshLayout.setEnabled(true);
+            rVLayoutManager.setScrollEnabled(true);
+            isClicking = false;
         }
     }
 
