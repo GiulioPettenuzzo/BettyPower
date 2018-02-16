@@ -13,6 +13,7 @@ import android.view.animation.RotateAnimation;
 
 import com.bettypower.adapters.SingleBetAdapter;
 import com.bettypower.entities.Match;
+import com.bettypower.entities.PalimpsestMatch;
 import com.renard.ocr.R;
 
 import java.util.ArrayList;
@@ -24,8 +25,8 @@ import java.util.ArrayList;
 
 public class ExpandCollapseClickExecutor {
     private SingleBetAdapter.ViewHolder holder;
-    private Match match;
-    private ArrayList<Match> isSelected;
+    private PalimpsestMatch match;
+    private ArrayList<PalimpsestMatch> isSelected;
     private int originalHeight = 0;
     private float elevation = 0;
     private int hidenResultHeight = 0;
@@ -38,7 +39,7 @@ public class ExpandCollapseClickExecutor {
     private final static int DURATION = 300;
 
 
-    public ExpandCollapseClickExecutor(Context context, SingleBetAdapter.ViewHolder holder, Match match, ArrayList<Match> isSelected){
+    public ExpandCollapseClickExecutor(Context context, SingleBetAdapter.ViewHolder holder, PalimpsestMatch match, ArrayList<PalimpsestMatch> isSelected){
         this.holder = holder;
         this.match = match;
         this.isSelected = isSelected;

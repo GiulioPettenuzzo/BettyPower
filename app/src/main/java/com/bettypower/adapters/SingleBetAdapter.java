@@ -42,6 +42,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Observer;
 
+import com.bettypower.entities.PalimpsestMatch;
 import com.bettypower.entities.ParcelableHiddenResult;
 import com.bettypower.entities.SingleBet;
 import com.bettypower.listeners.PreLoadingLinearLayoutManager;
@@ -59,8 +60,8 @@ import com.squareup.picasso.Picasso;
 public class SingleBetAdapter extends RecyclerView.Adapter implements ItemTouchHelperAdapter {
 
     private Bet singleBet;
-    private ArrayList<Match> allMatches = new ArrayList<>();
-    private ArrayList<Match> isSelected = new ArrayList<>();
+    private ArrayList<PalimpsestMatch> allMatches = new ArrayList<>();
+    private ArrayList<PalimpsestMatch> isSelected = new ArrayList<>();
 
     private boolean editMode = false;
     private boolean editModeConfirm = false;
@@ -79,7 +80,7 @@ public class SingleBetAdapter extends RecyclerView.Adapter implements ItemTouchH
         imageHelper = new ImageHelper(context);
     }
     //constructor for instance state
-    public SingleBetAdapter(Context context, Bet singleBet, ArrayList<Match> allSelectedMatch){
+    public SingleBetAdapter(Context context, Bet singleBet, ArrayList<PalimpsestMatch> allSelectedMatch){
         SingleBetAdapter.context = context;
         this.singleBet = singleBet;
         this.allMatches = singleBet.getArrayMatch();
@@ -211,11 +212,11 @@ public class SingleBetAdapter extends RecyclerView.Adapter implements ItemTouchH
         }
     }
 
-    public ArrayList<Match> getSelectedMatch(){
+    public ArrayList<PalimpsestMatch> getSelectedMatch(){
         return isSelected;
     }
 
-    public void setAllMatches(ArrayList<Match> allMatches){
+    public void setAllMatches(ArrayList<PalimpsestMatch> allMatches){
         this.allMatches = allMatches;
         //notifyDataSetChanged();
     }
@@ -290,7 +291,7 @@ public class SingleBetAdapter extends RecyclerView.Adapter implements ItemTouchH
         ImageView homeLogo;
         ImageView awayLogo;
         ConstraintLayout normalResult;
-        Match match;
+        PalimpsestMatch match;
 
         private ViewHolder(View itemView) {
             super(itemView);
@@ -319,9 +320,6 @@ public class SingleBetAdapter extends RecyclerView.Adapter implements ItemTouchH
 
             set.applyTo(normalResult);
 
-            //questo layout ha due click listener, uno per l'edit mode e uno per l'expande collapse,
-            //vanno messi qui...
-            //in piu il click listener delle check box
             itemView.setOnClickListener(this);
             fissaCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
@@ -339,7 +337,7 @@ public class SingleBetAdapter extends RecyclerView.Adapter implements ItemTouchH
         }
 
 
-        private void setItemView(Match mmatch){
+        private void setItemView(PalimpsestMatch mmatch){
             this.match = mmatch;
             homeTeam.setText(match.getHomeTeam().getName());
             awayTeam.setText(match.getAwayTeam().getName());
@@ -349,10 +347,9 @@ public class SingleBetAdapter extends RecyclerView.Adapter implements ItemTouchH
             bet.setText(match.getBet());
             betKind.setText(match.getBetKind());
             quote.setText(match.getQuote());
-
-            Picasso.with(context).load("file:"+context.getDir("logo_images", Context.MODE_PRIVATE).getPath()+"/"+match.getHomeTeam().getName() + ".png").error(context.getResources().getDrawable(R.drawable.ic_shield_with_castle_inside)).into(homeLogo);
-            Picasso.with(context).load("file:"+context.getDir("logo_images", Context.MODE_PRIVATE).getPath()+"/"+match.getAwayTeam().getName() + ".png").error(context.getResources().getDrawable(R.drawable.ic_eagle_shield)).into(awayLogo);
-
+            //homeLogo.setImageDrawable();
+            Picasso.with(context).load("file:"+context.getDir("logo_images", Context.MODE_PRIVATE).getPath()+"/"+match.getHomeTeam().getName() + ".png").placeholder(context.getResources().getDrawable(R.drawable.ic_shield_with_castle_inside)).error(context.getResources().getDrawable(R.drawable.ic_shield_with_castle_inside)).into(homeLogo);
+            Picasso.with(context).load("file:"+context.getDir("logo_images", Context.MODE_PRIVATE).getPath()+"/"+match.getAwayTeam().getName() + ".png").placeholder(context.getResources().getDrawable(R.drawable.ic_eagle_shield)).error(context.getResources().getDrawable(R.drawable.ic_eagle_shield)).into(awayLogo);
             if(editMode){
                 lineSeparator.setVisibility(View.GONE);
                 dropDownImageView.setVisibility(View.VISIBLE);
@@ -445,7 +442,7 @@ public class SingleBetAdapter extends RecyclerView.Adapter implements ItemTouchH
                 SetBetDialog selectBetDialog = new SetBetDialog(context, match);
                 selectBetDialog.setFinishEdittingDialogListener(new SetBetDialog.FinishEdittingDialogListener() {
                     @Override
-                    public void onEdittingDialogFinish(Match editMatch) {
+                    public void onEdittingDialogFinish(PalimpsestMatch editMatch) {
                         match.setBetKind(editMatch.getBetKind());
                         match.setBet(editMatch.getBet());
                         match.setQuote(editMatch.getQuote());
@@ -467,7 +464,6 @@ public class SingleBetAdapter extends RecyclerView.Adapter implements ItemTouchH
         EditText puntataEditText;
         EditText errorsEditText;
         CheckBox sistemaCheckBox;
-
         TextView errorsTextView;
         TextView numberMatchWinTextView;
         TextView numberMatchLostTextView;
@@ -487,12 +483,13 @@ public class SingleBetAdapter extends RecyclerView.Adapter implements ItemTouchH
             puntataEditText = (EditText) itemView.findViewById(R.id.puntata_edit_text);
             vincitaTextView = (TextView) itemView.findViewById(R.id.vincita);
             errorsEditText = (EditText) itemView.findViewById(R.id.errors_edit_text);
-            sistemaCheckBox = (CheckBox) itemView.findViewById(R.id.checkBox);
+            sistemaCheckBox = (CheckBox) itemView.findViewById(R.id.sistema_checkbox);
             errorsTextView = (TextView) itemView.findViewById(R.id.errors_text_view);
             numberMatchWinTextView = (TextView) itemView.findViewById(R.id.number_match_win);
             numberMatchLostTextView = (TextView) itemView.findViewById(R.id.number_match_lost);
             numberMatchNotFinished = (TextView) itemView.findViewById(R.id.match_not_finished);
             bookMakerTextView = (TextView) itemView.findViewById(R.id.book_maker_text_view);
+           // sistemaCheckBox.setOnCheckedChangeListener(new CheckedChangeListener());
           /*  if(singleBet.getErrors()!=null) {
                 String tmp = context.getResources().getString(R.string.sistema_errori) + " " + singleBet.getErrors();
                 errorsEditText.setText(singleBet.getErrors());
@@ -548,6 +545,7 @@ public class SingleBetAdapter extends RecyclerView.Adapter implements ItemTouchH
                     sistemaCheckBox.setChecked(true);
                 else
                     sistemaCheckBox.setChecked(false);
+                //TODO non il listener qui dentro
                 sistemaCheckBox.setOnCheckedChangeListener(new CheckedChangeListener());
                 sistemaCheckBox.setVisibility(View.VISIBLE);
                 errorsTextView.setText(context.getResources().getString(R.string.sistema_errori));
@@ -591,7 +589,7 @@ public class SingleBetAdapter extends RecyclerView.Adapter implements ItemTouchH
                         singleBet.setVincita(null);
                         values.put(DocumentContentProvider.Columns.IMPORTO_PAGAMENTO, (String) null);
                     }
-                    values.put(DocumentContentProvider.Columns.EVENT_NUMBER, (String) String.valueOf(allMatches.size()));
+                    values.put(DocumentContentProvider.Columns.EVENT_NUMBER, String.valueOf(allMatches.size()));
                     context.getContentResolver().update(uri,values,null,null);
                 }
                 else{
@@ -727,6 +725,9 @@ public class SingleBetAdapter extends RecyclerView.Adapter implements ItemTouchH
                         if (Integer.parseInt(errorsEditText.getText().toString()) > allMatches.size()) {
                             errorsEditText.setText(String.valueOf(allMatches.size() - 1));
                         }
+                        if(Integer.parseInt(errorsEditText.getText().toString()) <= 0){
+                            errorsEditText.setText("");
+                        }
                     }
                 }
             });
@@ -750,17 +751,19 @@ public class SingleBetAdapter extends RecyclerView.Adapter implements ItemTouchH
         private class CheckedChangeListener implements CheckBox.OnCheckedChangeListener{
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if(isChecked){
-                    singleBet.setSistema(true);
-                    notifyDataSetChanged();
-                }else{
-                    singleBet.setSistema(false);
-                    for (Match currentMatch:allMatches
-                            ) {
-                        currentMatch.setFissa(false);
+               // if(buttonView.getVisibility()==View.VISIBLE) { //per quando togli il listenere dalla bind
+                    if (isChecked) {
+                        singleBet.setSistema(true);
+                        notifyDataSetChanged();
+                    } else {
+                        singleBet.setSistema(false);
+                        for (PalimpsestMatch currentMatch : allMatches
+                                ) {
+                            currentMatch.setFissa(false);
+                        }
+                        notifyDataSetChanged();
                     }
-                    notifyDataSetChanged();
-                }
+              //  }
             }
         }
     }

@@ -15,27 +15,9 @@
  */
 package com.renard.ocr;
 
-import com.android.volley.DefaultRetryPolicy;
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
-import com.bettypower.SingleBetActivity;
-import com.bettypower.adapters.SingleBetAdapter;
 import com.bettypower.betMatchFinder.Resolver;
 import com.bettypower.entities.Match;
 import com.bettypower.entities.PalimpsestMatch;
-import com.bettypower.entities.ParcelableMatch;
-import com.bettypower.entities.ParcelablePalimpsestMatch;
-import com.bettypower.entities.ParcelableTeam;
-import com.bettypower.matchFinder.MatchFinder;
-import com.bettypower.matchFinder.ResponseResolver;
-import com.bettypower.threads.RealTimeFinderThread;
-import com.bettypower.unpacker.AllMatchesByPalimpsestURLUnpacker;
-import com.bettypower.unpacker.AllMatchesByPalimpsestUnpacker;
-import com.bettypower.unpacker.MatchpointUnpacker;
 import com.crashlytics.android.Crashlytics;
 import com.crashlytics.android.ndk.CrashlyticsNdk;
 import com.googlecode.tesseract.android.TessBaseAPI;
@@ -48,7 +30,6 @@ import com.renard.ocr.util.ResourceUtils;
 import com.squareup.leakcanary.LeakCanary;
 
 import android.app.Application;
-import android.content.Context;
 import android.os.StrictMode;
 import android.util.Log;
 import android.view.ViewConfiguration;
@@ -65,6 +46,7 @@ public class TextFairyApplication extends Application {
 
     private Analytics mAnalytics;
     private ArrayList<PalimpsestMatch> allPalimpsestMatch;
+    private  ArrayList<Match> allMatches = new ArrayList<>();
     public boolean isPalimpsestMatchLoaded = false;
     public AllMatchLoadListener allMatchLoadListener;
     public Resolver resolver;
@@ -105,6 +87,7 @@ public class TextFairyApplication extends Application {
     public void setAllPalimpsestMatch(ArrayList<PalimpsestMatch> allPalimpsestMatch){
         this.allPalimpsestMatch = allPalimpsestMatch;
     }
+
 
     private void checkLanguages() {
         if (BuildConfig.DEBUG) {

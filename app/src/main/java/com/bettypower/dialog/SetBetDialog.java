@@ -21,6 +21,7 @@ import android.widget.TextView;
 
 import com.bettypower.betMatchFinder.labelSet.BetLabelSet;
 import com.bettypower.entities.Match;
+import com.bettypower.entities.PalimpsestMatch;
 import com.renard.ocr.R;
 
 /**
@@ -43,12 +44,12 @@ public class SetBetDialog extends Dialog {
     private BetLabelSet betLabelSet = new BetLabelSet();
     private Object[] betKindArray;
     private Object[] allBet;
-    private Match match;
+    private PalimpsestMatch match;
 
     private FinishEdittingDialogListener finishEdittingDialogListener;
 
 
-    public SetBetDialog(@NonNull Context context, Match match) {
+    public SetBetDialog(@NonNull Context context, PalimpsestMatch match) {
         super(context);
         this.context = context;
         this.match = match;
@@ -382,7 +383,7 @@ public class SetBetDialog extends Dialog {
      * listener created in order to know when user finish typing and pass the match to the adapter
      */
     public interface FinishEdittingDialogListener{
-        void onEdittingDialogFinish(Match match);
+        void onEdittingDialogFinish(PalimpsestMatch match);
     }
 
     private class CorrectionToUserWatcher implements TextWatcher {

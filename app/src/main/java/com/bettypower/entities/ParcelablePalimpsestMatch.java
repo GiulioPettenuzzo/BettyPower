@@ -21,11 +21,14 @@ public class ParcelablePalimpsestMatch implements PalimpsestMatch {
     private String matchHour;
     private String eventNumber;
     private String completePalimpsest;
-    private String bookMaker;
     private String bet;
     private String betKind;
     private String finalQuote;
     private Map<String,String> allOdds;
+    private boolean fissa;
+    private String resultHomeTeam;
+    private String resultAwayTeam;
+    private ArrayList<HiddenResult> allHiddenResult = new ArrayList<>();
 
     public ParcelablePalimpsestMatch(Team homeTeam, Team awayTeam, String palimpsest, String eventNUmber, String matchTime){
         this.homeTeam = homeTeam;
@@ -36,18 +39,11 @@ public class ParcelablePalimpsestMatch implements PalimpsestMatch {
         StringTokenizer token = new StringTokenizer(matchTime);
         matchDate = token.nextToken();
         matchHour = token.nextToken();
-        bookMaker = ""; //TODO
     }
 
     public ParcelablePalimpsestMatch(Team homeTeam, Team awayTeam){
         this.homeTeam = homeTeam;
         this.awayTeam = awayTeam;
-    }
-
-
-    public ParcelablePalimpsestMatch(Parcel source){
-        this(new ParcelableTeam(source.readString()),new ParcelableTeam(source.readString()),source.readString(),source.readString(),source.readString());
-        this.bookMaker = source.readString();
     }
 
     public ParcelablePalimpsestMatch() {
@@ -121,7 +117,7 @@ public class ParcelablePalimpsestMatch implements PalimpsestMatch {
 
     @Override
     public String getHomeResult() {
-        return null;
+        return resultHomeTeam;
     }
 
     @Override
@@ -136,17 +132,17 @@ public class ParcelablePalimpsestMatch implements PalimpsestMatch {
 
     @Override
     public void setBetKind(String betKind) {
-
+        this.betKind = betKind;
     }
 
     @Override
     public String getBetKind() {
-        return null;
+        return betKind;
     }
 
     @Override
     public void setQuote(String quote) {
-
+        this.finalQuote = quote;
     }
 
     @Override
@@ -156,46 +152,44 @@ public class ParcelablePalimpsestMatch implements PalimpsestMatch {
 
     @Override
     public void setHomeResult(String result) {
-
+        this.resultHomeTeam = result;
     }
 
     @Override
     public String getAwayResult() {
-        return null;
+        return resultAwayTeam;
     }
 
     @Override
     public void setAwayResult(String result) {
-
+        this.resultAwayTeam = result;
     }
 
     @Override
     public void setFissa(boolean fissa) {
-
+        this.fissa = fissa;
     }
 
     @Override
     public boolean isFissa() {
-        return false;
+        return fissa;
     }
 
     @Override
     public ArrayList<HiddenResult> getAllHiddenResult() {
-        return null;
+        return allHiddenResult;
     }
 
     @Override
     public void setAllHiddenResult(ArrayList<HiddenResult> allHiddenResult) {
-
+        this.allHiddenResult = allHiddenResult;
     }
 
     @Override
-    public int getNumberOfHiddenResult() {
-        return 0;
-    }
-
-    @Override
-    public boolean compareTo(Match match) {
+    public boolean compareTo(PalimpsestMatch match) {
+        if(completePalimpsest.equals(match.getCompletePalimpsest())){
+            return true;
+        }
         return false;
     }
 
@@ -218,16 +212,6 @@ public class ParcelablePalimpsestMatch implements PalimpsestMatch {
     @Override
     public void setAllOdds(Map<String,String> allOdds) {
         this.allOdds = allOdds;
-    }
-
-    @Override
-    public String getBookMaker() {
-        return bookMaker;
-    }
-
-    @Override
-    public void setBookMaker(String bookMaker) {
-        this.bookMaker = bookMaker;
     }
 
     public boolean compareToByName(PalimpsestMatch paramPalimpsestMatch){
@@ -292,6 +276,16 @@ public class ParcelablePalimpsestMatch implements PalimpsestMatch {
         return 0;
     }
 
+    public ParcelablePalimpsestMatch(Parcel source){
+        this(new ParcelableTeam(source.readString()),new ParcelableTeam(source.readString()),source.readString(),source.readString(),source.readString());
+        this.bet = source.readString();
+        this.betKind = source.readString();
+        this.finalQuote = source.readString();
+        resultHomeTeam = source.readString();
+        resultAwayTeam = source.readString();
+        fissa = (Boolean)source.readValue(getClass().getClassLoader());
+        allHiddenResult = source.readArrayList(ParcelableHiddenResult.class.getClassLoader());
+    }
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
@@ -300,6 +294,13 @@ public class ParcelablePalimpsestMatch implements PalimpsestMatch {
         dest.writeString(palimpsest);
         dest.writeString(eventNumber);
         dest.writeString(matchTime);
-        dest.writeString(bookMaker);
+        dest.writeString(bet);
+        dest.writeString(betKind);
+        dest.writeString(finalQuote);
+        dest.writeString(resultHomeTeam);
+        dest.writeString(resultAwayTeam);
+        dest.writeValue(fissa);
+        dest.writeList(allHiddenResult);
+
     }
 }

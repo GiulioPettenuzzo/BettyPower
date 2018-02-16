@@ -5,6 +5,7 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import com.bettypower.adapters.SingleBetAdapter;
 import com.bettypower.entities.HiddenResult;
 import com.bettypower.entities.Match;
+import com.bettypower.entities.PalimpsestMatch;
 import com.bettypower.unpacker.Unpacker;
 import com.bettypower.unpacker.goalServeUnpacker;
 
@@ -16,8 +17,8 @@ import java.util.ArrayList;
 
 public class RefreshResultThread extends Thread{
 
-    private ArrayList<Match> allSavedMatch = new ArrayList<>();
-    private ArrayList<Match> allMatchOnGoalServe = new ArrayList<>();
+    private ArrayList<PalimpsestMatch> allSavedMatch = new ArrayList<>();
+    private ArrayList<PalimpsestMatch> allMatchOnGoalServe = new ArrayList<>();
     private String response;
     private LoadingListener loadingListener;
 
@@ -26,7 +27,7 @@ public class RefreshResultThread extends Thread{
 
 
 
-    public RefreshResultThread(String response, ArrayList<Match> allSavedMatch, LoadingListener loadingListener){
+    public RefreshResultThread(String response, ArrayList<PalimpsestMatch> allSavedMatch, LoadingListener loadingListener){
         this.response = response;
         this.allSavedMatch = allSavedMatch;
         this.loadingListener = loadingListener;

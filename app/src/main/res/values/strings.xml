@@ -1,6 +1,16 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
 <resources>
     <string name="delate_match_dialog_question">Devo aver sbagliato a leggere questa partita \n Mi dispiace! \n Sei sicuro di volerla eliminare?</string>
+
+    <string name="delate_bet_dialog_question_singolar">Eliminare la Scommessa?</string>
+    <string name="delete_bet_dialog_subtitle_singolar">Non potrai più recuperarla</string>
+    <string name="delete_bet_dialog_explaination_singolar">tutti i dati di questa schedina \n andranno perduti</string>
+
+    <string name="delate_bet_dialog_question_plural">Eliminare le Scommesse?</string>
+    <string name="delete_bet_dialog_subtitle_plural">Non potrai più recuperarle</string>
+    <string name="delete_bet_dialog_explaination_plural">tutti i dati di queste schedine \n andranno perduti</string>
+
+    <string name="add_new_match_dialog_title">Aggiungi nuova partita</string>
     <string name="delete_match_dialog_title">Eliminare </string>
     <string name="confirm">CONFERMA</string>
     <string name="annulla">ANNULLA</string>

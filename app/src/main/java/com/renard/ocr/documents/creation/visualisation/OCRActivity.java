@@ -17,8 +17,10 @@ package com.renard.ocr.documents.creation.visualisation;
 
 import com.bettypower.SingleBetActivity;
 import com.bettypower.betMatchFinder.listeners.CompleteElaborationListener;
+import com.bettypower.betMatchFinder.listeners.PalimpsestLoadListener;
 import com.bettypower.entities.Bet;
 import com.bettypower.entities.Match;
+import com.bettypower.entities.PalimpsestMatch;
 import com.bettypower.entities.ParcelableMatch;
 import com.bettypower.util.HashMatchUtil;
 import com.googlecode.leptonica.android.Pix;
@@ -296,7 +298,7 @@ public class OCRActivity extends MonitoredActivity implements LayoutChoseListene
 
     }
 
-    private ArrayList<Match> allMatch = new ArrayList<>();
+    private ArrayList<PalimpsestMatch> allMatch = new ArrayList<>();
     File imageFile = null;
     Uri documentUri = null;
 

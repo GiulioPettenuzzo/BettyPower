@@ -23,13 +23,14 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.bettypower.SingleBetActivity;
+import com.bettypower.dialog.DeleteBetDialog;
+import com.bettypower.dialog.DeleteMatchDialog;
 import com.bettypower.entities.PalimpsestMatch;
 import com.bettypower.entities.ParcelablePalimpsestMatch;
 import com.bettypower.entities.ParcelableTeam;
 import com.bettypower.unpacker.AllMatchesByPalimpsestURLUnpacker;
 import com.bettypower.unpacker.AllMatchesByPalimpsestUnpacker;
 import com.bettypower.util.touchHelper.ItemTouchHelperCallback;
-import com.renard.ocr.HintDialog;
 import com.renard.ocr.PermissionGrantedEvent;
 import com.renard.ocr.R;
 import com.renard.ocr.TextFairyApplication;
@@ -40,7 +41,6 @@ import com.renard.ocr.documents.viewing.DocumentContentProvider;
 import com.renard.ocr.documents.viewing.single.DocumentActivity;
 import com.renard.ocr.main_menu.AboutActivity;
 import com.renard.ocr.main_menu.FeedbackActivity;
-import com.renard.ocr.main_menu.ReleaseNoteDialog;
 import com.renard.ocr.main_menu.TipsActivity;
 import com.renard.ocr.main_menu.language.OCRLanguageActivity;
 import com.renard.ocr.main_menu.language.OcrLanguage;
@@ -58,8 +58,11 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -494,15 +497,6 @@ public class DocumentGridActivity extends NewDocumentActivity implements Documen
             public boolean onNavigationItemSelected(MenuItem menuItem) {
                 drawerLayout.closeDrawers();
                 switch (menuItem.getItemId()) {
-                    case R.id.whats_new:
-                        FragmentManager supportFragmentManager = getSupportFragmentManager();
-                        new ReleaseNoteDialog().show(supportFragmentManager, ReleaseNoteDialog.TAG);
-                        break;
-                    case R.id.add_language:
-                        Intent i = new Intent(DocumentGridActivity.this, OCRLanguageActivity.class);
-                        startActivity(i);
-                        overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
-                        break;
                     case R.id.show_tips:
                         startActivity(new Intent(DocumentGridActivity.this, TipsActivity.class));
                         overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
@@ -515,7 +509,6 @@ public class DocumentGridActivity extends NewDocumentActivity implements Documen
                         startActivity(new Intent(DocumentGridActivity.this, AboutActivity.class));
                         overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
                         break;
-
                 }
                 return true;
             }
@@ -556,14 +549,6 @@ public class DocumentGridActivity extends NewDocumentActivity implements Documen
     }
 
 
-    @Override
-    protected Dialog onCreateDialog(int id, Bundle args) {
-        switch (id) {
-            case HINT_DIALOG_ID:
-                return HintDialog.createDialog(this, R.string.document_list_help_title, R.raw.document_list_help);
-        }
-        return super.onCreateDialog(id, args);
-    }
 
     @Override
     public void onCheckedChanged(Set<Integer> checkedIds) {
@@ -572,23 +557,6 @@ public class DocumentGridActivity extends NewDocumentActivity implements Documen
         } else if (mActionMode != null && checkedIds.size() == 0) {
             mActionMode.finish();
             mActionMode = null;
-        }
-
-        if (mActionMode != null) {
-            // change state of action mode depending on the selection
-            final MenuItem editItem = mActionMode.getMenu().findItem(R.id.item_edit_title);
-            final MenuItem joinItem = mActionMode.getMenu().findItem(R.id.item_join);
-            if (checkedIds.size() == 1) {
-                editItem.setVisible(true);
-                editItem.setEnabled(true);
-                joinItem.setVisible(false);
-                joinItem.setEnabled(false);
-            } else {
-                editItem.setVisible(false);
-                editItem.setEnabled(false);
-                joinItem.setVisible(true);
-                joinItem.setEnabled(true);
-            }
         }
     }
 
@@ -745,28 +713,21 @@ public class DocumentGridActivity extends NewDocumentActivity implements Documen
 
     private class DocumentActionCallback implements ActionMode.Callback {
 
+        DeleteBetDialog deleteBetDialog;
         @Override
-        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+        public boolean onActionItemClicked(final ActionMode mode, MenuItem item) {
             int itemId = item.getItemId();
-            if (itemId == R.id.item_join) {
-                joinDocuments(mDocumentAdapter.getSelectedDocumentIds());
-                cancelMultiSelectionMode();
-                mode.finish();
-                return true;
-            } else if (itemId == R.id.item_edit_title) {
-                final Set<Integer> selectedDocs = mDocumentAdapter.getSelectedDocumentIds();
-                final int documentId = selectedDocs.iterator().next();
-                getSupportLoaderManager().initLoader(documentId, null, DocumentGridActivity.this);
-                return true;
-            } else if (itemId == R.id.item_export_as_pdf) {
-                new CreatePDFTask(mDocumentAdapter.getSelectedDocumentIds()).execute();
-                cancelMultiSelectionMode();
-                mode.finish();
-                return true;
-            } else if (itemId == R.id.item_delete) {
-                new DeleteDocumentTask(mDocumentAdapter.getSelectedDocumentIds(), false).execute();
-                cancelMultiSelectionMode();
-                mode.finish();
+            if (itemId == R.id.item_delete) {
+                 deleteBetDialog = new DeleteBetDialog(DocumentGridActivity.this, new DeleteBetDialog.DeleteBetDialogListener() {
+                    @Override
+                    public void onBetDelete() {
+                        new DeleteDocumentTask(mDocumentAdapter.getSelectedDocumentIds(), false).execute();
+                        cancelMultiSelectionMode();
+                        mode.finish();
+                        deleteBetDialog.dismiss();
+                    }
+                },mDocumentAdapter.getSelectedDocumentIds().size());
+                deleteBetDialog.show();
                 return true;
             }
             return true;
@@ -776,6 +737,10 @@ public class DocumentGridActivity extends NewDocumentActivity implements Documen
         @Override
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
             getMenuInflater().inflate(R.menu.grid_action_mode, menu);
+            getSupportActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.action_bar_edit_mode)));
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                getWindow().setStatusBarColor(getResources().getColor(R.color.action_bar_edit_mode));
+            }
             return true;
         }
 
@@ -787,6 +752,10 @@ public class DocumentGridActivity extends NewDocumentActivity implements Documen
 
         @Override
         public void onDestroyActionMode(ActionMode mode) {
+            getSupportActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.primary)));
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                getWindow().setStatusBarColor(getResources().getColor(R.color.primary));
+            }
             if (mActionMode != null) {
                 mActionMode = null;
                 cancelMultiSelectionMode();
@@ -922,7 +891,6 @@ public class DocumentGridActivity extends NewDocumentActivity implements Documen
             }
             builder.append(")");
             return builder.toString();
-
         }
 
         @Override

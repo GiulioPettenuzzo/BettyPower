@@ -18,7 +18,6 @@ package com.renard.ocr.documents.viewing.single;
 
 import com.renard.ocr.documents.viewing.DocumentContentProvider;
 import com.renard.ocr.documents.viewing.DocumentContentProvider.Columns;
-import com.renard.ocr.HintDialog;
 import com.renard.ocr.MonitoredActivity;
 import com.renard.ocr.R;
 import com.renard.ocr.documents.viewing.single.SimpleDocumentAdapter.DocumentViewHolder;
@@ -74,15 +73,7 @@ public class TableOfContentsActivity extends MonitoredActivity implements Loader
     protected int getHintDialogId() {
         return -1;
     }
-
-    @Override
-    protected Dialog onCreateDialog(int id, Bundle args) {
-        switch (id) {
-            case HINT_DIALOG_ID:
-                return HintDialog.createDialog(this, R.string.toc_help_title, R.raw.toc_help);
-        }
-        return super.onCreateDialog(id, args);
-    }
+    
 
 
     @Override

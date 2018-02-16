@@ -20,9 +20,12 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.ArrayAdapter;
 import android.widget.Toast;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -32,10 +35,12 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.bettypower.adapters.SingleBetAdapter;
 import com.bettypower.adapters.helpers.ExpandCollapseClickExecutor;
+import com.bettypower.dialog.AddMatchDialog;
 import com.bettypower.dialog.SetBetDialog;
 import com.bettypower.entities.Bet;
 import com.bettypower.entities.HiddenResult;
 import com.bettypower.entities.Match;
+import com.bettypower.entities.PalimpsestMatch;
 import com.bettypower.entities.ParcelableHiddenResult;
 import com.bettypower.entities.ParcelableMatch;
 import com.bettypower.entities.ParcelableTeam;
@@ -44,8 +49,10 @@ import com.bettypower.listeners.PreLoadingLinearLayoutManager;
 import com.bettypower.threads.LoadImageThread;
 import com.bettypower.threads.RefreshResultThread;
 import com.bettypower.util.HashMatchUtil;
+import com.bettypower.util.Helper;
 import com.bettypower.util.touchHelper.ItemTouchHelperCallback;
 import com.renard.ocr.R;
+import com.renard.ocr.TextFairyApplication;
 import com.renard.ocr.documents.viewing.DocumentContentProvider;
 
 import java.util.ArrayList;
@@ -64,8 +71,8 @@ public class SingleBetActivity extends AppCompatActivity {
 
     private Toolbar toolbar;
     private Bet bet;
-    public ArrayList<Match> allMatch = new ArrayList<>();
-    public ArrayList<Match> allMatchSelected = new ArrayList<>();
+    public ArrayList<PalimpsestMatch> allMatch = new ArrayList<>();
+    public ArrayList<PalimpsestMatch> allMatchSelected = new ArrayList<>();
     public ArrayList<String> allLogosURL = new ArrayList<>();
     private boolean isClicking = false;
     private boolean isAllLogoUploaded = true;
@@ -86,7 +93,6 @@ public class SingleBetActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_single_bet);
         setRecyclerAndManager();
-
 
         //AllMatchesByPalimpsestUnpacker allMatchesByPalimpsestUnpacker = new AllMatchesByPalimpsestUnpacker(getApplicationContext());
         if(savedInstanceState!=null && savedInstanceState.containsKey(ALL_MATCH_STATE)){
@@ -216,7 +222,29 @@ public class SingleBetActivity extends AppCompatActivity {
                 Log.i("share_menu_item","share_menu_item");
                 return true;
             case R.id.edit_menu_item:
-                enableEditStyle();
+                if(!editMode) {
+                    enableEditStyle();
+                }else{
+                    final AddMatchDialog addMatchDialog = new AddMatchDialog(SingleBetActivity.this,bet.getArrayMatch(),SingleBetActivity.this);
+                    addMatchDialog.show();
+                    addMatchDialog.setCanceledOnTouchOutside(false);
+                    WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
+                    Window window = addMatchDialog.getWindow();
+                    lp.copyFrom(window.getAttributes());
+                    lp.width = WindowManager.LayoutParams.MATCH_PARENT;
+                    //lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
+                    window.setAttributes(lp);
+                    addMatchDialog.setOnAddNewItem(new AddMatchDialog.FinishEditDialog() {
+                        @Override
+                        public void onAddNewItem(PalimpsestMatch match) {
+                            addMatchDialog.dismiss();
+                            allMatch.add(match);
+                            bet.setArrayMatch(allMatch);
+                            singleBetAdapter.notifyItemInserted(allMatch.lastIndexOf(match));
+                        }
+                    });
+
+                }
                 return true;
             case R.id.confirm:
                 Thread saveModification = new Thread(new Runnable() {
@@ -226,7 +254,7 @@ public class SingleBetActivity extends AppCompatActivity {
                         HashMatchUtil utils = new HashMatchUtil();
                         String stringArrayMatch = utils.fromArrayToString(allMatch);
                         bet.setSistema(false);
-                        for (Match currentMatch:allMatch
+                        for (PalimpsestMatch currentMatch:allMatch
                                 ) {
                             if(currentMatch.isFissa()) {
                                 bet.setSistema(true);
@@ -252,7 +280,8 @@ public class SingleBetActivity extends AppCompatActivity {
     private void enableEditStyle(){
         toolbar.setNavigationIcon(R.drawable.cross);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
-        editMenuItem.setVisible(false);
+        //editMenuItem.setVisible(false);
+        editMenuItem.setIcon(R.drawable.add_item);
         shareMenuItem.setVisible(false);
         confirmMenuItem.setVisible(true);
         editMode = true;
@@ -273,7 +302,8 @@ public class SingleBetActivity extends AppCompatActivity {
     private void disableEditStyle(){
         toolbar.setNavigationIcon(null);
         getSupportActionBar().setDisplayShowTitleEnabled(true);
-        editMenuItem.setVisible(true);
+       // editMenuItem.setVisible(true);
+        editMenuItem.setIcon(R.drawable.ic_mode_edit_white_48px);
         shareMenuItem.setVisible(true);
         confirmMenuItem.setVisible(false);
         editMode = false;
@@ -321,10 +351,9 @@ public class SingleBetActivity extends AppCompatActivity {
                     HashMatchUtil util = new HashMatchUtil();
                     allMatch = util.fromStringToArray(text);
                     bet = new SingleBet(allMatch);
-                    for (Match currentMatch:allMatch
+                    for (PalimpsestMatch currentMatch:allMatch
                          ) {
                         //NEXT LINE FOR TEST
-                        //currentMatch.setAllHiddenResult(getHiddenResultForTest());
                         if(currentMatch.isFissa()) {
                             bet.setSistema(true);
                             break;
@@ -339,7 +368,13 @@ public class SingleBetActivity extends AppCompatActivity {
                     singleBetAdapter = new SingleBetAdapter(SingleBetActivity.this,bet);
                     singleBetAdapter.setUri(uri);
                     singleBetAdapter.setExpandCollapseClickMode(new ExpandCollapseItemClickModeListener());
-                    rVSingleBet.setAdapter(singleBetAdapter);
+
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            rVSingleBet.setAdapter(singleBetAdapter);
+                        }
+                    });
                 }
             });
             loadMatchesFromMemory.start();
@@ -362,7 +397,7 @@ public class SingleBetActivity extends AppCompatActivity {
         }
         else{
             allMatch = bet.getArrayMatch();
-            for (Match currentMatch:allMatch) {
+            for (PalimpsestMatch currentMatch:allMatch) {
                 currentMatch.setAllHiddenResult(getHiddenResultForTest());
             }
             singleBetAdapter = new SingleBetAdapter(SingleBetActivity.this, bet);
@@ -400,7 +435,7 @@ public class SingleBetActivity extends AppCompatActivity {
             allMatch.add(match);
         }
 
-        Bet bet = new SingleBet(allMatch);
+       // Bet bet = new SingleBet(allMatch);
         return bet;
     }
 
@@ -448,7 +483,7 @@ public class SingleBetActivity extends AppCompatActivity {
                                 LoadImageThread(response,allMatch,allLogosURL,getApplicationContext());
                         loadImageThread.setOnLoadLogoListener(new LoadImageThread.LoadLogoListener() {
                             @Override
-                            public void onLoadLogoFinish(final Match match) {
+                            public void onLoadLogoFinish(final PalimpsestMatch match) {
                                 runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
@@ -460,7 +495,6 @@ public class SingleBetActivity extends AppCompatActivity {
                                         }
                                         if(allMatch.lastIndexOf(match)==allMatch.size()-1){
                                             singleBetAdapter.notifyDataSetChanged();
-                                            //DA QUI LANCIAVO VOLLEY DA QUESTA ACTIVITY
                                         }
                                     }
                                 });
@@ -580,7 +614,7 @@ public class SingleBetActivity extends AppCompatActivity {
             HashMatchUtil util = new HashMatchUtil();
             allMatch = util.fromStringToArray(text);
             bet.setSistema(false);
-            for (Match currentMatch:allMatch
+            for (PalimpsestMatch currentMatch:allMatch
                     ) {
                 if(currentMatch.isFissa()) {
                     bet.setSistema(true);

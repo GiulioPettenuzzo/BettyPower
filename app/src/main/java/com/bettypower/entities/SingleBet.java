@@ -12,7 +12,7 @@ import java.util.List;
 
 public class SingleBet implements Bet {
 
-    private ArrayList<Match> allMatches;
+    private ArrayList<PalimpsestMatch> allMatches;
     private String bookmaker;
     private String date;
     private String puntata;
@@ -20,17 +20,17 @@ public class SingleBet implements Bet {
     private String errors;
     private boolean isSistema;
 
-    public SingleBet(ArrayList<Match> allMatches){
+    public SingleBet(ArrayList<PalimpsestMatch> allMatches){
         this.allMatches = allMatches;
     }
 
     @Override
-    public ArrayList<Match> getArrayMatch() {
+    public ArrayList<PalimpsestMatch> getArrayMatch() {
         return allMatches;
     }
 
     @Override
-    public void setArrayMatch(ArrayList<Match> allMatches) {
+    public void setArrayMatch(ArrayList<PalimpsestMatch> allMatches) {
         this.allMatches = allMatches;
     }
 
@@ -108,7 +108,7 @@ public class SingleBet implements Bet {
     };
 
     public SingleBet(Parcel source){
-        this( source.readArrayList(ParcelableMatch.class.getClassLoader()));
+        this( source.readArrayList(ParcelablePalimpsestMatch.class.getClassLoader()));
         //allMatches = new ArrayList<>();
        // this.allMatches = source.readArrayList(List.class.getClassLoader());
         this.bookmaker = source.readString();

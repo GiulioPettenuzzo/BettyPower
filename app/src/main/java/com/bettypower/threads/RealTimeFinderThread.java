@@ -212,8 +212,8 @@ public class RealTimeFinderThread extends Thread {
      * @param match
      * @return true if allMatch contains the match
      */
-    private boolean contains(ArrayList<PalimpsestMatch> allMatch, Match match){
-        for (Match currentMatch: allMatch
+    private boolean contains(ArrayList<PalimpsestMatch> allMatch, PalimpsestMatch match){
+        for (PalimpsestMatch currentMatch: allMatch
                 ) {
             if(currentMatch.compareTo(match)){
                 return true;

@@ -8,6 +8,7 @@ import android.util.Log;
 
 import com.bettypower.adapters.SingleBetAdapter;
 import com.bettypower.entities.Match;
+import com.bettypower.entities.PalimpsestMatch;
 import com.bettypower.unpacker.LogoUnpacker;
 import com.bettypower.adapters.SingleBetAdapter;
 import com.bettypower.entities.Match;
@@ -26,11 +27,11 @@ public class LoadImageThread extends Thread {
 
     Context context;
     String response;
-    ArrayList<Match> allMatch;
+    ArrayList<PalimpsestMatch> allMatch;
     ArrayList<String> allLogosURL;
     LoadLogoListener loadLogoListener;
 
-    public LoadImageThread(String response, ArrayList<Match> allMatch,ArrayList<String> allLogosURL,Context context){
+    public LoadImageThread(String response, ArrayList<PalimpsestMatch> allMatch, ArrayList<String> allLogosURL, Context context){
         this.response = response;
         this.allMatch = allMatch;
         this.allLogosURL = allLogosURL;
@@ -46,7 +47,7 @@ public class LoadImageThread extends Thread {
         super.run();
         LogoUnpacker logoUnpacker = new LogoUnpacker(response);
         allLogosURL = logoUnpacker.getAllLogos();
-        for (final Match match:allMatch) {
+        for (final PalimpsestMatch match:allMatch) {
             Bitmap homeBitmap = null;
             Bitmap awayBitmap = null;
             //TODO quando avrai inserito tutti i loghi la parte qui sotto li associerà a ciascuna squadra se ci sono altrimenti restano null
@@ -145,7 +146,7 @@ public class LoadImageThread extends Thread {
     }
 
     public interface LoadLogoListener{
-        void onLoadLogoFinish(Match match);
+        void onLoadLogoFinish(PalimpsestMatch match);
         void onAllLogosUploaded();
     }
 

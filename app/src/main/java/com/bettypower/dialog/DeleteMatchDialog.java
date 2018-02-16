@@ -8,6 +8,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.bettypower.entities.Match;
+import com.bettypower.entities.PalimpsestMatch;
 import com.renard.ocr.R;
 
 import java.util.StringTokenizer;
@@ -19,14 +20,14 @@ import java.util.StringTokenizer;
 public class DeleteMatchDialog extends Dialog {
 
     private Context context;
-    private Match match;
+    private PalimpsestMatch match;
     private DeleteMatchDialogListener deleteMatchDialogListener;
 
     private Button cancelButton;
     private Button confirmButton;
     private TextView title;
 
-    public DeleteMatchDialog(Context context, Match match){
+    public DeleteMatchDialog(Context context, PalimpsestMatch match){
         super(context);
         this.context = context;
         this.match = match;

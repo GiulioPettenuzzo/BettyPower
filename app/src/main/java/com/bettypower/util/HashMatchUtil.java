@@ -4,8 +4,10 @@ import android.content.Intent;
 
 import com.bettypower.entities.HiddenResult;
 import com.bettypower.entities.Match;
+import com.bettypower.entities.PalimpsestMatch;
 import com.bettypower.entities.ParcelableHiddenResult;
 import com.bettypower.entities.ParcelableMatch;
+import com.bettypower.entities.ParcelablePalimpsestMatch;
 import com.bettypower.entities.ParcelableTeam;
 
 import java.util.ArrayList;
@@ -26,12 +28,13 @@ public class HashMatchUtil {
      * @return
      */
     //MELBOURNE CITY FC :-) WELLINGTON PHOENIX :-) 21/10 08:35 :-) goal :-) NULL :-) 1 :-) 1 this_match_is_finishFC SKA-ENERGIYA KHABAROVSK :-) UFA :-) 21/10 10:30 :-) goal :-) NULL :-) 1 :-) 1 this_match_is_finishFK TOSNO :-) FC ROSTOV :-) 21/10 13:00 :-) 1 :-) NULL :-) 1 :-) 1 this_match_is_finishSYDNEY :-) WESTERN SYDNEY :-) 21/10 10:50 :-) NULL :-) NULL :-) 1 :-) 1 this_match_is_finishLEVANTE :-) GETAFE :-) 21/10 13:00 :-) 12 :-) NULL :-) 1 :-) 1 this_match_is_finishFINALE :-)  VIAREGGIO :-) 26/11 14:30 :-) NULL :-) NULL :-) 1 :-) 1 this_match_is_finishCHELSEA :-) WATFORD FC :-) 21/10 13:30 :-) 12 :-) NULL :-) 1 :-) 1 this_match_is_finishFINALE :-)  VIAREGGIO :-) 26/11 14:30 :-) NULL :-) NULL :-) 1 :-) 1 this_match_is_finish
-    public String fromArrayToString(ArrayList<Match> allMatch) {
+    public String fromArrayToString(ArrayList<PalimpsestMatch> allMatch) {
         String result = "";
-        for (Match currentmatch:allMatch
+        for (PalimpsestMatch currentmatch:allMatch
              ) {
             result = result + currentmatch.getHomeTeam().getName() + " " + SEPARATOR;
             result = result + " " + currentmatch.getAwayTeam().getName() + " " + SEPARATOR;
+            result = result + " " + currentmatch.getCompletePalimpsest() + " " + SEPARATOR;
             result = result + " " +  currentmatch.getTime() + " " +SEPARATOR;
 
             if(currentmatch.getBet() == null)
@@ -53,25 +56,27 @@ public class HashMatchUtil {
                 result = result + " true " + SEPARATOR;
             else
                 result = result + " false " + SEPARATOR;
-            for (HiddenResult currentHiddenResult:currentmatch.getAllHiddenResult()
-                 ) {
-                result = result + " " + currentHiddenResult.getActionTeam() + " " + SEPARATOR;
-                result = result + " " + currentHiddenResult.getAction() + " " + SEPARATOR;
-                result = result + " " + currentHiddenResult.getPlayerName() + " " + SEPARATOR;
-                if(currentHiddenResult.getResult()!=null && !currentHiddenResult.getResult().equals(""))
-                    result = result + " " + currentHiddenResult.getResult() + " " + SEPARATOR;
-                else
-                    result = result + " NULL " + SEPARATOR;
-                result = result + " " + currentHiddenResult.getTime() + " " + SEPARATOR;
+            if(currentmatch.getAllHiddenResult()!=null) {
+                for (HiddenResult currentHiddenResult : currentmatch.getAllHiddenResult()
+                        ) {
+                    result = result + " " + currentHiddenResult.getActionTeam() + " " + SEPARATOR;
+                    result = result + " " + currentHiddenResult.getAction() + " " + SEPARATOR;
+                    result = result + " " + currentHiddenResult.getPlayerName() + " " + SEPARATOR;
+                    if (currentHiddenResult.getResult() != null && !currentHiddenResult.getResult().equals(""))
+                        result = result + " " + currentHiddenResult.getResult() + " " + SEPARATOR;
+                    else
+                        result = result + " NULL " + SEPARATOR;
+                    result = result + " " + currentHiddenResult.getTime() + " " + SEPARATOR;
+                }
             }
             result = result + " " +  MATCH_SEPARATOR + " ";
         }
         return result;
     }
 
-    public ArrayList<Match> fromStringToArray(String string) {
+    public ArrayList<PalimpsestMatch> fromStringToArray(String string) {
         StringTokenizer token = new StringTokenizer(string);
-        ArrayList<Match> result = new ArrayList<>();
+        ArrayList<PalimpsestMatch> result = new ArrayList<>();
         while(token.hasMoreTokens()){
             String word = token.nextToken();
             String homeTeamName = word;
@@ -88,8 +93,12 @@ public class HashMatchUtil {
                 if(!word.equals(SEPARATOR))
                     awayTeamName = awayTeamName + " " + word;
             }
+            PalimpsestMatch match = new ParcelablePalimpsestMatch(new ParcelableTeam(homeTeamName),new ParcelableTeam(awayTeamName));
 
-            Match match = new ParcelableMatch(new ParcelableTeam(homeTeamName),new ParcelableTeam(awayTeamName));
+
+            match.setCompletePalimpsest(token.nextToken());
+            token.nextToken();
+
 
             word = token.nextToken();
             String time = word;
@@ -141,13 +150,21 @@ public class HashMatchUtil {
 
             word = token.nextToken();
             String homeResult = word;
-            match.setHomeResult(homeResult);
+            if(!homeResult.equalsIgnoreCase("null")) {
+                match.setHomeResult(homeResult);
+            }else{
+                match.setHomeResult("-");
+            }
 
             token.nextToken();
 
             word = token.nextToken();
             String awayResult = word;
-            match.setAwayResult(awayResult);
+            if(!awayResult.equalsIgnoreCase("null")) {
+                match.setAwayResult(awayResult);
+            }else{
+                match.setAwayResult("-");
+            }
 
             token.nextToken();
 

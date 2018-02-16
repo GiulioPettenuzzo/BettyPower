@@ -1,8 +1,8 @@
 package com.bettypower.unpacker;
 
 import com.bettypower.entities.HiddenResult;
-import com.bettypower.entities.Match;
-import com.bettypower.entities.ParcelableMatch;
+import com.bettypower.entities.PalimpsestMatch;
+import com.bettypower.entities.ParcelablePalimpsestMatch;
 import com.bettypower.entities.ParcelableTeam;
 import com.bettypower.entities.Team;
 
@@ -19,7 +19,7 @@ import java.util.StringTokenizer;
 public class goalServeUnpacker implements Unpacker {
 
     private ArrayList<Team> allTeams = new ArrayList<>();
-    private ArrayList<Match> allMatches = new ArrayList<>();
+    private ArrayList<PalimpsestMatch> allMatches = new ArrayList<>();
 
     private ArrayList<Team> allHomeTeams = new ArrayList<>();
     private ArrayList<Team> allAwayTeams = new ArrayList<>();
@@ -59,7 +59,7 @@ public class goalServeUnpacker implements Unpacker {
                         time = "Termin.";
                     }
                 String result = getResult(currentTeam);
-                Match match = new ParcelableMatch(homeTeam, awayTeam);
+                PalimpsestMatch match = new ParcelablePalimpsestMatch(homeTeam, awayTeam);
                 match.setTime(time);
                 match.setAwayResult(getAwayScore(result));
                 match.setHomeResult(getHomeScore(result));
@@ -72,7 +72,7 @@ public class goalServeUnpacker implements Unpacker {
                 break;
             }
         }
-        allMatches.get(3).getNumberOfHiddenResult();
+        //allMatches.get(3).getNumberOfHiddenResult();
     }
 
     @Override
@@ -89,7 +89,7 @@ public class goalServeUnpacker implements Unpacker {
     }
 
     @Override
-    public ArrayList<Match> getAllMatches() {
+    public ArrayList<PalimpsestMatch> getAllMatches() {
         return allMatches;
     }
 

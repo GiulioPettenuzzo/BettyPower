@@ -1,6 +1,6 @@
 package com.bettypower.unpacker;
 
-import com.bettypower.entities.Match;
+import com.bettypower.entities.PalimpsestMatch;
 import com.bettypower.entities.Team;
 
 import java.util.ArrayList;
@@ -21,6 +21,6 @@ public interface Unpacker {
      * basic method to recive the whole matches found in web
      * @return
      */
-    public ArrayList<Match> getAllMatches();
+    public ArrayList<PalimpsestMatch> getAllMatches();
 
 }

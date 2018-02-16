@@ -1,6 +1,5 @@
 package com.renard.ocr.main_menu;
 
-import com.renard.ocr.HintDialog;
 import com.renard.ocr.MonitoredActivity;
 import com.renard.ocr.R;
 
@@ -36,7 +35,6 @@ public class PrivacyPolicyActivity extends MonitoredActivity {
         initToolbar();
         setToolbarMessage(R.string.pref_title_privacy);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        initWebView();
         initTrackingToggle();
     }
 
@@ -52,10 +50,6 @@ public class PrivacyPolicyActivity extends MonitoredActivity {
         mTrackingLabel.setText(!isChecked ? R.string.data_tracking_off : R.string.data_tracking_on);
     }
 
-    private void initWebView() {
-        final String path = HintDialog.convertResourceIdToPath(getApplication(), R.raw.privacy_policy);
-        mWebView.loadUrl(path);
-    }
 
     @Override
     public String getScreenName() {

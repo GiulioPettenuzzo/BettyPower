@@ -122,23 +122,23 @@ public class Resolver {
     }
 
     private void notifyThreadsFinish(){
-        ArrayList<Match> allMatchFound = new ArrayList<>();
+        ArrayList<PalimpsestMatch> allMatchFound = new ArrayList<>();
         for (MatchToFind currentMatch:allMatchFoundByStaticOCR
              ) {
             if(currentMatch.getPalimpsestMatch().size()==1) {
                 PalimpsestMatch palimpsestMatch = currentMatch.getPalimpsestMatch().get(0);
-                Match match = new ParcelableMatch(palimpsestMatch.getHomeTeam(),palimpsestMatch.getAwayTeam());
-                match.setTime(palimpsestMatch.getDate() + " " + palimpsestMatch.getHour());
-                match.setHomeResult("1");
-                match.setAwayResult("1");
-                if(currentMatch.getBet()!=null) {
-                    match.setBet(currentMatch.getBet());
+                //Match currentMatch = new ParcelableMatch(palimpsestMatch.getHomeTeam(),palimpsestMatch.getAwayTeam());
+                //currentMatch.setTime(currentMatch.getDate() + " " + currentMatch.getHour());
+                palimpsestMatch.setHomeResult("1");
+                palimpsestMatch.setAwayResult("1");
+                if(palimpsestMatch.getBet()!=null) {
+                    palimpsestMatch.setBet(currentMatch.getBet());
                 }
-                if(currentMatch.getBetKind()!=null){
-                    match.setBetKind(currentMatch.getBetKind());
+                if(palimpsestMatch.getBetKind()!=null){
+                    palimpsestMatch.setBetKind(currentMatch.getBetKind());
                 }
                 //TODO quote
-                allMatchFound.add(match);
+                allMatchFound.add(palimpsestMatch);
             }
         }
         Bet bet = new SingleBet(allMatchFound);

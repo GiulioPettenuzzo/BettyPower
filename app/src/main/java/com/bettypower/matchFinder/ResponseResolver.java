@@ -201,8 +201,8 @@ public class ResponseResolver {
      *********************************   AUSILIAR METHODS   ****************************************
      **********************************************************************************************/
 
-    private boolean isMatchAlreadyInList(ArrayList<PalimpsestMatch> allMatch, Match match){
-        for (Match currentMatch:allMatch
+    private boolean isMatchAlreadyInList(ArrayList<PalimpsestMatch> allMatch, PalimpsestMatch match){
+        for (PalimpsestMatch currentMatch:allMatch
                 ) {
             if(currentMatch.getHomeTeam().getName().equals(match.getHomeTeam().getName()) &&
                     currentMatch.getAwayTeam().getName().equals(match.getAwayTeam().getName())){

@@ -26,7 +26,6 @@ import com.googlecode.leptonica.android.Pix;
 import com.googlecode.leptonica.android.Projective;
 import com.googlecode.leptonica.android.Rotate;
 import com.googlecode.tesseract.android.OCR;
-import com.renard.ocr.HintDialog;
 import com.renard.ocr.MonitoredActivity;
 import com.renard.ocr.R;
 import com.renard.ocr.documents.viewing.grid.DocumentGridActivity;
@@ -241,14 +240,6 @@ public class CropImageActivity extends MonitoredActivity implements BlurWarningD
     }
 
 
-    @Override
-    protected Dialog onCreateDialog(int id, Bundle args) {
-        switch (id) {
-            case HINT_DIALOG_ID:
-                return HintDialog.createDialog(this, R.string.crop_help_title, R.raw.crop_help);
-        }
-        return super.onCreateDialog(id, args);
-    }
 
 
     private void adjustOptionsMenu() {

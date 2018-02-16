@@ -16,7 +16,6 @@
 
 package com.renard.ocr.documents.viewing.single;
 
-import com.renard.ocr.HintDialog;
 import com.renard.ocr.R;
 import com.renard.ocr.documents.creation.NewDocumentActivity;
 import com.renard.ocr.documents.viewing.DocumentContentProvider;
@@ -414,15 +413,6 @@ public class DocumentActivity extends NewDocumentActivity implements LoaderManag
                     break;
             }
         }
-    }
-
-    @Override
-    protected Dialog onCreateDialog(int id, Bundle args) {
-        switch (id) {
-            case HINT_DIALOG_ID:
-                return HintDialog.createDialog(this, R.string.document_help_title, R.raw.document_help);
-        }
-        return super.onCreateDialog(id, args);
     }
 
     @Override

@@ -9,8 +9,8 @@ import java.util.ArrayList;
  */
 
 public interface Bet extends Parcelable{
-    ArrayList<Match> getArrayMatch();
-    void setArrayMatch(ArrayList<Match> allMatches);
+    ArrayList<PalimpsestMatch> getArrayMatch();
+    void setArrayMatch(ArrayList<PalimpsestMatch> allMatches);
 
     String getBookMaker();
     void setBookMaker(String bookMaker);

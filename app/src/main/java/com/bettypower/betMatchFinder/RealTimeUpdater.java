@@ -99,9 +99,9 @@ public class RealTimeUpdater {
                 ArrayList<PalimpsestMatch> result = new ArrayList<>();
                 for (PalimpsestMatch currentPalimpsestMatch:allPalimpsestMatch
                      ) {
-                    if(currentPalimpsestMatch.getBookMaker().equals(map.get(Finder.BOOKMAKER).toString())){
+                /*    if(currentPalimpsestMatch.getBookMaker().equals(map.get(Finder.BOOKMAKER).toString())){
                         result.add(currentPalimpsestMatch);
-                    }
+                    }*/
                 }
                 allPalimpsestMatch = result;
             }
