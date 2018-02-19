@@ -46,7 +46,7 @@
         app:layout_constraintStart_toEndOf="@+id/home_team_add_logo"
         tools:layout_editor_absoluteY="16dp" />
 
-    <AutoCompleteTextView
+    <com.bettypower.dialog.CustomTextView
         android:id="@+id/autoCompleteTextView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -55,6 +55,7 @@
         android:layout_marginTop="8dp"
         android:inputType="textNoSuggestions"
         android:textColor="@color/Text_dark"
+        android:completionThreshold="1"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
@@ -83,7 +84,8 @@
         app:layout_constraintHorizontal_chainStyle="spread_inside"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_eagle_shield" />
+        app:srcCompat="@drawable/ic_eagle_shield"
+        android:layout_marginLeft="8dp" />
 
     <ImageView
         android:id="@+id/away_team_add_logo"

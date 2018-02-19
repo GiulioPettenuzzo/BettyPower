@@ -40,5 +40,7 @@
     <color name="grey_op">#d3dedede</color>
     <color name="material_grey_transparent">#e7fafafa</color>
     <color name="line_separator">#eaeaea</color>
+    <color name="grid_title_colour">#4e5365</color>
+    <color name="grit_title_background">#e7ede75e</color>
 
 </resources>

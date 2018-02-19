@@ -96,11 +96,11 @@
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="false"
             android:layout_toLeftOf="@+id/page_number"
-            android:background="@color/material_grey_transparent"
+            android:background="@color/default_title_indicator_selected_color"
             android:gravity="center_vertical"
             android:maxLines="1"
             android:padding="4dp"
-            android:textColor="@color/Tekt_dark_lighter" />
+            android:textColor="@color/grid_title_colour" />
 
     </RelativeLayout>
 

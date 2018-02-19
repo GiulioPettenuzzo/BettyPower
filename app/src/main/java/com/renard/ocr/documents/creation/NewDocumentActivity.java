@@ -16,6 +16,7 @@
 
 package com.renard.ocr.documents.creation;
 
+import com.bettypower.SingleBetActivity;
 import com.bettypower.entities.Match;
 import com.bettypower.threads.RealTimeFinderThread;
 import com.crashlytics.android.Crashlytics;
@@ -277,6 +278,10 @@ public abstract class NewDocumentActivity extends MonitoredActivity {
         } else if (itemId == R.id.item_gallery) {
             checkRam(MemoryWarningDialog.DoAfter.START_GALLERY);
             return true;
+        } else if (itemId == R.id.manual_bet){
+            Intent intent = new Intent(NewDocumentActivity.this,SingleBetActivity.class);
+            intent.putExtra("manual_creation","value");
+            startActivity(intent);
         }
 
         return super.onOptionsItemSelected(item);
@@ -864,7 +869,7 @@ public abstract class NewDocumentActivity extends MonitoredActivity {
         }
     }
 
-    protected class DeleteDocumentTask extends AsyncTask<Void, Void, Integer> {
+    public class DeleteDocumentTask extends AsyncTask<Void, Void, Integer> {
         Set<Integer> mIds = new HashSet<Integer>();
         private final static int RESULT_REMOTE_EXCEPTION = -1;
         final boolean mFinishActivity;

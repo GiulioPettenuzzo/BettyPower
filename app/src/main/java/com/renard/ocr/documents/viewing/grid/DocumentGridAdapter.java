@@ -25,6 +25,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.support.constraint.ConstraintLayout;
 import android.text.format.DateFormat;
 import android.util.Log;
@@ -56,7 +57,7 @@ public class DocumentGridAdapter extends CursorAdapter implements OnCheckedChang
 		void onCheckedChanged(final Set<Integer> checkedIds);
 	}
 
-	private final static String[] PROJECTION = { Columns.ID, Columns.TITLE, Columns.OCR_TEXT, Columns.CREATED, Columns.PHOTO_PATH,Columns.CHILD_COUNT,Columns.EVENT_NUMBER,Columns.IMPORTO_SCOMMESSO,Columns.IMPORTO_PAGAMENTO };
+	private final static String[] PROJECTION = { Columns.ID, Columns.TITLE, Columns.OCR_TEXT, Columns.CREATED, Columns.PHOTO_PATH,Columns.CHILD_COUNT,Columns.EVENT_NUMBER,Columns.IMPORTO_SCOMMESSO,Columns.IMPORTO_PAGAMENTO,Columns.HOCR_TEXT };
 
 	private Set<Integer> mSelectedDocuments = new HashSet<Integer>();
 	private LayoutInflater mInflater;
@@ -101,6 +102,8 @@ public class DocumentGridAdapter extends CursorAdapter implements OnCheckedChang
 		mSelectedDocuments.clear();
 	}
 
+	int indexHocrForManual;
+
 	public DocumentGridAdapter(DocumentGridActivity activity, int elementLayout, OnCheckedChangeListener listener) {
 		super(activity, activity.getContentResolver().query(DocumentContentProvider.CONTENT_URI, PROJECTION, DocumentContentProvider.Columns.PARENT_ID + "=-1", null, null), true);
 		mElementLayoutId = elementLayout;
@@ -114,6 +117,7 @@ public class DocumentGridAdapter extends CursorAdapter implements OnCheckedChang
 		mEventNumber = c.getColumnIndex(Columns.EVENT_NUMBER);
 		mTotaleImportoPagamento = c.getColumnIndex(Columns.IMPORTO_PAGAMENTO);
 		mTotaleImportoScommesso = c.getColumnIndex(Columns.IMPORTO_SCOMMESSO);
+		indexHocrForManual = c.getColumnIndex(Columns.HOCR_TEXT);
 		mCheckedChangeListener = listener;
 	}
 
@@ -137,15 +141,20 @@ public class DocumentGridAdapter extends CursorAdapter implements OnCheckedChang
 		if (holder.mPageNumber != null) {
 			holder.mPageNumber.setText(String.valueOf(childCount+1));
 		}
-		if (holder.gridElement != null) {
+		String hocrForManual = cursor.getString(indexHocrForManual);
 
-			if (mActivity.getScrollState() == AbsListView.OnScrollListener.SCROLL_STATE_FLING || mActivity.isPendingThumbnailUpdate()) {
-				holder.gridElement.setImage(Util.sDefaultDocumentThumbnail);
-				holder.updateThumbnail = true;
-			} else {
-				final Drawable d = Util.getDocumentThumbnail(documentId);
-				holder.gridElement.setImage(d);
-				holder.updateThumbnail = false;
+		if (holder.gridElement != null) {
+			if(hocrForManual!=null) {
+				if (mActivity.getScrollState() == AbsListView.OnScrollListener.SCROLL_STATE_FLING || mActivity.isPendingThumbnailUpdate()) {
+					holder.gridElement.setImage(Util.sDefaultDocumentThumbnail);
+					holder.updateThumbnail = true;
+				} else {
+					final Drawable d = Util.getDocumentThumbnail(documentId);
+					holder.gridElement.setImage(d);
+					holder.updateThumbnail = false;
+				}
+			}else{
+				holder.gridElement.setImage(context.getResources().getDrawable(R.mipmap.betty_power_initials_white));
 			}
 		}
 
@@ -190,6 +199,7 @@ public class DocumentGridAdapter extends CursorAdapter implements OnCheckedChang
 	public View newView(Context context, Cursor cursor, ViewGroup parent) {
 		View v = null;
 		DocumentViewHolder holder = null;
+		Log.i("new","view");
 		v = mInflater.inflate(mElementLayoutId,null, false);
 		int index = cursor.getColumnIndex(Columns.ID);
 		int documentId = cursor.getInt(index);
@@ -197,6 +207,7 @@ public class DocumentGridAdapter extends CursorAdapter implements OnCheckedChang
 		holder.documentId = documentId;
 		holder.gridElement.setChecked(mSelectedDocuments.contains(documentId));
 		holder.gridElement.setOnCheckedChangeListener(this);
+		//holder.gridElement.setImage(null);
 		v.setTag(holder);
 		FastBitmapDrawable start = Util.sDefaultDocumentThumbnail;
 		Bitmap startBitmap = null;

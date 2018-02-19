@@ -1,13 +1,16 @@
 package com.bettypower;
 
+import android.content.ContentProviderClient;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.database.Cursor;
+import android.graphics.Path;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.RemoteException;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -51,11 +54,19 @@ import com.bettypower.threads.RefreshResultThread;
 import com.bettypower.util.HashMatchUtil;
 import com.bettypower.util.Helper;
 import com.bettypower.util.touchHelper.ItemTouchHelperCallback;
+import com.renard.ocr.BuildConfig;
 import com.renard.ocr.R;
 import com.renard.ocr.TextFairyApplication;
+import com.renard.ocr.documents.creation.NewDocumentActivity;
+import com.renard.ocr.documents.creation.visualisation.OCRActivity;
 import com.renard.ocr.documents.viewing.DocumentContentProvider;
+import com.renard.ocr.documents.viewing.single.DocumentActivity;
+import com.renard.ocr.util.Util;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * this is the activity that show the bet
@@ -86,6 +97,7 @@ public class SingleBetActivity extends AppCompatActivity {
     private static final String ALL_MATCH_SELECTED_STATE = "all_match_selected_state";
     private static final String EDIT_MODE = "edit_mode";
     private static final String IMAGE_URI = "image_uri";
+    private static final String MANUAL_CREATION = "manual_creation";
 
 
     @Override
@@ -127,6 +139,28 @@ public class SingleBetActivity extends AppCompatActivity {
         rVSingleBet.setOnScrollListener(new HidingScrollListener());
         //code to refresh when scrolling up
         swipeRefreshLayout.setOnRefreshListener(new OnRefreshListener());
+    }
+
+    /**
+     * Dispatch onPause() to fragments.
+     */
+    @Override
+    protected void onPause() {
+        super.onPause();
+        try {
+            Cursor c = getContentResolver().query(uri, new String[]{DocumentContentProvider.Columns.ID}, null, null, null);
+            c.moveToFirst();
+            Integer id = c.getInt(c.getPosition());
+            if (allMatch.size() == 0) {
+                getContentResolver().delete(uri, DocumentContentProvider.Columns.ID + "=" + id, null);
+            }
+            c.close();
+        }
+        catch(Exception e){
+
+        }
+        //new NewDocumentActivity.DeleteDocumentTask(ids,false);
+        //new NewDocumentActivity.DeleteDocumentTask(ids, false).execute();
     }
 
     @Override
@@ -200,7 +234,13 @@ public class SingleBetActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.single_bet_action_menu, menu);
+        Cursor c = getContentResolver().query(uri, new String[]{DocumentContentProvider.Columns.HOCR_TEXT}, null, null, null);
+        c.moveToFirst();
+        String text = c.getString(c.getPosition());
         switchMenuItem = menu.findItem(R.id.switch_menu_item);
+        if(text==null){
+            switchMenuItem.setVisible(false);
+        }
         shareMenuItem = menu.findItem(R.id.share_menu_item);
         editMenuItem = menu.findItem(R.id.edit_menu_item);
         confirmMenuItem = menu.findItem(R.id.confirm);
@@ -225,25 +265,7 @@ public class SingleBetActivity extends AppCompatActivity {
                 if(!editMode) {
                     enableEditStyle();
                 }else{
-                    final AddMatchDialog addMatchDialog = new AddMatchDialog(SingleBetActivity.this,bet.getArrayMatch(),SingleBetActivity.this);
-                    addMatchDialog.show();
-                    addMatchDialog.setCanceledOnTouchOutside(false);
-                    WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
-                    Window window = addMatchDialog.getWindow();
-                    lp.copyFrom(window.getAttributes());
-                    lp.width = WindowManager.LayoutParams.MATCH_PARENT;
-                    //lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
-                    window.setAttributes(lp);
-                    addMatchDialog.setOnAddNewItem(new AddMatchDialog.FinishEditDialog() {
-                        @Override
-                        public void onAddNewItem(PalimpsestMatch match) {
-                            addMatchDialog.dismiss();
-                            allMatch.add(match);
-                            bet.setArrayMatch(allMatch);
-                            singleBetAdapter.notifyItemInserted(allMatch.lastIndexOf(match));
-                        }
-                    });
-
+                    setAddMatchDialog();
                 }
                 return true;
             case R.id.confirm:
@@ -331,53 +353,74 @@ public class SingleBetActivity extends AppCompatActivity {
     //TODO
 
 
-    private void firstTimeMatchLoader(){
+    private void firstTimeMatchLoader() {
         Intent intent = getIntent();
         //final String result = intent.getStringExtra("testo_completo");
        // final TextFairyApplication application = (TextFairyApplication) getApplicationContext();
 
         //allMatch = intent.getParcelableArrayListExtra("all_match");
        // bet = intent.getExtras().getParcelable("all_match");
-        bet = intent.getParcelableExtra("all_match");
-        uri = intent.getData();
-        if(bet == null){
+        String manualBet = intent.getStringExtra(MANUAL_CREATION);
+        if(manualBet!=null){
+            allMatch = new ArrayList<>();
+            bet = new SingleBet(allMatch);
+            singleBetAdapter = new SingleBetAdapter(SingleBetActivity.this,bet);
+            editMode = true;
+            HashMatchUtil util = new HashMatchUtil();
+            //TODO QUI
+            try {
+                uri = saveDocumentToDB(util.fromArrayToString(bet.getArrayMatch()));
+            }catch (Exception e){
 
-            Thread loadMatchesFromMemory = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    Cursor c = getContentResolver().query(uri, new String[]{DocumentContentProvider.Columns.OCR_TEXT,DocumentContentProvider.Columns.IMPORTO_PAGAMENTO,DocumentContentProvider.Columns.IMPORTO_SCOMMESSO,DocumentContentProvider.Columns.ERROR_NUMBER}, null, null, null);
-                    c.moveToFirst();
-                    String text = c.getString(c.getPosition());
-                    HashMatchUtil util = new HashMatchUtil();
-                    allMatch = util.fromStringToArray(text);
-                    bet = new SingleBet(allMatch);
-                    for (PalimpsestMatch currentMatch:allMatch
-                         ) {
+            }
+            setAddMatchDialog();
+           /* File imageFile = new File(("android.resource://"+ BuildConfig.APPLICATION_ID+"/" + R.drawable.ic_betty_power_green));
+            if (imageFile != null) {
+                Util.createThumbnail(SingleBetActivity.this, imageFile, Integer.valueOf(uri.getLastPathSegment()));
+            }*/
+            singleBetAdapter.setUri(uri);
+            rVSingleBet.setAdapter(singleBetAdapter);
+        }else {
+            bet = intent.getParcelableExtra("all_match");
+            uri = intent.getData();
+            if (bet == null) {
+
+                Thread loadMatchesFromMemory = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Cursor c = getContentResolver().query(uri, new String[]{DocumentContentProvider.Columns.OCR_TEXT, DocumentContentProvider.Columns.IMPORTO_PAGAMENTO, DocumentContentProvider.Columns.IMPORTO_SCOMMESSO, DocumentContentProvider.Columns.ERROR_NUMBER}, null, null, null);
+                        c.moveToFirst();
+                        String text = c.getString(c.getPosition());
+                        HashMatchUtil util = new HashMatchUtil();
+                        allMatch = util.fromStringToArray(text);
+                        bet = new SingleBet(allMatch);
+                        for (PalimpsestMatch currentMatch : allMatch
+                                ) {
+                            //NEXT LINE FOR TEST
+                            if (currentMatch.isFissa()) {
+                                bet.setSistema(true);
+                                break;
+                            }
+                        }
                         //NEXT LINE FOR TEST
-                        if(currentMatch.isFissa()) {
-                            bet.setSistema(true);
-                            break;
-                        }
-                    }
-                    //NEXT LINE FOR TEST
-                    bet.setArrayMatch(allMatch);
-                    bet.setPuntata(c.getString(c.getColumnIndex(DocumentContentProvider.Columns.IMPORTO_SCOMMESSO)));
-                    bet.setVincita(c.getString(c.getColumnIndex(DocumentContentProvider.Columns.IMPORTO_PAGAMENTO)));
-                    bet.setErrors(c.getString(c.getColumnIndex(DocumentContentProvider.Columns.ERROR_NUMBER)));
-                    c.close();
-                    singleBetAdapter = new SingleBetAdapter(SingleBetActivity.this,bet);
-                    singleBetAdapter.setUri(uri);
-                    singleBetAdapter.setExpandCollapseClickMode(new ExpandCollapseItemClickModeListener());
+                        bet.setArrayMatch(allMatch);
+                        bet.setPuntata(c.getString(c.getColumnIndex(DocumentContentProvider.Columns.IMPORTO_SCOMMESSO)));
+                        bet.setVincita(c.getString(c.getColumnIndex(DocumentContentProvider.Columns.IMPORTO_PAGAMENTO)));
+                        bet.setErrors(c.getString(c.getColumnIndex(DocumentContentProvider.Columns.ERROR_NUMBER)));
+                        c.close();
+                        singleBetAdapter = new SingleBetAdapter(SingleBetActivity.this, bet);
+                        singleBetAdapter.setUri(uri);
+                        singleBetAdapter.setExpandCollapseClickMode(new ExpandCollapseItemClickModeListener());
 
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            rVSingleBet.setAdapter(singleBetAdapter);
-                        }
-                    });
-                }
-            });
-            loadMatchesFromMemory.start();
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                rVSingleBet.setAdapter(singleBetAdapter);
+                            }
+                        });
+                    }
+                });
+                loadMatchesFromMemory.start();
 
           /*  bet = betForTest();
             allMatch = bet.getArrayMatch();
@@ -391,24 +434,24 @@ public class SingleBetActivity extends AppCompatActivity {
             allMatchLoadListener.onMatchesLoaded();
             singleBetAdapter.setOutsideClickListener(new ActivityClickListener());
             singleBetAdapter.setDialogListener(new DialogClickListener());*/
-        //    ContentValues values = new ContentValues();
-     //       values.put(DocumentContentProvider.Columns.EVENT_NUMBER,String.valueOf(allMatch.size()));
+                //    ContentValues values = new ContentValues();
+                //       values.put(DocumentContentProvider.Columns.EVENT_NUMBER,String.valueOf(allMatch.size()));
 //            getApplicationContext().getContentResolver().update(uri,values,null,null);
-        }
-        else{
-            allMatch = bet.getArrayMatch();
-            for (PalimpsestMatch currentMatch:allMatch) {
-                currentMatch.setAllHiddenResult(getHiddenResultForTest());
-            }
-            singleBetAdapter = new SingleBetAdapter(SingleBetActivity.this, bet);
-            singleBetAdapter.setUri(uri);
-            rVSingleBet.setAdapter(singleBetAdapter);
-            allMatchLoadListener.onMatchesLoaded();
-            singleBetAdapter.setExpandCollapseClickMode(new ExpandCollapseItemClickModeListener());
-            ContentValues values = new ContentValues();
-            values.put(DocumentContentProvider.Columns.EVENT_NUMBER,String.valueOf(allMatch.size()));
-            getApplicationContext().getContentResolver().update(uri,values,null,null);
+            } else {
+                allMatch = bet.getArrayMatch();
+                for (PalimpsestMatch currentMatch : allMatch) {
+                    currentMatch.setAllHiddenResult(getHiddenResultForTest());
+                }
+                singleBetAdapter = new SingleBetAdapter(SingleBetActivity.this, bet);
+                singleBetAdapter.setUri(uri);
+                rVSingleBet.setAdapter(singleBetAdapter);
+                allMatchLoadListener.onMatchesLoaded();
+                singleBetAdapter.setExpandCollapseClickMode(new ExpandCollapseItemClickModeListener());
+                ContentValues values = new ContentValues();
+                values.put(DocumentContentProvider.Columns.EVENT_NUMBER, String.valueOf(allMatch.size()));
+                getApplicationContext().getContentResolver().update(uri, values, null, null);
 
+            }
         }
     }
 
@@ -581,6 +624,51 @@ public class SingleBetActivity extends AppCompatActivity {
             stringRequest.setShouldCache(false);
             queue.add(stringRequest);
 
+        }
+    }
+
+    private void setAddMatchDialog(){
+        final AddMatchDialog addMatchDialog = new AddMatchDialog(SingleBetActivity.this,bet.getArrayMatch(),SingleBetActivity.this);
+        addMatchDialog.show();
+        addMatchDialog.setCanceledOnTouchOutside(false);
+        WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
+        Window window = addMatchDialog.getWindow();
+        lp.copyFrom(window.getAttributes());
+        lp.width = WindowManager.LayoutParams.MATCH_PARENT;
+        //lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
+        window.setAttributes(lp);
+        addMatchDialog.setOnAddNewItem(new AddMatchDialog.FinishEditDialog() {
+            @Override
+            public void onAddNewItem(PalimpsestMatch match) {
+                addMatchDialog.dismiss();
+                allMatch.add(match);
+                bet.setArrayMatch(allMatch);
+                singleBetAdapter.notifyItemInserted(allMatch.lastIndexOf(match));
+            }
+        });
+    }
+
+    private Uri saveDocumentToDB(String plainText)
+            throws RemoteException {
+        ContentProviderClient client = null;
+
+        try {
+            ContentValues v = new ContentValues();
+         //   v.put(DocumentContentProvider.Columns.PHOTO_PATH,
+          //          Uri.parse("android.resource://"+ BuildConfig.APPLICATION_ID+"/" + R.drawable.ic_betty_power_green).toString());
+            if (plainText != null) {
+                v.put(DocumentContentProvider.Columns.OCR_TEXT, plainText);
+            }
+            v.put(DocumentContentProvider.Columns.EVENT_NUMBER,String.valueOf(0));
+           /* if (mParentId > -1) {
+                v.put(DocumentContentProvider.Columns.PARENT_ID, mParentId);
+            }*/
+            client = getContentResolver().acquireContentProviderClient(DocumentContentProvider.CONTENT_URI);
+            return client.insert(DocumentContentProvider.CONTENT_URI, v);
+        } finally {
+            if (client != null) {
+                client.release();
+            }
         }
     }
 

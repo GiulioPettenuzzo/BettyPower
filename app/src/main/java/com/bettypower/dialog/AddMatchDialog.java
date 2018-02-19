@@ -7,7 +7,9 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.text.InputFilter;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
@@ -43,7 +45,7 @@ import java.util.StringTokenizer;
 public class AddMatchDialog extends Dialog {
 
     private Context context;
-    private AutoCompleteTextView autoCompleteTextView;
+    private CustomTextView autoCompleteTextView;
     private ArrayList<PalimpsestMatch> allMatches;
     private ArrayList<PalimpsestMatch> allMatchInBet;
     private PalimpsestMatch selectedPalimpsestMatch;
@@ -66,7 +68,7 @@ public class AddMatchDialog extends Dialog {
         this.allMatchInBet = allMatchesInBet;
         application = (TextFairyApplication) context.getApplicationContext();
         setContentView(R.layout.dialog_add_new_match);
-        autoCompleteTextView = (AutoCompleteTextView) findViewById(R.id.autoCompleteTextView);
+        autoCompleteTextView = (CustomTextView) findViewById(R.id.autoCompleteTextView);
         confirm = (Button) findViewById(R.id.add_dialog_confirm);
         delete = (Button) findViewById(R.id.add_dialog_cancel);
         matchDateTextView = (TextView) findViewById(R.id.match_time_text_view);
@@ -126,6 +128,8 @@ public class AddMatchDialog extends Dialog {
                         matchDateTextView.setVisibility(View.INVISIBLE);
                         selectedPalimpsestMatch = null;
                         confirm.setOnClickListener(null);
+                        homeImageView.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_eagle_shield));
+                        awayImageView.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_shield_with_castle_inside));
                     }
                 });
             }
@@ -185,6 +189,24 @@ public class AddMatchDialog extends Dialog {
         this.finishEditDialog = finishEditDialog;
     }
 
+    /**
+     * Called when the dialog has detected the user's press of the back
+     * key.  The default implementation simply cancels the dialog (only if
+     * it is cancelable), but you can override this to do whatever you want.
+     */
+    @Override
+    public void onBackPressed() {
+        if(autoCompleteTextView.isFocused()) {
+            InputMethodManager inputMethodManager =
+                    (InputMethodManager) activity.getSystemService(
+                            Activity.INPUT_METHOD_SERVICE);
+            inputMethodManager.hideSoftInputFromWindow(
+                    activity.getCurrentFocus().getWindowToken(), 0);
+        }else {
+            super.onBackPressed();
+        }
+    }
+
     public interface FinishEditDialog{
         void onAddNewItem(PalimpsestMatch newMatch);
     }
@@ -205,8 +227,8 @@ public class AddMatchDialog extends Dialog {
                                 activity.runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
-                                        Picasso.with(context).load("file:"+context.getDir("logo_images", Context.MODE_PRIVATE).getPath()+"/"+match.getHomeTeam().getName() + ".png").error(context.getResources().getDrawable(R.drawable.ic_shield_with_castle_inside)).into(homeImageView);
-                                        Picasso.with(context).load("file:"+context.getDir("logo_images", Context.MODE_PRIVATE).getPath()+"/"+match.getAwayTeam().getName() + ".png").error(context.getResources().getDrawable(R.drawable.ic_eagle_shield)).into(awayImageView);
+                                        Picasso.with(context).load("file:"+context.getDir("logo_images", Context.MODE_PRIVATE).getPath()+"/"+match.getHomeTeam().getName() + ".png").error(context.getResources().getDrawable(R.drawable.ic_eagle_shield)).into(homeImageView);
+                                        Picasso.with(context).load("file:"+context.getDir("logo_images", Context.MODE_PRIVATE).getPath()+"/"+match.getAwayTeam().getName() + ".png").error(context.getResources().getDrawable(R.drawable.ic_shield_with_castle_inside)).into(awayImageView);
                                     }
                                 });
                             }
