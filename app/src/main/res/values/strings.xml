@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
 <resources>
     <string name="delate_match_dialog_question">Devo aver sbagliato a leggere questa partita \n Mi dispiace! \n Sei sicuro di volerla eliminare?</string>
-
+    <string name="autocomplete_textview_hint">"squadra in casa - squadra ospite"</string>
     <string name="delate_bet_dialog_question_singolar">Eliminare la Scommessa?</string>
     <string name="delete_bet_dialog_subtitle_singolar">Non potrai più recuperarla</string>
     <string name="delete_bet_dialog_explaination_singolar">tutti i dati di questa schedina \n andranno perduti</string>
@@ -297,4 +297,7 @@
     <string name="time_match_terminated">termin.</string>
     <string name="no_connection">connessione assente, riprova più tardi</string>
     <string name="check_connection">controlla la tua connessione e riprova</string>
+    <string name="the_photo_of_the_bet">the photo of the bet</string>
+    <string name="home_team_image_logo">home team image logo</string>
+    <string name="away_team_image_logo">away team image logo</string>
 </resources>

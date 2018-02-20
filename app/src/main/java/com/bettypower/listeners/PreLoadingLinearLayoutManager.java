@@ -7,6 +7,7 @@ import android.support.v7.widget.RecyclerView;
 
 /**
  * Created by giuliopettenuzzo on 26/07/17.
+ * in order to get te scroll smoothly in the old version of android
  */
 
 public class PreLoadingLinearLayoutManager extends LinearLayoutManager {

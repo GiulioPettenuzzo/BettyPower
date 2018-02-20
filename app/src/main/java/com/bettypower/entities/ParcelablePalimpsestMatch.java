@@ -216,43 +216,39 @@ public class ParcelablePalimpsestMatch implements PalimpsestMatch {
 
     public boolean compareToByName(PalimpsestMatch paramPalimpsestMatch){
         StringTokenizer homeToken = new StringTokenizer(getHomeTeam().getName());
-        String homeTeam = "";
+        StringBuilder homeTeam = new StringBuilder();
         while(homeToken.hasMoreTokens()){
             String word = homeToken.nextToken();
             if(word.length()>2){
-                homeTeam = homeTeam + " " + word;
+                homeTeam.append(" ").append(word);
             }
         }
         StringTokenizer awayToken = new StringTokenizer(getAwayTeam().getName());
-        String awayTeam = "";
+        StringBuilder awayTeam = new StringBuilder();
         while(awayToken.hasMoreTokens()){
             String word = awayToken.nextToken();
             if(word.length()>2){
-                awayTeam = awayTeam + " " + word;
+                awayTeam.append(" ").append(word);
             }
         }
         StringTokenizer paramHomeToken = new StringTokenizer(paramPalimpsestMatch.getHomeTeam().getName());
-        String paramHomeTeam = "";
+        StringBuilder paramHomeTeam = new StringBuilder();
         while(paramHomeToken.hasMoreTokens()){
             String word = paramHomeToken.nextToken();
             if(word.length()>2){
-                paramHomeTeam = paramHomeTeam + " " + word;
+                paramHomeTeam.append(" ").append(word);
             }
         }
         StringTokenizer paramAwayToken = new StringTokenizer(paramPalimpsestMatch.getAwayTeam().getName());
-        String paramAwayTeam = "";
+        StringBuilder paramAwayTeam = new StringBuilder();
         while(paramAwayToken.hasMoreTokens()){
             String word = paramAwayToken.nextToken();
             if(word.length()>2){
-                paramAwayTeam = paramAwayTeam + " " + word;
+                paramAwayTeam.append(" ").append(word);
             }
         }
         if(getTime().equalsIgnoreCase(paramPalimpsestMatch.getTime())){
-            if(homeTeam.equalsIgnoreCase(paramHomeTeam) || awayTeam.equalsIgnoreCase(paramAwayTeam)) {
-                return true;
-            }else{
-                return false;
-            }
+            return homeTeam.toString().equalsIgnoreCase(paramHomeTeam.toString()) || awayTeam.toString().equalsIgnoreCase(paramAwayTeam.toString());
         }
         else{
             return false;

@@ -12,7 +12,7 @@
 
     <color name="grey2">#555555</color>
     <color name="grey3">#777777</color>
-    <color name="grey6">#DDDDDD</color>
+    <color name="grey6">#dddddd</color>
 	<color name="progress_color">#ff33b5e5</color>  
 	<color name="circle_indicator_background">#66000000</color>  
 	
@@ -28,9 +28,9 @@
     <color name="toolbar_background">#98005f4e</color>
     <color name="toolbar_background_light">#006249</color>
     <color name="toolbar_background_dark">#004428</color>
-    <color name="Tekt_dark_lighter">#4e5365</color>
+    <color name="Tekt_dark_lighter">#f14e5365</color>
     <color name="Text_dark">#323641</color>
-    <color name="green_for_dialog">#63c417</color>
+    <color name="green_for_dialog">#c563c417</color>
     <color name="blu_facebook">#4266b2</color>
     <color name="title_colour_transparent">#9f40af08</color>
     <color name="title_opacity">#8f006249</color>
@@ -41,6 +41,9 @@
     <color name="material_grey_transparent">#e7fafafa</color>
     <color name="line_separator">#eaeaea</color>
     <color name="grid_title_colour">#4e5365</color>
-    <color name="grit_title_background">#e7ede75e</color>
+    <color name="grit_title_background">#daffffff</color>
+    <color name="toolbar_lighter">#259a24</color>
+    <color name="action_bar_lighter">#0b7e07</color>
+    <color name="grid_title_dark">#53687d</color>
 
 </resources>

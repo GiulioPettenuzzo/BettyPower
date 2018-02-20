@@ -12,11 +12,11 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
         android:background="@color/cardview_light_background"
+        android:elevation="0dp"
         android:text="@string/annulla"
         android:textColor="@color/blu_facebook"
         app:layout_constraintEnd_toStartOf="@+id/add_dialog_confirm"
-        app:layout_constraintTop_toBottomOf="@+id/match_time_text_view"
-        android:layout_marginRight="8dp" />
+        app:layout_constraintTop_toBottomOf="@+id/match_time_text_view" />
 
     <Button
         android:id="@+id/add_dialog_confirm"
@@ -25,11 +25,11 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
         android:background="@color/cardview_light_background"
+        android:elevation="0dp"
         android:text="@string/confirm"
         android:textColor="@color/green_for_dialog"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/match_time_text_view"
-        android:layout_marginRight="8dp" />
+        app:layout_constraintTop_toBottomOf="@+id/match_time_text_view" />
 
     <TextView
         android:id="@+id/add_match_title"
@@ -86,8 +86,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/ic_eagle_shield"
-        android:layout_marginLeft="8dp"
-        android:contentDescription="@string/home_team_image_logo"/>
+        android:contentDescription="@string/home_team_image_logo" />
 
     <ImageView
         android:id="@+id/away_team_add_logo"
@@ -100,6 +99,5 @@
         app:layout_constraintStart_toEndOf="@+id/add_match_title"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/ic_shield_with_castle_inside"
-        android:layout_marginRight="8dp"
-        android:contentDescription="@string/away_team_image_logo"/>
+        android:contentDescription="@string/away_team_image_logo" />
 </android.support.constraint.ConstraintLayout>

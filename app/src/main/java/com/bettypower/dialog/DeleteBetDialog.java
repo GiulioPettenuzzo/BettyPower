@@ -11,15 +11,11 @@ import com.renard.ocr.R;
 
 /**
  * Created by giuliopettenuzzo on 07/02/18.
+ * In order to confirm the elimination of a bet
  */
 
 public class DeleteBetDialog extends Dialog {
 
-    private Button cancelButton;
-    private Button confirmButton;
-    private TextView title;
-    private TextView subTitle;
-    private TextView explaination;
     private DeleteBetDialogListener mDeleteBetDialogListener;
 
     /**
@@ -34,11 +30,11 @@ public class DeleteBetDialog extends Dialog {
         super(context);
         setContentView(R.layout.dialog_delate_match);
         this.mDeleteBetDialogListener = deleteBetDialogListener;
-        cancelButton = (Button) findViewById(R.id.delate_dialog_cancel_button);
-        confirmButton = (Button) findViewById(R.id.delate_dialog_confirm_button);
-        title = (TextView) findViewById(R.id.main_title);
-        subTitle = (TextView) findViewById(R.id.delete_match_dialog_title);
-        explaination = (TextView) findViewById(R.id.delate_message);
+        Button cancelButton = (Button) findViewById(R.id.delate_dialog_cancel_button);
+        Button confirmButton = (Button) findViewById(R.id.delate_dialog_confirm_button);
+        TextView title = (TextView) findViewById(R.id.main_title);
+        TextView subTitle = (TextView) findViewById(R.id.delete_match_dialog_title);
+        TextView explaination = (TextView) findViewById(R.id.delate_message);
 
         if(numberDocument==1) {
             title.setText(R.string.delate_bet_dialog_question_singolar);

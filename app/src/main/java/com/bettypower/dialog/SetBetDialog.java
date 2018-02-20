@@ -2,7 +2,6 @@ package com.bettypower.dialog;
 
 import android.app.Dialog;
 import android.content.Context;
-
 import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -11,16 +10,13 @@ import android.text.InputFilter;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.KeyEvent;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-
 import com.bettypower.betMatchFinder.labelSet.BetLabelSet;
-import com.bettypower.entities.Match;
 import com.bettypower.entities.PalimpsestMatch;
 import com.renard.ocr.R;
 
@@ -48,6 +44,8 @@ public class SetBetDialog extends Dialog {
 
     private FinishEdittingDialogListener finishEdittingDialogListener;
 
+    private static final int MIN_QUOTE_VALUE = 101;
+    private static final int MAX_QUOTE_VALUE = 9999;
 
     public SetBetDialog(@NonNull Context context, PalimpsestMatch match) {
         super(context);
@@ -68,7 +66,7 @@ public class SetBetDialog extends Dialog {
         saveTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(showQuote.getText()==null || showQuote.getText().equals(""))
+                if(showQuote.getText()==null || showQuote.getText().toString().equals(""))
                     match.setQuote(null);
                 else
                     match.setQuote(showQuote.getText().toString());
@@ -93,20 +91,21 @@ public class SetBetDialog extends Dialog {
 
     private void initViews(){
         setContentView(R.layout.dialog_set_bet);
-        TextView illustrationTextView = (TextView) findViewById(R.id.illustration);
         showBetKindTextView = (TextView) findViewById(R.id.show_bet_kind);
         deleteTextView = (Button) findViewById(R.id.delete_text_view);
         saveTextView = (Button) findViewById(R.id.select_text_view);
-        TextView teamsNamesTextView = (TextView) findViewById(R.id.teams_names);
         showBet = (Button) findViewById(R.id.show_bet_button);
         showQuote = (EditText) findViewById(R.id.show_quote_edit_text);
         selectBetKindPicker = (com.shawnlin.numberpicker.NumberPicker) findViewById(R.id.select_bet_kind);
         selectBetPicker = (com.shawnlin.numberpicker.NumberPicker) findViewById(R.id.select_bet);
         selectQuotePicker = (com.shawnlin.numberpicker.NumberPicker) findViewById(R.id.select_quote_picker);
+        TextView teamsNamesTextView = (TextView) findViewById(R.id.teams_names);
+        TextView illustrationTextView = (TextView) findViewById(R.id.illustration);
 
         betKindArray =  betLabelSet.hashBetAndBetKind().keySet().toArray();
         illustrationTextView.setText(context.getResources().getString(R.string.dialog_illustration_set_bet));
-        teamsNamesTextView.setText(match.getHomeTeam().getName() + " - " + match.getAwayTeam().getName());
+        String teamsName = match.getHomeTeam().getName() + " - " + match.getAwayTeam().getName();
+        teamsNamesTextView.setText(teamsName);
     }
 
     /**
@@ -147,8 +146,8 @@ public class SetBetDialog extends Dialog {
 
     private void setQuotePickerAndView(){
         selectQuotePicker.setWheelItemCount(3);
-        selectQuotePicker.setMinValue(101);
-        selectQuotePicker.setMaxValue(9999);
+        selectQuotePicker.setMinValue(MIN_QUOTE_VALUE);
+        selectQuotePicker.setMaxValue(MAX_QUOTE_VALUE);
         selectQuotePicker.setWrapSelectorWheel(false);
         if(match.getQuote()!=null && !match.getQuote().equals("")){
             selectQuotePicker.setValue(fromQuoteToNumber(match.getQuote()));
@@ -162,7 +161,6 @@ public class SetBetDialog extends Dialog {
         selectQuotePicker.setFormatter(new com.shawnlin.numberpicker.NumberPicker.Formatter() {
             @Override
             public String format(int value) {
-                //return allQuote[value];
                 return getQuoteFormat(value);
             }
         });
@@ -173,7 +171,6 @@ public class SetBetDialog extends Dialog {
             }
         });
         showQuote.getBackground().mutate().setColorFilter(context.getResources().getColor(R.color.primary), PorterDuff.Mode.SRC_ATOP);
-        //showQuote.clearFocus();
 
         showQuote.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
@@ -197,7 +194,9 @@ public class SetBetDialog extends Dialog {
                 if(actionId == EditorInfo.IME_ACTION_DONE){
                     Log.i("TYPE","TYPE");
                     InputMethodManager imm = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-                    imm.hideSoftInputFromWindow(showQuote.getWindowToken(), 0);
+                    if (imm != null) {
+                        imm.hideSoftInputFromWindow(showQuote.getWindowToken(), 0);
+                    }
                     v.setFocusable(false);
                     showQuote.setText(fixQuote(showQuote.getText().toString()));
                     selectQuotePicker.setValue(fromQuoteToNumber(showQuote.getText().toString()));
@@ -293,14 +292,14 @@ public class SetBetDialog extends Dialog {
     * from number picker easily
     */
     private int fromQuoteToNumber(String quote){
-        String result = "";
+        StringBuilder result = new StringBuilder();
         for (int i = 0; i<quote.length();i++){
             if(quote.charAt(i) != ','){
-                result = result + String.valueOf(quote.charAt(i));
+                result.append(String.valueOf(quote.charAt(i)));
             }
         }
         try {
-            return Integer.parseInt(result);
+            return Integer.parseInt(result.toString());
         }
         catch (NumberFormatException e){
             return 200;
@@ -320,8 +319,6 @@ public class SetBetDialog extends Dialog {
         }
         return numString;
     }
-
-
 
     /* *********************************************************************************************
      *********************************   AUSILIAR METHOD   ****************************************

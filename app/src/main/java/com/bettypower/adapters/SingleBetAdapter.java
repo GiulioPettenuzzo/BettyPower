@@ -1,13 +1,11 @@
 package com.bettypower.adapters;
 
+import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
-import android.os.Environment;
 import android.support.constraint.ConstraintLayout;
 import android.support.constraint.ConstraintSet;
 import android.support.v7.widget.RecyclerView;
@@ -19,34 +17,22 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.AbsListView;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
 import com.bettypower.HiddenResultLayout;
-import com.bettypower.SingleBetActivity;
 import com.bettypower.adapters.helpers.CorrectionToUserWatcher;
 import com.bettypower.adapters.helpers.ExpandCollapseClickExecutor;
 import com.bettypower.dialog.DeleteMatchDialog;
 import com.bettypower.dialog.SetBetDialog;
 import com.bettypower.entities.Bet;
 import com.bettypower.entities.HiddenResult;
-import com.bettypower.entities.Match;
-
-import java.io.File;
-import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Observer;
-
 import com.bettypower.entities.PalimpsestMatch;
 import com.bettypower.entities.ParcelableHiddenResult;
-import com.bettypower.entities.SingleBet;
-import com.bettypower.listeners.PreLoadingLinearLayoutManager;
-import com.bettypower.util.ImageHelper;
 import com.bettypower.util.touchHelper.ItemTouchHelperAdapter;
 import com.renard.ocr.R;
 import com.renard.ocr.documents.viewing.DocumentContentProvider;
@@ -62,22 +48,18 @@ public class SingleBetAdapter extends RecyclerView.Adapter implements ItemTouchH
     private Bet singleBet;
     private ArrayList<PalimpsestMatch> allMatches = new ArrayList<>();
     private ArrayList<PalimpsestMatch> isSelected = new ArrayList<>();
-
     private boolean editMode = false;
     private boolean editModeConfirm = false;
-
     private static final int ELEVATION = 0;
-
+    @SuppressLint("StaticFieldLeak")
     private static Context context;
     private Uri uri;
-    private ImageHelper imageHelper;
 
     //normal constructor.......
     public SingleBetAdapter(Context context, Bet singleBet){
         SingleBetAdapter.context = context;
         this.singleBet = singleBet;
         this.allMatches = singleBet.getArrayMatch();
-        imageHelper = new ImageHelper(context);
     }
     //constructor for instance state
     public SingleBetAdapter(Context context, Bet singleBet, ArrayList<PalimpsestMatch> allSelectedMatch){
@@ -85,7 +67,6 @@ public class SingleBetAdapter extends RecyclerView.Adapter implements ItemTouchH
         this.singleBet = singleBet;
         this.allMatches = singleBet.getArrayMatch();
         isSelected = allSelectedMatch;
-        imageHelper = new ImageHelper(context);
     }
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -144,15 +125,12 @@ public class SingleBetAdapter extends RecyclerView.Adapter implements ItemTouchH
                 }
                 break;
             case 1:
-                SingleBetAdapter.LastItemViewHolder lastItemViewHolder = (SingleBetAdapter.LastItemViewHolder) holder;
                 break;
-
         }
     }
 
     @Override
     public void onBindViewHolder(final RecyclerView.ViewHolder holder, final int position) {
-        //holder.hiddenResult.removeAllViews();
         switch (holder.getItemViewType()) {
             case 0:
                 SingleBetAdapter.ViewHolder viewHolder = (SingleBetAdapter.ViewHolder) holder;
@@ -163,7 +141,6 @@ public class SingleBetAdapter extends RecyclerView.Adapter implements ItemTouchH
                 lastItemViewHolder.setItemView();
                 break;
         }
-
     }
 
     /**
@@ -218,12 +195,6 @@ public class SingleBetAdapter extends RecyclerView.Adapter implements ItemTouchH
 
     public void setAllMatches(ArrayList<PalimpsestMatch> allMatches){
         this.allMatches = allMatches;
-        //notifyDataSetChanged();
-    }
-
-    public void setSingleBet(Bet singleBet){
-        this.singleBet = singleBet;
-        notifyDataSetChanged();
     }
 
     @Override
@@ -347,7 +318,6 @@ public class SingleBetAdapter extends RecyclerView.Adapter implements ItemTouchH
             bet.setText(match.getBet());
             betKind.setText(match.getBetKind());
             quote.setText(match.getQuote());
-            //homeLogo.setImageDrawable();
             Picasso.with(context).load("file:"+context.getDir("logo_images", Context.MODE_PRIVATE).getPath()+"/"+match.getHomeTeam().getName() + ".png").placeholder(context.getResources().getDrawable(R.drawable.ic_shield_with_castle_inside)).error(context.getResources().getDrawable(R.drawable.ic_shield_with_castle_inside)).into(homeLogo);
             Picasso.with(context).load("file:"+context.getDir("logo_images", Context.MODE_PRIVATE).getPath()+"/"+match.getAwayTeam().getName() + ".png").placeholder(context.getResources().getDrawable(R.drawable.ic_eagle_shield)).error(context.getResources().getDrawable(R.drawable.ic_eagle_shield)).into(awayLogo);
             if(editMode){
@@ -489,50 +459,15 @@ public class SingleBetAdapter extends RecyclerView.Adapter implements ItemTouchH
             numberMatchLostTextView = (TextView) itemView.findViewById(R.id.number_match_lost);
             numberMatchNotFinished = (TextView) itemView.findViewById(R.id.match_not_finished);
             bookMakerTextView = (TextView) itemView.findViewById(R.id.book_maker_text_view);
-           // sistemaCheckBox.setOnCheckedChangeListener(new CheckedChangeListener());
-          /*  if(singleBet.getErrors()!=null) {
-                String tmp = context.getResources().getString(R.string.sistema_errori) + " " + singleBet.getErrors();
-                errorsEditText.setText(singleBet.getErrors());
-                errorsTextView.setText(tmp);
-            }else{
-                errorsTextView.setVisibility(View.GONE);
-            }
-            if(singleBet.getPuntata()!=null && !singleBet.getPuntata().isEmpty()) {
-                String tmp = context.getResources().getString(R.string.totale_importo_scommesso) + " " + singleBet.getPuntata()+ "€";
-                puntataEditText.setText(singleBet.getPuntata());
-                puntataTextView.setText(tmp);
-            }
-            else{
-                puntataTextView.setVisibility(View.GONE);
-            }
-            if(singleBet.getVincita()!=null && !singleBet.getVincita().isEmpty()) {
-                String tmp = context.getResources().getString(R.string.totale_vincita) + " " + singleBet.getVincita()+ "€";
-                vincitaEditText.setText(singleBet.getVincita());
-                vincitaTextView.setText(tmp);
-            }
-            else{
-                vincitaTextView.setVisibility(View.GONE);
-            }
-            vincitaEditText.setVisibility(View.GONE);
-            puntataEditText.setVisibility(View.GONE);
-            errorsEditText.setVisibility(View.GONE);
-            sistemaCheckBox.setVisibility(View.GONE);
-            String numberAvveniments = context.getResources().getString(R.string.number_avveniments) +" "+ String.valueOf(allMatches.size());
-            matchNumberTextView.setText(numberAvveniments);
-            if(singleBet.isSistema())
-                sistemaCheckBox.setChecked(true);
-            else
-                sistemaCheckBox.setChecked(false);
-            sistemaCheckBox.setOnCheckedChangeListener(new CheckedChangeListener());*/
             setTextEdit();
 
         }
 
         private void setItemView(){
-            Log.i("holder id" , String.valueOf(getItemId()));
             String numberAvveniments = context.getResources().getString(R.string.number_avveniments) +" "+ String.valueOf(allMatches.size());
             matchNumberTextView.setText(numberAvveniments);
             if(editMode){
+                itemView.setBackgroundColor(context.getResources().getColor(R.color.toolbar_background_light));
                 vincitaTextView.setVisibility(View.VISIBLE);
                 vincitaEditText.setVisibility(View.VISIBLE);
                 puntataEditText.setVisibility(View.VISIBLE);
@@ -553,6 +488,7 @@ public class SingleBetAdapter extends RecyclerView.Adapter implements ItemTouchH
                 puntataTextView.setText(context.getResources().getString(R.string.totale_importo_scommesso));
             }
             else{
+                itemView.setBackgroundColor(context.getResources().getColor(R.color.toolbar_lighter));
                 if(editModeConfirm){
                     editModeConfirm = false;
                     ContentValues values = new ContentValues();
@@ -751,19 +687,17 @@ public class SingleBetAdapter extends RecyclerView.Adapter implements ItemTouchH
         private class CheckedChangeListener implements CheckBox.OnCheckedChangeListener{
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-               // if(buttonView.getVisibility()==View.VISIBLE) { //per quando togli il listenere dalla bind
-                    if (isChecked) {
-                        singleBet.setSistema(true);
-                        notifyDataSetChanged();
-                    } else {
-                        singleBet.setSistema(false);
-                        for (PalimpsestMatch currentMatch : allMatches
-                                ) {
-                            currentMatch.setFissa(false);
-                        }
-                        notifyDataSetChanged();
+                if (isChecked) {
+                    singleBet.setSistema(true);
+                    notifyDataSetChanged();
+                } else {
+                    singleBet.setSistema(false);
+                    for (PalimpsestMatch currentMatch : allMatches
+                            ) {
+                        currentMatch.setFissa(false);
                     }
-              //  }
+                    notifyDataSetChanged();
+                }
             }
         }
     }

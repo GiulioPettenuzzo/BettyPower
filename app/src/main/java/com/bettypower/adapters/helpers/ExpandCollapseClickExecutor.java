@@ -12,7 +12,6 @@ import android.view.animation.Animation;
 import android.view.animation.RotateAnimation;
 
 import com.bettypower.adapters.SingleBetAdapter;
-import com.bettypower.entities.Match;
 import com.bettypower.entities.PalimpsestMatch;
 import com.renard.ocr.R;
 
@@ -32,10 +31,7 @@ public class ExpandCollapseClickExecutor {
     private int hidenResultHeight = 0;
     private ValueAnimator dropDownAnimation;
     private Context context;
-
     private ExpandCollapseClickExecutor.ClickStat clickStat;
-
-
     private final static int DURATION = 300;
 
 

@@ -18,7 +18,6 @@ package com.renard.ocr.documents.creation;
 
 import com.bettypower.SingleBetActivity;
 import com.bettypower.entities.Match;
-import com.bettypower.threads.RealTimeFinderThread;
 import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.samples.vision.ocrreader.OcrCaptureActivity;
 import com.google.android.gms.samples.vision.ocrreader.ui.camera.CameraSource;

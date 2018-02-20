@@ -3,16 +3,13 @@ package com.bettypower.threads;
 import android.support.v4.widget.SwipeRefreshLayout;
 
 import com.bettypower.adapters.SingleBetAdapter;
-import com.bettypower.entities.HiddenResult;
-import com.bettypower.entities.Match;
 import com.bettypower.entities.PalimpsestMatch;
-import com.bettypower.unpacker.Unpacker;
-import com.bettypower.unpacker.goalServeUnpacker;
 
 import java.util.ArrayList;
 
 /**
  * Created by giuliopettenuzzo on 21/07/17.
+ *
  */
 
 public class RefreshResultThread extends Thread{

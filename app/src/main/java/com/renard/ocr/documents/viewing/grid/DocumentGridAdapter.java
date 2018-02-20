@@ -19,6 +19,7 @@ package com.renard.ocr.documents.viewing.grid;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
 
 import android.content.Context;
@@ -154,7 +155,21 @@ public class DocumentGridAdapter extends CursorAdapter implements OnCheckedChang
 					holder.updateThumbnail = false;
 				}
 			}else{
-				holder.gridElement.setImage(context.getResources().getDrawable(R.mipmap.betty_power_initials_white));
+				int resId[]={R.drawable.ic_soccer_player_yellow_green_silhouette
+						,R.drawable.ic_soccer_player_dark_green_silhouette
+						,R.drawable.ic_soccer_player_dark_orange_silhouette
+						,R.drawable.ic_soccer_player_deep_pink_silhouette
+						,R.drawable.ic_soccer_player_dodger_blue_silhouette
+						,R.drawable.ic_soccer_player_grey_silhouette
+						,R.drawable.ic_soccer_player_indigo_silhouette
+						,R.drawable.ic_soccer_player_light_sea_green_silhouette
+						,R.drawable.ic_soccer_player_purple_silhouette
+				};
+				Random rand = new Random();
+				int index = rand.nextInt((resId.length- 1) - 0 + 1) + 0;
+
+				//imgView.setImageResource(resId[index]);
+				holder.gridElement.setImage(context.getResources().getDrawable(resId[index]));
 			}
 		}
 

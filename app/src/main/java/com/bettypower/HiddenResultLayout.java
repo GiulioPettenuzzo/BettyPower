@@ -1,7 +1,7 @@
 package com.bettypower;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
-import android.support.constraint.ConstraintLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
@@ -13,8 +13,10 @@ import com.renard.ocr.R;
 
 /**
  * Created by giuliopettenuzzo on 30/06/17.
+ * layout for red card, yellow card and goal
  */
 
+@SuppressLint("ViewConstructor")
 public class HiddenResultLayout extends RelativeLayout {
     Context context;
     TextView homePlayer;
@@ -25,8 +27,6 @@ public class HiddenResultLayout extends RelativeLayout {
     TextView time;
     ImageView homeAction;
     ImageView awayAction;
-
-    ConstraintLayout constraintLayout;
 
     private static final int HOME_TEAM = 0;
     private static final int AWAY_TEAM = 1;
@@ -39,27 +39,30 @@ public class HiddenResultLayout extends RelativeLayout {
         LayoutInflater layoutInflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         switch (hiddenResult.getActionTeam()){
             case HOME_TEAM:
-                view = layoutInflater.inflate(R.layout.item_hidden_result_home, this, true);
+                if (layoutInflater != null) {
+                    view = layoutInflater.inflate(R.layout.item_hidden_result_home, this, true);
+                }
                 homeAction = (ImageView) findViewById(R.id.home_action);
                 homePlayer = (TextView) findViewById(R.id.home_player);
                 result = (TextView) findViewById(R.id.action_result);
                 time = (TextView) findViewById(R.id.action_time);
                 break;
             case AWAY_TEAM:
-                view = layoutInflater.inflate(R.layout.item_hidden_result_away, this, true);
+                if (layoutInflater != null) {
+                    view = layoutInflater.inflate(R.layout.item_hidden_result_away, this, true);
+                }
                 awayAction = (ImageView) findViewById(R.id.away_action);
                 awayPlayer = (TextView) findViewById(R.id.away_player);
                 result = (TextView) findViewById(R.id.action_result);
                 time = (TextView) findViewById(R.id.action_time);
                 break;
             case ERROR_TEAM:
-                break; //TODO
+                break;
         }
     }
     public void setGoalHiddenResult(){
         time.setText(hiddenResult.getTime());
         result.setText(hiddenResult.getResult());
-       // result.setVisibility(GONE);
         if (hiddenResult.getActionTeam() == HOME_TEAM){
             homeAction.setImageDrawable(context.getResources().getDrawable(R.drawable.goal_ball));
             homePlayer.setText(hiddenResult.getPlayerName());
@@ -93,8 +96,5 @@ public class HiddenResultLayout extends RelativeLayout {
             awayAction.setImageDrawable(context.getResources().getDrawable(R.drawable.red_card));
             awayPlayer.setText(hiddenResult.getPlayerName());
         }
-    }
-    public TextView getHomPlayer(){
-        return homePlayer;
     }
 }

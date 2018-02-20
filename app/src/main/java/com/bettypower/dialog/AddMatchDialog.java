@@ -3,43 +3,27 @@ package com.bettypower.dialog;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
-import android.os.Bundle;
+import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 import android.text.InputFilter;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
-import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
-import com.bettypower.SingleBetActivity;
 import com.bettypower.adapters.DropDownAutoCompleteTextViewAdapter;
-import com.bettypower.entities.Match;
 import com.bettypower.entities.PalimpsestMatch;
-import com.bettypower.entities.ParcelableMatch;
-import com.bettypower.entities.ParcelablePalimpsestMatch;
-import com.bettypower.entities.ParcelableTeam;
-import com.bettypower.threads.LoadImageThread;
+import com.bettypower.threads.LoadLogoThread;
 import com.renard.ocr.R;
 import com.renard.ocr.TextFairyApplication;
-import com.squareup.picasso.Picasso;
-
 import java.util.ArrayList;
-import java.util.StringTokenizer;
 
 /**
  * Created by giuliopettenuzzo on 27/01/18.
+ * Custom class to add a match
  */
 
 public class AddMatchDialog extends Dialog {
@@ -50,33 +34,30 @@ public class AddMatchDialog extends Dialog {
     private ArrayList<PalimpsestMatch> allMatchInBet;
     private PalimpsestMatch selectedPalimpsestMatch;
     private Button confirm;
-    private Button delete;
     private ImageView homeImageView;
     private ImageView awayImageView;
     private FinishEditDialog finishEditDialog;
     private TextView matchDateTextView;
-    private TextFairyApplication application;
     private DropDownAutoCompleteTextViewAdapter dropDownAutoCompleteTextViewAdapter;
     private Activity activity;
 
-    private static final String IMAGE_URL = "http://www.fishtagram.it/loghi.html";
-
-
     public AddMatchDialog(@NonNull final Context context,ArrayList<PalimpsestMatch> allMatchesInBet,Activity activity) {
         super(context);
+        setContentView(R.layout.dialog_add_new_match);
         this.context = context;
         this.allMatchInBet = allMatchesInBet;
-        application = (TextFairyApplication) context.getApplicationContext();
-        setContentView(R.layout.dialog_add_new_match);
+        this.activity = activity;
+
         autoCompleteTextView = (CustomTextView) findViewById(R.id.autoCompleteTextView);
         confirm = (Button) findViewById(R.id.add_dialog_confirm);
-        delete = (Button) findViewById(R.id.add_dialog_cancel);
         matchDateTextView = (TextView) findViewById(R.id.match_time_text_view);
         homeImageView = (ImageView) findViewById(R.id.home_team_add_logo);
         awayImageView = (ImageView) findViewById(R.id.away_team_add_logo);
-        autoCompleteTextView.setHint("squadra in casa - squadra ospite");
+        autoCompleteTextView.setHint(context.getResources().getString(R.string.autocomplete_textview_hint));
         autoCompleteTextView.setFilters(new InputFilter[] {new InputFilter.AllCaps()});
-        this.activity = activity;
+        TextFairyApplication application = (TextFairyApplication) context.getApplicationContext();
+        Button delete = (Button) findViewById(R.id.add_dialog_cancel);
+
 
         matchDateTextView.setVisibility(View.INVISIBLE);
         this.allMatches = application.getAllPalimpsestMatch();
@@ -123,7 +104,6 @@ public class AddMatchDialog extends Dialog {
                 activity.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        Log.i("NOT SELECTED","NOT SELECTED");
                         confirm.setTextColor(context.getResources().getColor(R.color.grey6));
                         matchDateTextView.setVisibility(View.INVISIBLE);
                         selectedPalimpsestMatch = null;
@@ -156,7 +136,8 @@ public class AddMatchDialog extends Dialog {
                 });
                 matchDateTextView.setVisibility(View.VISIBLE);
                 matchDateTextView.setText(selectedPalimpsestMatch.getTime());
-                loadAllLogosExecutor(selectedPalimpsestMatch);
+                //loadAllLogosExecutor(selectedPalimpsestMatch);
+                loadMatchLogos(selectedPalimpsestMatch);
             }
         });
     }
@@ -200,8 +181,10 @@ public class AddMatchDialog extends Dialog {
             InputMethodManager inputMethodManager =
                     (InputMethodManager) activity.getSystemService(
                             Activity.INPUT_METHOD_SERVICE);
-            inputMethodManager.hideSoftInputFromWindow(
-                    activity.getCurrentFocus().getWindowToken(), 0);
+            if (inputMethodManager != null && activity.getCurrentFocus()!=null) {
+                inputMethodManager.hideSoftInputFromWindow(
+                        activity.getCurrentFocus().getWindowToken(), 0);
+            }
         }else {
             super.onBackPressed();
         }
@@ -211,42 +194,20 @@ public class AddMatchDialog extends Dialog {
         void onAddNewItem(PalimpsestMatch newMatch);
     }
 
-    public void loadAllLogosExecutor(PalimpsestMatch match){
-        final ArrayList<PalimpsestMatch> allMatch = new ArrayList<>();
-        allMatch.add(match);
-        RequestQueue imageQueue = Volley.newRequestQueue(context);
-        StringRequest imageRequest = new StringRequest(Request.Method.GET, IMAGE_URL,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        LoadImageThread loadImageThread = new
-                                LoadImageThread(response,allMatch,new ArrayList<String>(),context);
-                        loadImageThread.setOnLoadLogoListener(new LoadImageThread.LoadLogoListener() {
-                            @Override
-                            public void onLoadLogoFinish(final PalimpsestMatch match) {
-                                activity.runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        Picasso.with(context).load("file:"+context.getDir("logo_images", Context.MODE_PRIVATE).getPath()+"/"+match.getHomeTeam().getName() + ".png").error(context.getResources().getDrawable(R.drawable.ic_eagle_shield)).into(homeImageView);
-                                        Picasso.with(context).load("file:"+context.getDir("logo_images", Context.MODE_PRIVATE).getPath()+"/"+match.getAwayTeam().getName() + ".png").error(context.getResources().getDrawable(R.drawable.ic_shield_with_castle_inside)).into(awayImageView);
-                                    }
-                                });
-                            }
-
-                            @Override
-                            public void onAllLogosUploaded() {
-                            }
-                        });
-                        loadImageThread.start();
-
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.i("errore", error.toString());
-            }
-        });
-        imageRequest.setShouldCache(false);
-        imageQueue.add(imageRequest);
+    private void loadMatchLogos(PalimpsestMatch match){
+            LoadLogoThread homeThread = new LoadLogoThread(match.getHomeTeam().getName(), new LoadLogoThread.LoadLogoListener() {
+                @Override
+                public void onLoadLogoFinish(Bitmap bitmap) {
+                    homeImageView.setImageBitmap(bitmap);
+                }
+            },context);
+            homeThread.start();
+            LoadLogoThread awayThread = new LoadLogoThread(match.getAwayTeam().getName(), new LoadLogoThread.LoadLogoListener() {
+                @Override
+                public void onLoadLogoFinish(Bitmap bitmap) {
+                    awayImageView.setImageBitmap(bitmap);
+                }
+            },context);
+            awayThread.start();
     }
 }

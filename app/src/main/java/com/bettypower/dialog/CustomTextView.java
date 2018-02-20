@@ -2,13 +2,12 @@ package com.bettypower.dialog;
 
 import android.content.Context;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.AutoCompleteTextView;
 
 /**
  * Created by giuliopettenuzzo on 18/02/18.
+ * Without this implementation when user press the back button it has effect in the textview and not in the keyboard
  */
 
 public class CustomTextView extends android.support.v7.widget.AppCompatAutoCompleteTextView {
@@ -31,8 +30,9 @@ public class CustomTextView extends android.support.v7.widget.AppCompatAutoCompl
             InputMethodManager mgr = (InputMethodManager)
 
                     getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-            mgr.hideSoftInputFromWindow(this.getWindowToken(), 0);
-            // TODO: Hide your view as you do it in your activity
+            if (mgr != null) {
+                mgr.hideSoftInputFromWindow(this.getWindowToken(), 0);
+            }
         }
         return false;
     }

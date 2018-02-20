@@ -25,8 +25,8 @@
         <item name="android:windowNoTitle">true</item>
         <item name="windowActionBar">false</item>
         <item name="colorPrimary">@color/toolbar_background_light</item>
-        <item name="colorPrimaryDark">@color/toolbar_background_dark</item>
-        <item name="colorAccent">@color/accent</item>
+        <item name="colorPrimaryDark">@color/action_bar_lighter</item>
+        <item name="colorAccent">@color/toolbar_lighter</item>
         <item name="android:textColorPrimary">@color/item_background</item>
         <item name="android:textColorSecondary">@color/text_secondary</item>
     </style>

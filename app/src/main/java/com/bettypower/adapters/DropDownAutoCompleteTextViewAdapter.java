@@ -1,7 +1,6 @@
 package com.bettypower.adapters;
 
 import android.content.Context;
-import android.content.res.XmlResourceParser;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
@@ -10,22 +9,18 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Filter;
 import android.widget.TextView;
-
-import com.bettypower.entities.Match;
 import com.bettypower.entities.PalimpsestMatch;
 import com.renard.ocr.R;
-
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+
 
 /**
  * Created by giuliopettenuzzo on 28/01/18.
+ * Adapter for autoCompleteTextView used for show all the match in the database
  */
 
 public class DropDownAutoCompleteTextViewAdapter<M extends Parcelable> extends ArrayAdapter {
 
-    private final String MY_DEBUG_TAG = "CustomerAdapter";
     private ArrayList<PalimpsestMatch> items;
     private ArrayList<PalimpsestMatch> itemsAll;
     private ArrayList<PalimpsestMatch> suggestions;
@@ -51,14 +46,17 @@ public class DropDownAutoCompleteTextViewAdapter<M extends Parcelable> extends A
         super(context, resource);
     }
 
-    public View getView(int position, View convertView, ViewGroup parent) {
+    @NonNull
+    public View getView(int position, View convertView, @NonNull ViewGroup parent) {
         View v = convertView;
         if (v == null) {
             LayoutInflater vi = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            v = vi.inflate(viewResourceId, null);
+            if (vi != null) {
+                v = vi.inflate(viewResourceId, null);
+            }
         }
         PalimpsestMatch match = items.get(position);
-        if (match != null) {
+        if (match != null && v!=null) {
             TextView homeTeamName = (TextView) v.findViewById(R.id.home_team_item_autocomplete);
             if (homeTeamName != null) {
                 homeTeamName.setText(match.getHomeTeam().getName());
@@ -75,12 +73,13 @@ public class DropDownAutoCompleteTextViewAdapter<M extends Parcelable> extends A
         return v;
     }
 
+    @NonNull
     @Override
     public Filter getFilter() {
         return nameFilter;
     }
 
-    Filter nameFilter = new Filter() {
+    private Filter nameFilter = new Filter() {
         @Override
         public String convertResultToString(Object resultValue) {
             String str = ((PalimpsestMatch)(resultValue)).getHomeTeam().getName() + " - " +  ((PalimpsestMatch)(resultValue)).getAwayTeam().getName();
@@ -103,15 +102,6 @@ public class DropDownAutoCompleteTextViewAdapter<M extends Parcelable> extends A
         }
         @Override
         protected void publishResults(CharSequence constraint, FilterResults results) {
-            /*clear();
-            if (results != null && results.count > 0) {
-                // we have filtered results
-                addAll((ArrayList<PalimpsestMatch>) results.values);
-            } else {
-                // no filter, add entire original list back in
-                addAll(itemsAll);
-            }
-            notifyDataSetChanged();*/
             ArrayList<PalimpsestMatch> filteredList = (ArrayList<PalimpsestMatch>) results.values;
             if(results != null && results.count > 0) {
                 clear();
@@ -153,8 +143,6 @@ public class DropDownAutoCompleteTextViewAdapter<M extends Parcelable> extends A
     }
 
     public interface SelectItemListener{
-        //TODO serve per informare il dialog che ho schiacciato qualcosa, in modo da aggiornare data e forse loghi.
-        //void onMatchSelected(PalimpsestMatch selectedMatch);
         void onMatchNotSelected();
     }
 

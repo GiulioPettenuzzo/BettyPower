@@ -7,6 +7,7 @@ import java.util.Map;
 
 /**
  * Created by giuliopettenuzzo on 01/08/17.
+ * all the stuff that characterize the matches
  */
 
 public interface PalimpsestMatch extends Parcelable{

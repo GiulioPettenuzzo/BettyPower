@@ -755,9 +755,9 @@ public class DocumentGridActivity extends NewDocumentActivity implements Documen
 
         @Override
         public void onDestroyActionMode(ActionMode mode) {
-            getSupportActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.primary)));
+            getSupportActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.toolbar_lighter)));
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                getWindow().setStatusBarColor(getResources().getColor(R.color.primary));
+                getWindow().setStatusBarColor(getResources().getColor(R.color.action_bar_lighter));
             }
             if (mActionMode != null) {
                 mActionMode = null;

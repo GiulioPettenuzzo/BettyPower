@@ -6,8 +6,6 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-
-import com.bettypower.entities.Match;
 import com.bettypower.entities.PalimpsestMatch;
 import com.renard.ocr.R;
 
@@ -15,21 +13,16 @@ import java.util.StringTokenizer;
 
 /**
  * Created by giuliopettenuzzo on 22/01/18.
+ * In order to confirm the elimination of a match in the bet
  */
 
 public class DeleteMatchDialog extends Dialog {
 
-    private Context context;
     private PalimpsestMatch match;
     private DeleteMatchDialogListener deleteMatchDialogListener;
 
-    private Button cancelButton;
-    private Button confirmButton;
-    private TextView title;
-
     public DeleteMatchDialog(Context context, PalimpsestMatch match){
         super(context);
-        this.context = context;
         this.match = match;
     }
 
@@ -37,21 +30,21 @@ public class DeleteMatchDialog extends Dialog {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.dialog_delate_match);
-        cancelButton = (Button) findViewById(R.id.delate_dialog_cancel_button);
-        confirmButton = (Button) findViewById(R.id.delate_dialog_confirm_button);
-        title = (TextView) findViewById(R.id.delete_match_dialog_title);
+        Button cancelButton = (Button) findViewById(R.id.delate_dialog_cancel_button);
+        Button confirmButton = (Button) findViewById(R.id.delate_dialog_confirm_button);
+        TextView title = (TextView) findViewById(R.id.delete_match_dialog_title);
 
         String matchName = match.getHomeTeam().getName() + " - " + match.getAwayTeam().getName() +"?";
         StringTokenizer token = new StringTokenizer(matchName);
-        String matchNameCapitalized = "";
+        StringBuilder matchNameCapitalized = new StringBuilder();
         while(token.hasMoreTokens()){
             String word = token.nextToken();
-            if(matchNameCapitalized.isEmpty())
-                matchNameCapitalized = word.substring(0,1).toUpperCase() + word.substring(1).toLowerCase();
+            if(matchNameCapitalized.length() == 0)
+                matchNameCapitalized = new StringBuilder(word.substring(0, 1).toUpperCase() + word.substring(1).toLowerCase());
             else
-                matchNameCapitalized = matchNameCapitalized + " " + word.substring(0,1).toUpperCase() + word.substring(1).toLowerCase();
+                matchNameCapitalized.append(" ").append(word.substring(0, 1).toUpperCase()).append(word.substring(1).toLowerCase());
         }
-        title.setText(matchNameCapitalized);
+        title.setText(matchNameCapitalized.toString());
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
