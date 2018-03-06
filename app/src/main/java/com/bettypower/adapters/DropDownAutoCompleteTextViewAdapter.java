@@ -36,6 +36,13 @@ public class DropDownAutoCompleteTextViewAdapter<M extends Parcelable> extends A
         this.viewResourceId = viewResourceId;
     }
 
+    public void setAllMatches(ArrayList<PalimpsestMatch> items){
+        this.items = items;
+        this.itemsAll = (ArrayList<PalimpsestMatch>) items.clone();
+        this.suggestions = new ArrayList<PalimpsestMatch>();
+        notifyDataSetChanged();
+    }
+
     /**
      * Constructor
      *

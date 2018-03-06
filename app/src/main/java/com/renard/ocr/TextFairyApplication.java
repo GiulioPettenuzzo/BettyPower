@@ -46,7 +46,6 @@ public class TextFairyApplication extends Application {
 
     private Analytics mAnalytics;
     private ArrayList<PalimpsestMatch> allPalimpsestMatch;
-    private  ArrayList<Match> allMatches = new ArrayList<>();
     public boolean isPalimpsestMatchLoaded = false;
     public AllMatchLoadListener allMatchLoadListener;
     public Resolver resolver;
@@ -58,7 +57,7 @@ public class TextFairyApplication extends Application {
         initTextPreferences();
         enableStrictMode();
         alwaysShowOverflowButton();
-        startLeakCanary();
+        //startLeakCanary();
         checkLanguages();
     }
 

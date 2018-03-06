@@ -30,6 +30,7 @@ import com.bettypower.entities.ParcelablePalimpsestMatch;
 import com.bettypower.entities.ParcelableTeam;
 import com.bettypower.unpacker.AllMatchesByPalimpsestURLUnpacker;
 import com.bettypower.unpacker.AllMatchesByPalimpsestUnpacker;
+import com.bettypower.unpacker.AllMatchesUnpacker;
 import com.bettypower.util.touchHelper.ItemTouchHelperCallback;
 import com.renard.ocr.PermissionGrantedEvent;
 import com.renard.ocr.R;
@@ -144,35 +145,23 @@ public class DocumentGridActivity extends NewDocumentActivity implements Documen
         final TextFairyApplication application = (TextFairyApplication) getApplicationContext();
 
         RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
-        final StringRequest stringRequest = new StringRequest(Request.Method.GET, "http://www.betcalcio.it/home/home.asp?sid={592202F0-7763-4C6B-AFFD-02F9FEFD92B5}&idca=32&idpa=2",
+        final StringRequest stringRequest = new StringRequest(Request.Method.GET, "http://www.fishtagram.it/bettypower/result_data.php",
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(final String response) {
                         Log.i("primo volley", "uno");
-                        AllMatchesByPalimpsestURLUnpacker allMatchesByPalimpsestURLUnpacker = new AllMatchesByPalimpsestURLUnpacker(response);
-                        ArrayList<String> allUrl = allMatchesByPalimpsestURLUnpacker.getAllURL();
-                        //AllMatchesByPalimpsestUnpacker allMatchesByPalimpsestUnpacker = new AllMatchesByPalimpsestUnpacker(getApplicationContext(), currentURL, new AllMatchesByPalimpsestUnpacker.ResponseLoaderListener() {
-                        final AllMatchesByPalimpsestUnpacker allMatchesByPalimpsestUnpacker = new AllMatchesByPalimpsestUnpacker(getApplicationContext(), allUrl, new AllMatchesByPalimpsestUnpacker.ResponseLoaderListener() {
-
-                            @Override
-                            public void onFinishResponseLoading(ArrayList<PalimpsestMatch> allPalimpsestMatches) {
-                                allPalimpsestMatches = addPalimpsestForDebug(allPalimpsestMatches);
-                                allPalimpsestMatches = addSpanishPalimpsestForDebug(allPalimpsestMatches);
-                                allPalimpsestMatches = addReplatz(allPalimpsestMatches);
-                                allPalimpsestMatches = addFivePalimpsestForDebug(allPalimpsestMatches);
-                                allPalimpsestMatches = addFifteen(allPalimpsestMatches);
-                                allPalimpsestMatches = addBetter(allPalimpsestMatches);
-                                application.setAllPalimpsestMatch(allPalimpsestMatches);
-                                application.isPalimpsestMatchLoaded = true;
-                                if(application.allMatchLoadListener!=null)
-                                    application.allMatchLoadListener.onMatchLoaded(allPalimpsestMatches);
-
-                                Log.i("PALINSESTO NUMERO " ,String.valueOf(allPalimpsestMatches.size()));
-                                Toast toast = Toast.makeText(DocumentGridActivity.this, String.valueOf(allPalimpsestMatches.size()), Toast.LENGTH_SHORT);
-                                toast.show();
-                            }
-                        });
-
+                        Thread loader = new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            AllMatchesUnpacker allMatchesUnpacker = new AllMatchesUnpacker(response);
+                            ArrayList<PalimpsestMatch> allPalimpsestMatches = allMatchesUnpacker.getAllMatches();
+                            application.setAllPalimpsestMatch(allPalimpsestMatches);
+                            application.isPalimpsestMatchLoaded = true;
+                            if(application.allMatchLoadListener!=null)
+                                 application.allMatchLoadListener.onMatchLoaded(allPalimpsestMatches);
+                        }
+                    });
+                    loader.start();
                     }
                 }, new Response.ErrorListener() {
             @Override

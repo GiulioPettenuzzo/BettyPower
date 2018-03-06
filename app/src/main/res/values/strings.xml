@@ -5,7 +5,7 @@
     <string name="delate_bet_dialog_question_singolar">Eliminare la Scommessa?</string>
     <string name="delete_bet_dialog_subtitle_singolar">Non potrai più recuperarla</string>
     <string name="delete_bet_dialog_explaination_singolar">tutti i dati di questa schedina \n andranno perduti</string>
-
+    <string name="intervallo">Intervallo</string>
     <string name="delate_bet_dialog_question_plural">Eliminare le Scommesse?</string>
     <string name="delete_bet_dialog_subtitle_plural">Non potrai più recuperarle</string>
     <string name="delete_bet_dialog_explaination_plural">tutti i dati di queste schedine \n andranno perduti</string>

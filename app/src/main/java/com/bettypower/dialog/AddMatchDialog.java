@@ -88,16 +88,28 @@ public class AddMatchDialog extends Dialog {
         });
     }
 
-    private void getMatchesAndSetAdapter(){
-        ArrayList<PalimpsestMatch> nuova = new ArrayList<>();
-        for (PalimpsestMatch currentPalimpsestMatch:allMatches
-                ) {
-           if(!isMatchInList(allMatchInBet,currentPalimpsestMatch)){
-               nuova.add(currentPalimpsestMatch);
-           }
-        }
+    ArrayList<PalimpsestMatch> nuova = new ArrayList<>();
 
+    private void getMatchesAndSetAdapter(){
         dropDownAutoCompleteTextViewAdapter = new DropDownAutoCompleteTextViewAdapter<>(context, R.layout.item_match_autocomplete ,nuova);
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                for (PalimpsestMatch currentPalimpsestMatch:allMatches
+                        ) {
+                    if(!isMatchInList(allMatchInBet,currentPalimpsestMatch)){
+                        if(!isMatchInList(nuova,currentPalimpsestMatch)) {
+                            nuova.add(currentPalimpsestMatch);
+                            //dropDownAutoCompleteTextViewAdapter.add(currentPalimpsestMatch);
+                        }
+                    }
+                }
+                dropDownAutoCompleteTextViewAdapter.setAllMatches(nuova);
+            }
+        });
+        thread.start();
+
+
         dropDownAutoCompleteTextViewAdapter.setSelectedItemListener(new DropDownAutoCompleteTextViewAdapter.SelectItemListener() {
             @Override
             public void onMatchNotSelected() {

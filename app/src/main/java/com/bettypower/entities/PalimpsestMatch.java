@@ -30,6 +30,8 @@ public interface PalimpsestMatch extends Parcelable{
     String getTime();
     String getDate();
     String getHour();
+    void setResultTime(String resultTime);
+    String getResultTime();
     void setTime(String time);
 
     void setBet(String bet);

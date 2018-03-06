@@ -14,22 +14,26 @@ public class HiddenResultUnpacker {
 
     private String response;
 
-    private static final String ACTION_GOAL = "\"Goal\"";
+    public static final String ACTION_GOAL = "\"Goal\"";
     private static final String ACTION_YELLOWCARD = "\"Yellowcard\"";
     private static final String ACTION_REDCARD = "\"Redcard\"";
-    private static final String NO_ACTION = "no_action";
+    public static final String NO_ACTION = "no_action";
 
 
+    public HiddenResultUnpacker(){
+
+    }
     public HiddenResultUnpacker(String response){
         this.response = response;
     }
     public HiddenResult getHiddenResult(){
         //TODO controllo no_action
         String player = "home player";
-        if(findActionTeam() == 1){
+        int actionTeam = findActionTeam();
+        if(actionTeam == 1){
             player = findAwayPlayer();
         }
-        else if(findActionTeam() == 0){
+        else if(actionTeam == 0){
             player = findHomePlayer();
         }
         ParcelableHiddenResult hiddenResult =  new ParcelableHiddenResult(player,findActionTime(),findAction(),findActionTeam());
@@ -94,6 +98,9 @@ public class HiddenResultUnpacker {
         StringTokenizer tokenizer = new StringTokenizer(response,">");
         while (tokenizer.hasMoreTokens()){
             String word = tokenizer.nextToken();
+            if(word.equals("46</td")){
+                String x = "";
+            }
             if(word.endsWith("</td")){
                 word = word.substring(0,word.length()-4);
                 try{
@@ -106,6 +113,7 @@ public class HiddenResultUnpacker {
                     }
                 }
                 catch(Exception e){
+                    return 1;
                 }
             }
         }
@@ -196,5 +204,9 @@ public class HiddenResultUnpacker {
         }
         result = String.copyValueOf(charArray);
         return result;
+    }
+
+    public void setResponse(String response){
+        this.response = response;
     }
 }

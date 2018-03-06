@@ -54,13 +54,19 @@ public class goalServeUnpacker implements Unpacker {
                     while (awayTeam.getName().startsWith(" ")) {
                         awayTeam.setName(awayTeam.getName().substring(1));
                     }
-                String time = getTime(currentTeam);
-                    if (time.compareTo("FT") == 0) {
-                        time = "Termin.";
-                    }
+                String resultTime = getTime(currentTeam);
+                if(resultTime.equalsIgnoreCase("ht")){
+                    resultTime = "Intervallo";
+                }
+                if(resultTime.equalsIgnoreCase("ft")){
+                    resultTime = "Terminata";
+                }
+                if(resultTime.equalsIgnoreCase("postp.")){
+                    resultTime = "Posticipata";
+                }
                 String result = getResult(currentTeam);
                 PalimpsestMatch match = new ParcelablePalimpsestMatch(homeTeam, awayTeam);
-                match.setTime(time);
+                match.setResultTime(resultTime);
                 match.setAwayResult(getAwayScore(result));
                 match.setHomeResult(getHomeScore(result));
                 match.setAllHiddenResult(allHiddenResult);

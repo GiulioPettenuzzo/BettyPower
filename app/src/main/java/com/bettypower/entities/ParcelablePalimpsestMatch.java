@@ -10,7 +10,6 @@ import java.util.StringTokenizer;
 /**
  * Created by giuliopettenuzzo on 01/08/17.
  */
-//TODO non ho fatto i test dei parcelable
 public class ParcelablePalimpsestMatch implements PalimpsestMatch {
 
     private Team homeTeam;
@@ -28,6 +27,7 @@ public class ParcelablePalimpsestMatch implements PalimpsestMatch {
     private boolean fissa;
     private String resultHomeTeam;
     private String resultAwayTeam;
+    private String resultTime;
     private ArrayList<HiddenResult> allHiddenResult = new ArrayList<>();
 
     public ParcelablePalimpsestMatch(Team homeTeam, Team awayTeam, String palimpsest, String eventNUmber, String matchTime){
@@ -104,6 +104,16 @@ public class ParcelablePalimpsestMatch implements PalimpsestMatch {
     @Override
     public String getHour() {
         return matchHour;
+    }
+
+    @Override
+    public void setResultTime(String resultTime) {
+        this.resultTime = resultTime;
+    }
+
+    @Override
+    public String getResultTime() {
+        return resultTime;
     }
 
     @Override
@@ -195,7 +205,9 @@ public class ParcelablePalimpsestMatch implements PalimpsestMatch {
 
     @Override
     public String getCompletePalimpsest() {
-        completePalimpsest = palimpsest + eventNumber;
+        if((palimpsest!=null && eventNumber!=null) && (!palimpsest.equalsIgnoreCase("null") && !eventNumber.equalsIgnoreCase("null"))) {
+            completePalimpsest = palimpsest + eventNumber;
+        }
         return completePalimpsest;
     }
 
@@ -281,6 +293,7 @@ public class ParcelablePalimpsestMatch implements PalimpsestMatch {
         resultAwayTeam = source.readString();
         fissa = (Boolean)source.readValue(getClass().getClassLoader());
         allHiddenResult = source.readArrayList(ParcelableHiddenResult.class.getClassLoader());
+        resultTime = source.readString();
     }
 
     @Override
@@ -297,6 +310,7 @@ public class ParcelablePalimpsestMatch implements PalimpsestMatch {
         dest.writeString(resultAwayTeam);
         dest.writeValue(fissa);
         dest.writeList(allHiddenResult);
+        dest.writeString(resultTime);
 
     }
 }

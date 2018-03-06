@@ -241,6 +241,26 @@ public class SingleBetAdapter extends RecyclerView.Adapter implements ItemTouchH
         deleteMatchDialog.show();
     }
 
+    private boolean isNumber(String text){
+        try{
+            int number = Integer.parseInt(text);
+            return true;
+        }
+        catch(Exception e){
+            return false;
+        }
+    }
+
+    private String getRightResultTime(String resultTime){
+        if(resultTime.equalsIgnoreCase("HT")){
+            return "intervallo";
+        }
+        if(resultTime.equalsIgnoreCase("FT")){
+            return "terminata";
+        }
+        return resultTime;
+    }
+
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         public View itemView;
@@ -314,7 +334,24 @@ public class SingleBetAdapter extends RecyclerView.Adapter implements ItemTouchH
             awayTeam.setText(match.getAwayTeam().getName());
             homeScores.setText(match.getHomeResult());
             awayScores.setText(match.getAwayResult());
-            time.setText(match.getTime());
+
+
+           /* if(match.getResultTime()==null)
+                time.setText(match.getTime());
+            else {
+                if(!isNumber(match.getResultTime()))
+                    time.setText(match.getTime());
+                else
+                    time.setText(match.getResultTime());
+            }*/
+            if(match.getResultTime()==null){
+                time.setText(match.getTime());
+            }else{
+                if(!match.getResultTime().contains(":"))
+                    time.setText(match.getResultTime());
+                else
+                    time.setText(match.getTime());
+            }
             bet.setText(match.getBet());
             betKind.setText(match.getBetKind());
             quote.setText(match.getQuote());
@@ -480,12 +517,14 @@ public class SingleBetAdapter extends RecyclerView.Adapter implements ItemTouchH
                     sistemaCheckBox.setChecked(true);
                 else
                     sistemaCheckBox.setChecked(false);
-                //TODO non il listener qui dentro
                 sistemaCheckBox.setOnCheckedChangeListener(new CheckedChangeListener());
                 sistemaCheckBox.setVisibility(View.VISIBLE);
                 errorsTextView.setText(context.getResources().getString(R.string.sistema_errori));
                 vincitaTextView.setText(context.getResources().getString(R.string.totale_vincita));
                 puntataTextView.setText(context.getResources().getString(R.string.totale_importo_scommesso));
+                errorsEditText.setText(singleBet.getErrors());
+                vincitaEditText.setText(singleBet.getVincita());
+                puntataEditText.setText(singleBet.getPuntata());
             }
             else{
                 itemView.setBackgroundColor(context.getResources().getColor(R.color.toolbar_lighter));
@@ -568,8 +607,10 @@ public class SingleBetAdapter extends RecyclerView.Adapter implements ItemTouchH
                 public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                     if(actionId == EditorInfo.IME_ACTION_DONE || actionId == EditorInfo.IME_ACTION_NEXT){
                         vincitaEditText.setFilters(new InputFilter[] {new InputFilter.LengthFilter(50)});
-                        if(!puntataEditText.getText().toString().equals(""))
+                        if(!puntataEditText.getText().toString().equals("")) {
                             vincitaEditText.setText(fixEuroValue(vincitaEditText.getText().toString()));
+                            singleBet.setVincita(vincitaEditText.getText().toString());
+                        }
                         InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
                         if (imm != null) {
                             imm.hideSoftInputFromWindow(vincitaEditText.getWindowToken(), 0);
@@ -593,6 +634,7 @@ public class SingleBetAdapter extends RecyclerView.Adapter implements ItemTouchH
                         if (imm != null) {
                             imm.hideSoftInputFromWindow(vincitaEditText.getWindowToken(), 0);
                         }
+                        singleBet.setVincita(vincitaEditText.getText().toString());
                         vincitaEditText.clearFocus();
                     }
 
@@ -604,8 +646,10 @@ public class SingleBetAdapter extends RecyclerView.Adapter implements ItemTouchH
                 public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                     if(actionId == EditorInfo.IME_ACTION_DONE || actionId == EditorInfo.IME_ACTION_NEXT){
                         puntataEditText.setFilters(new InputFilter[] {new InputFilter.LengthFilter(50)});
-                        if(!puntataEditText.getText().toString().equals(""))
-                         puntataEditText.setText(fixEuroValue(puntataEditText.getText().toString()));
+                        if(!puntataEditText.getText().toString().equals("")) {
+                            puntataEditText.setText(fixEuroValue(puntataEditText.getText().toString()));
+                            singleBet.setPuntata(puntataEditText.getText().toString());
+                        }
                         InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
                         if (imm != null) {
                             imm.hideSoftInputFromWindow(puntataEditText.getWindowToken(), 0);
@@ -628,6 +672,7 @@ public class SingleBetAdapter extends RecyclerView.Adapter implements ItemTouchH
                         if (imm != null) {
                             imm.hideSoftInputFromWindow(puntataEditText.getWindowToken(), 0);
                         }
+                        singleBet.setPuntata(puntataEditText.getText().toString());
                         puntataEditText.clearFocus();
                     }
                 }
@@ -639,6 +684,9 @@ public class SingleBetAdapter extends RecyclerView.Adapter implements ItemTouchH
                     if(actionId == EditorInfo.IME_ACTION_DONE || actionId == EditorInfo.IME_ACTION_NEXT) {
                         if(!errorsEditText.getText().toString().equals("") && Integer.parseInt(errorsEditText.getText().toString())>allMatches.size()){
                             errorsEditText.setText(String.valueOf(allMatches.size()-1));
+                        }
+                        if(!errorsEditText.getText().toString().equals("")){
+                            singleBet.setErrors(errorsEditText.getText().toString());
                         }
                         InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
                         if (imm != null) {
@@ -664,6 +712,7 @@ public class SingleBetAdapter extends RecyclerView.Adapter implements ItemTouchH
                         if(Integer.parseInt(errorsEditText.getText().toString()) <= 0){
                             errorsEditText.setText("");
                         }
+                        singleBet.setErrors(errorsEditText.getText().toString());
                     }
                 }
             });

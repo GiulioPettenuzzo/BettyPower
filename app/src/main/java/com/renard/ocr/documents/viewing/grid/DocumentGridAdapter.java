@@ -157,8 +157,6 @@ public class DocumentGridAdapter extends CursorAdapter implements OnCheckedChang
 			}else{
 				int resId[]={R.drawable.ic_soccer_player_yellow_green_silhouette
 						,R.drawable.ic_soccer_player_dark_green_silhouette
-						,R.drawable.ic_soccer_player_dark_orange_silhouette
-						,R.drawable.ic_soccer_player_deep_pink_silhouette
 						,R.drawable.ic_soccer_player_dodger_blue_silhouette
 						,R.drawable.ic_soccer_player_grey_silhouette
 						,R.drawable.ic_soccer_player_indigo_silhouette

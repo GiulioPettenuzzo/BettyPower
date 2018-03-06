@@ -45,10 +45,12 @@ import com.bettypower.entities.ParcelableHiddenResult;
 import com.bettypower.entities.SingleBet;
 import com.bettypower.listeners.PreLoadingLinearLayoutManager;
 import com.bettypower.threads.LoadLogoThread;
+import com.bettypower.threads.RefreshAllResultThread;
 import com.bettypower.threads.RefreshResultThread;
 import com.bettypower.util.HashMatchUtil;
 import com.bettypower.util.touchHelper.ItemTouchHelperCallback;
 import com.renard.ocr.R;
+import com.renard.ocr.TextFairyApplication;
 import com.renard.ocr.documents.viewing.DocumentContentProvider;
 import java.util.ArrayList;
 
@@ -72,6 +74,7 @@ public class SingleBetActivity extends AppCompatActivity {
     private ItemTouchHelper itemTouchHelper;
     private Uri uri;
 
+    private static final String ALL_MATCH_URL = "http://www.fishtagram.it/bettypower/result_data.php";
     private static final String MATCH_URL = "http://www.goalserve.com/updaters/soccerupdate.aspx";
     private static final String ALL_MATCH_STATE = "save_all_match";
     private static final String ALL_MATCH_SELECTED_STATE = "all_match_selected_state";
@@ -461,14 +464,26 @@ public class SingleBetActivity extends AppCompatActivity {
                     HashMatchUtil util = new HashMatchUtil();
                     allMatch = util.fromStringToArray(text);
                     bet = new SingleBet(allMatch);
-                    for (PalimpsestMatch currentMatch : allMatch
-                            ) {
-                        //NEXT LINE FOR TEST
-                        if (currentMatch.isFissa()) {
-                            bet.setSistema(true);
-                            break;
-                        }
+                    TextFairyApplication application = (TextFairyApplication) getApplication();
+
+                    if(application.isPalimpsestMatchLoaded){
+                        ArrayList<PalimpsestMatch> allPalimpsestMatch = application.getAllPalimpsestMatch();
+                        checkForResult(allPalimpsestMatch);
+                    }else{
+                        application.setAllMatchLoadListener(new TextFairyApplication.AllMatchLoadListener() {
+                            @Override
+                            public void onMatchLoaded(ArrayList<PalimpsestMatch> allPalimpsestMatch) {
+                                checkForResult(allPalimpsestMatch);
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        singleBetAdapter.notifyDataSetChanged();
+                                    }
+                                });
+                            }
+                        });
                     }
+
                     //NEXT LINE FOR TEST
                     bet.setArrayMatch(allMatch);
                     bet.setPuntata(c.getString(c.getColumnIndex(DocumentContentProvider.Columns.IMPORTO_SCOMMESSO)));
@@ -585,12 +600,20 @@ public class SingleBetActivity extends AppCompatActivity {
                             Log.i("response = ",response);
                             RefreshResultThread refreshResultThread = new RefreshResultThread(response, allMatch, new RefreshResultThread.LoadingListener() {
                                 @Override
-                                public void onFinishLoading() {
+                                public void onFinishLoading(final ArrayList<PalimpsestMatch> allMatches) {
                                     runOnUiThread(new Runnable() {
                                         @Override
                                         public void run() {
-                                            singleBetAdapter.setAllMatches(allMatch);
+                                            singleBetAdapter.setAllMatches(allMatches);
+                                            bet.setArrayMatch(allMatches);
                                             swipeRefreshLayout.setRefreshing(false);
+                                            singleBetAdapter.notifyDataSetChanged();
+                                            HashMatchUtil utils = new HashMatchUtil();
+                                            String stringArrayMatch = utils.fromArrayToString(allMatches);
+                                            ContentValues values = new ContentValues();
+                                            values.put(DocumentContentProvider.Columns.OCR_TEXT, stringArrayMatch);
+                                            getApplicationContext().getContentResolver().update(uri,values,null,null);
+                                            makeVolleyForAllPalimpsest(false);
                                         }
                                     });
                                 }
@@ -600,15 +623,71 @@ public class SingleBetActivity extends AppCompatActivity {
                     }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    swipeRefreshLayout.setRefreshing(false);
-                    Toast toast = Toast.makeText(getApplicationContext(),R.string.no_connection, Toast.LENGTH_SHORT);
-                    toast.show();
+                    makeVolleyForAllPalimpsest(true);
                 }
             });
             stringRequest.setShouldCache(false);
             queue.add(stringRequest);
 
         }
+    }
+
+    private void makeVolleyForAllPalimpsest(final boolean goalServeError){
+        RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, ALL_MATCH_URL, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                RefreshAllResultThread refreshAllResultThread = new RefreshAllResultThread(response, allMatch, new RefreshAllResultThread.LoadingListener() {
+                    @Override
+                    public void onAllPalimpsestReady(ArrayList<PalimpsestMatch> allMatches) {
+                        if(goalServeError){
+                            singleBetAdapter.setAllMatches(allMatches);
+                            bet.setArrayMatch(allMatches);
+                            swipeRefreshLayout.setRefreshing(false);
+                            singleBetAdapter.notifyDataSetChanged();
+                            TextFairyApplication application = (TextFairyApplication) getApplication();
+                            application.setAllPalimpsestMatch(allMatches);
+                            HashMatchUtil utils = new HashMatchUtil();
+                            String stringArrayMatch = utils.fromArrayToString(allMatches);
+                            ContentValues values = new ContentValues();
+                            values.put(DocumentContentProvider.Columns.OCR_TEXT, stringArrayMatch);
+                            getApplicationContext().getContentResolver().update(uri,values,null,null);
+
+                        }else{
+                            TextFairyApplication application = (TextFairyApplication) getApplication();
+                            application.setAllPalimpsestMatch(allMatches);
+                        }
+                    }
+
+                    @Override
+                    public void onBetPalimpsestReady(ArrayList<PalimpsestMatch> allMatches) {
+                        if(goalServeError){
+                            singleBetAdapter.setAllMatches(allMatches);
+                            bet.setArrayMatch(allMatches);
+                            swipeRefreshLayout.setRefreshing(false);
+                            singleBetAdapter.notifyDataSetChanged();
+                            HashMatchUtil utils = new HashMatchUtil();
+                            String stringArrayMatch = utils.fromArrayToString(allMatches);
+                            ContentValues values = new ContentValues();
+                            values.put(DocumentContentProvider.Columns.OCR_TEXT, stringArrayMatch);
+                            getApplicationContext().getContentResolver().update(uri,values,null,null);
+                        }
+                    }
+                });
+                refreshAllResultThread.start();
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                if(goalServeError) {
+                    swipeRefreshLayout.setRefreshing(false);
+                    Toast toast = Toast.makeText(getApplicationContext(), R.string.no_connection, Toast.LENGTH_SHORT);
+                    toast.show();
+                }
+            }
+        });
+        stringRequest.setShouldCache(false);
+        queue.add(stringRequest);
     }
 
     //********************************** INSERT NEW MATCH ***************************************
@@ -628,13 +707,50 @@ public class SingleBetActivity extends AppCompatActivity {
         }
         addMatchDialog.setOnAddNewItem(new AddMatchDialog.FinishEditDialog() {
             @Override
-            public void onAddNewItem(PalimpsestMatch match) {
+            public void onAddNewItem(final PalimpsestMatch match) {
                 addMatchDialog.dismiss();
                 allMatch.add(match);
                 bet.setArrayMatch(allMatch);
                 singleBetAdapter.notifyItemInserted(allMatch.lastIndexOf(match));
+                LoadLogoThread homeThread = new LoadLogoThread(match.getHomeTeam().getName(), new LoadLogoThread.LoadLogoListener() {
+                    @Override
+                    public void onLoadLogoFinish(Bitmap bitmap) {
+                        singleBetAdapter.notifyItemChanged(allMatch.lastIndexOf(match));
+                    }
+                },SingleBetActivity.this);
+                homeThread.start();
+                LoadLogoThread awayThread = new LoadLogoThread(match.getAwayTeam().getName(), new LoadLogoThread.LoadLogoListener() {
+                    @Override
+                    public void onLoadLogoFinish(Bitmap bitmap) {
+                        singleBetAdapter.notifyItemChanged(allMatch.lastIndexOf(match));
+                    }
+                },SingleBetActivity.this);
+                awayThread.start();
             }
         });
+    }
+
+    private void checkForResult(ArrayList<PalimpsestMatch> allPalimpsestMatch){
+        for (PalimpsestMatch currentMatch : allMatch
+                ) {
+            if (currentMatch.isFissa()) {
+                bet.setSistema(true);
+                //break;
+            }
+            for (PalimpsestMatch currentResultMatch:allPalimpsestMatch
+                    ) {
+                if(currentMatch.compareTo(currentResultMatch)){
+                    currentMatch.setHomeResult(currentResultMatch.getHomeResult());
+                    currentMatch.setAwayResult(currentResultMatch.getAwayResult());
+                    currentMatch.setResultTime(currentResultMatch.getResultTime());
+                    currentMatch.setAllHiddenResult(currentResultMatch.getAllHiddenResult());
+                    Log.i("match", "match trovato!!");
+                    break;
+                }
+            }
+
+        }
+        bet.setArrayMatch(allMatch);
     }
 
     //********************************** SHOW - HIDE TOOLBAR ***************************************
