@@ -27,6 +27,7 @@ public class HiddenResultLayout extends RelativeLayout {
     TextView time;
     ImageView homeAction;
     ImageView awayAction;
+    TextView noMatchFound;
 
     private static final int HOME_TEAM = 0;
     private static final int AWAY_TEAM = 1;
@@ -57,6 +58,13 @@ public class HiddenResultLayout extends RelativeLayout {
                 time = (TextView) findViewById(R.id.action_time);
                 break;
             case ERROR_TEAM:
+                if (layoutInflater != null) {
+                    view = layoutInflater.inflate(R.layout.item_hidden_result_home, this, true);
+                }
+                homeAction = (ImageView) findViewById(R.id.home_action);
+                homePlayer = (TextView) findViewById(R.id.home_player);
+                result = (TextView) findViewById(R.id.action_result);
+                time = (TextView) findViewById(R.id.action_time);
                 break;
         }
     }
@@ -75,16 +83,14 @@ public class HiddenResultLayout extends RelativeLayout {
     public void setYellowCardHiddenResult(){
         result.setVisibility(GONE);
         time.setText(hiddenResult.getTime());
-        if (hiddenResult.getActionTeam() == HOME_TEAM){
+        if (hiddenResult.getActionTeam() == HOME_TEAM) {
             homeAction.setImageDrawable(context.getResources().getDrawable(R.drawable.yellow_card));
             homePlayer.setText(hiddenResult.getPlayerName());
-        }
-        else{
+        } else {
             awayAction.setImageDrawable(context.getResources().getDrawable(R.drawable.yellow_card));
             awayPlayer.setText(hiddenResult.getPlayerName());
         }
     }
-    //doesn't work
     public void setRedCardHiddenResult(){
         result.setVisibility(GONE);
         time.setText(hiddenResult.getTime());
@@ -96,5 +102,11 @@ public class HiddenResultLayout extends RelativeLayout {
             awayAction.setImageDrawable(context.getResources().getDrawable(R.drawable.red_card));
             awayPlayer.setText(hiddenResult.getPlayerName());
         }
+    }
+    public void setNoMatchFound(){
+        result.setVisibility(GONE);
+        time.setVisibility(GONE);
+        homeAction.setVisibility(GONE);
+        homePlayer.setText(R.string.no_result_found);
     }
 }

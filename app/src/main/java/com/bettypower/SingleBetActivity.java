@@ -122,6 +122,13 @@ public class SingleBetActivity extends AppCompatActivity {
         swipeRefreshLayout.setOnRefreshListener(new OnRefreshListener());
     }
 
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        swipeRefreshLayout.setRefreshing(true);
+        makeVolleyForMatchInBet();
+    }
+
     /**
      * Dispatch onPause() to fragments.
      */
@@ -470,6 +477,12 @@ public class SingleBetActivity extends AppCompatActivity {
                         ArrayList<PalimpsestMatch> allPalimpsestMatch = application.getAllPalimpsestMatch();
                         checkForResult(allPalimpsestMatch);
                     }else{
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                swipeRefreshLayout.setRefreshing(true);
+                            }
+                        });
                         application.setAllMatchLoadListener(new TextFairyApplication.AllMatchLoadListener() {
                             @Override
                             public void onMatchLoaded(ArrayList<PalimpsestMatch> allPalimpsestMatch) {
@@ -477,6 +490,7 @@ public class SingleBetActivity extends AppCompatActivity {
                                 runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
+                                        swipeRefreshLayout.setRefreshing(false);
                                         singleBetAdapter.notifyDataSetChanged();
                                     }
                                 });
@@ -549,13 +563,13 @@ public class SingleBetActivity extends AppCompatActivity {
 
         @Override
         public void onClickStart() {
-            swipeRefreshLayout.setEnabled(false);
+            //swipeRefreshLayout.setEnabled(false);
             rVLayoutManager.setScrollEnabled(false);
         }
 
         @Override
         public void onClickEnds() {
-            swipeRefreshLayout.setEnabled(true);
+            //swipeRefreshLayout.setEnabled(true);
             rVLayoutManager.setScrollEnabled(true);
         }
     }
@@ -592,44 +606,48 @@ public class SingleBetActivity extends AppCompatActivity {
          */
         @Override
         public void onRefresh() {
-            RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
-            StringRequest stringRequest = new StringRequest(Request.Method.GET, MATCH_URL,
-                    new Response.Listener<String>() {
-                        @Override
-                        public void onResponse(String response) {
-                            Log.i("response = ",response);
-                            RefreshResultThread refreshResultThread = new RefreshResultThread(response, allMatch, new RefreshResultThread.LoadingListener() {
-                                @Override
-                                public void onFinishLoading(final ArrayList<PalimpsestMatch> allMatches) {
-                                    runOnUiThread(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            singleBetAdapter.setAllMatches(allMatches);
-                                            bet.setArrayMatch(allMatches);
-                                            swipeRefreshLayout.setRefreshing(false);
-                                            singleBetAdapter.notifyDataSetChanged();
-                                            HashMatchUtil utils = new HashMatchUtil();
-                                            String stringArrayMatch = utils.fromArrayToString(allMatches);
-                                            ContentValues values = new ContentValues();
-                                            values.put(DocumentContentProvider.Columns.OCR_TEXT, stringArrayMatch);
-                                            getApplicationContext().getContentResolver().update(uri,values,null,null);
-                                            makeVolleyForAllPalimpsest(false);
-                                        }
-                                    });
-                                }
-                            });
-                            refreshResultThread.start();
-                        }
-                    }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    makeVolleyForAllPalimpsest(true);
-                }
-            });
-            stringRequest.setShouldCache(false);
-            queue.add(stringRequest);
-
+            makeVolleyForMatchInBet();
         }
+    }
+
+    private void makeVolleyForMatchInBet(){
+        RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, MATCH_URL,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Log.i("response = ",response);
+                        RefreshResultThread refreshResultThread = new RefreshResultThread(response, allMatch, new RefreshResultThread.LoadingListener() {
+                            @Override
+                            public void onFinishLoading(final ArrayList<PalimpsestMatch> allMatches) {
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        singleBetAdapter.setAllMatches(allMatches);
+                                        bet.setArrayMatch(allMatches);
+                                        swipeRefreshLayout.setRefreshing(false);
+                                        singleBetAdapter.notifyDataSetChanged();
+                                        HashMatchUtil utils = new HashMatchUtil();
+                                        String stringArrayMatch = utils.fromArrayToString(allMatches);
+                                        ContentValues values = new ContentValues();
+                                        values.put(DocumentContentProvider.Columns.OCR_TEXT, stringArrayMatch);
+                                        getApplicationContext().getContentResolver().update(uri,values,null,null);
+                                        makeVolleyForAllPalimpsest(false);
+                                    }
+                                });
+                            }
+                        });
+                        refreshResultThread.start();
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                makeVolleyForAllPalimpsest(true);
+            }
+        });
+        stringRequest.setShouldCache(false);
+        queue.add(stringRequest);
+
     }
 
     private void makeVolleyForAllPalimpsest(final boolean goalServeError){
@@ -639,39 +657,34 @@ public class SingleBetActivity extends AppCompatActivity {
             public void onResponse(String response) {
                 RefreshAllResultThread refreshAllResultThread = new RefreshAllResultThread(response, allMatch, new RefreshAllResultThread.LoadingListener() {
                     @Override
-                    public void onAllPalimpsestReady(ArrayList<PalimpsestMatch> allMatches) {
-                        if(goalServeError){
-                            singleBetAdapter.setAllMatches(allMatches);
-                            bet.setArrayMatch(allMatches);
-                            swipeRefreshLayout.setRefreshing(false);
-                            singleBetAdapter.notifyDataSetChanged();
-                            TextFairyApplication application = (TextFairyApplication) getApplication();
-                            application.setAllPalimpsestMatch(allMatches);
-                            HashMatchUtil utils = new HashMatchUtil();
-                            String stringArrayMatch = utils.fromArrayToString(allMatches);
-                            ContentValues values = new ContentValues();
-                            values.put(DocumentContentProvider.Columns.OCR_TEXT, stringArrayMatch);
-                            getApplicationContext().getContentResolver().update(uri,values,null,null);
-
-                        }else{
-                            TextFairyApplication application = (TextFairyApplication) getApplication();
-                            application.setAllPalimpsestMatch(allMatches);
-                        }
+                    public void onAllPalimpsestReady(final ArrayList<PalimpsestMatch> allMatches) {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                TextFairyApplication application = (TextFairyApplication) getApplication();
+                                application.setAllPalimpsestMatch(allMatches);
+                            }
+                        });
                     }
 
                     @Override
-                    public void onBetPalimpsestReady(ArrayList<PalimpsestMatch> allMatches) {
-                        if(goalServeError){
-                            singleBetAdapter.setAllMatches(allMatches);
-                            bet.setArrayMatch(allMatches);
-                            swipeRefreshLayout.setRefreshing(false);
-                            singleBetAdapter.notifyDataSetChanged();
-                            HashMatchUtil utils = new HashMatchUtil();
-                            String stringArrayMatch = utils.fromArrayToString(allMatches);
-                            ContentValues values = new ContentValues();
-                            values.put(DocumentContentProvider.Columns.OCR_TEXT, stringArrayMatch);
-                            getApplicationContext().getContentResolver().update(uri,values,null,null);
-                        }
+                    public void onBetPalimpsestReady(final ArrayList<PalimpsestMatch> allMatches) {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                if(goalServeError){
+                                    singleBetAdapter.setAllMatches(allMatches);
+                                    bet.setArrayMatch(allMatches);
+                                    swipeRefreshLayout.setRefreshing(false);
+                                    singleBetAdapter.notifyDataSetChanged();
+                                    HashMatchUtil utils = new HashMatchUtil();
+                                    String stringArrayMatch = utils.fromArrayToString(allMatches);
+                                    ContentValues values = new ContentValues();
+                                    values.put(DocumentContentProvider.Columns.OCR_TEXT, stringArrayMatch);
+                                    getApplicationContext().getContentResolver().update(uri,values,null,null);
+                                }
+                            }
+                        });
                     }
                 });
                 refreshAllResultThread.start();
@@ -680,9 +693,14 @@ public class SingleBetActivity extends AppCompatActivity {
             @Override
             public void onErrorResponse(VolleyError error) {
                 if(goalServeError) {
-                    swipeRefreshLayout.setRefreshing(false);
-                    Toast toast = Toast.makeText(getApplicationContext(), R.string.no_connection, Toast.LENGTH_SHORT);
-                    toast.show();
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            swipeRefreshLayout.setRefreshing(false);
+                            Toast toast = Toast.makeText(getApplicationContext(), R.string.no_connection, Toast.LENGTH_SHORT);
+                            toast.show();
+                        }
+                    });
                 }
             }
         });
@@ -712,6 +730,7 @@ public class SingleBetActivity extends AppCompatActivity {
                 allMatch.add(match);
                 bet.setArrayMatch(allMatch);
                 singleBetAdapter.notifyItemInserted(allMatch.lastIndexOf(match));
+                singleBetAdapter.setExpandCollapseClickMode(new ExpandCollapseItemClickModeListener());
                 LoadLogoThread homeThread = new LoadLogoThread(match.getHomeTeam().getName(), new LoadLogoThread.LoadLogoListener() {
                     @Override
                     public void onLoadLogoFinish(Bitmap bitmap) {
@@ -751,6 +770,11 @@ public class SingleBetActivity extends AppCompatActivity {
 
         }
         bet.setArrayMatch(allMatch);
+        HashMatchUtil utils = new HashMatchUtil();
+        String stringArrayMatch = utils.fromArrayToString(allMatch);
+        ContentValues values = new ContentValues();
+        values.put(DocumentContentProvider.Columns.OCR_TEXT, stringArrayMatch);
+        getApplicationContext().getContentResolver().update(uri,values,null,null);
     }
 
     //********************************** SHOW - HIDE TOOLBAR ***************************************

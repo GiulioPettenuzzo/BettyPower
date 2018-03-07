@@ -30,12 +30,21 @@ import com.bettypower.dialog.DeleteMatchDialog;
 import com.bettypower.dialog.SetBetDialog;
 import com.bettypower.entities.Bet;
 import com.bettypower.entities.HiddenResult;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.Locale;
+
 import com.bettypower.entities.PalimpsestMatch;
 import com.bettypower.entities.ParcelableHiddenResult;
 import com.bettypower.util.touchHelper.ItemTouchHelperAdapter;
 import com.renard.ocr.R;
 import com.renard.ocr.documents.viewing.DocumentContentProvider;
+import com.renard.ocr.util.Screen;
 import com.squareup.picasso.Picasso;
 
 /**
@@ -183,6 +192,11 @@ public class SingleBetAdapter extends RecyclerView.Adapter implements ItemTouchH
                     HiddenResultLayout hiddenResultLayoutYellow = new HiddenResultLayout(context,event);
                     viewHolder.hiddenResult.addView(hiddenResultLayoutYellow);
                     hiddenResultLayoutYellow.setYellowCardHiddenResult();
+                    break;
+                case ParcelableHiddenResult.NO_MATCH_FOUND:
+                    HiddenResultLayout hiddenResultLayoutNoMatchFound = new HiddenResultLayout(context,event);
+                    viewHolder.hiddenResult.addView(hiddenResultLayoutNoMatchFound);
+                    hiddenResultLayoutNoMatchFound.setNoMatchFound();
                     break;
             }
 
@@ -332,6 +346,13 @@ public class SingleBetAdapter extends RecyclerView.Adapter implements ItemTouchH
             this.match = mmatch;
             homeTeam.setText(match.getHomeTeam().getName());
             awayTeam.setText(match.getAwayTeam().getName());
+            if(isTimeOut(match.getDate(),match.getHour()) && match.getHomeResult().equalsIgnoreCase("-") && match.getAwayResult().equalsIgnoreCase("-")){ //FUNZIONA ORA DEVO INSERIRE L'HIDDEN RESULT
+                HiddenResult hiddenResult = new ParcelableHiddenResult("","",ParcelableHiddenResult.NO_MATCH_FOUND,ParcelableHiddenResult.ERROR_TEAM);
+                ArrayList<HiddenResult> allHiddenResult = new ArrayList<>();
+                allHiddenResult.add(hiddenResult);
+                match.setAllHiddenResult(allHiddenResult);
+                Log.i("TIME OUT ", homeTeam.getText().toString());
+            }
             homeScores.setText(match.getHomeResult());
             awayScores.setText(match.getAwayResult());
 
@@ -344,6 +365,7 @@ public class SingleBetAdapter extends RecyclerView.Adapter implements ItemTouchH
                 else
                     time.setText(match.getResultTime());
             }*/
+
             if(match.getResultTime()==null){
                 time.setText(match.getTime());
             }else{
@@ -749,6 +771,27 @@ public class SingleBetAdapter extends RecyclerView.Adapter implements ItemTouchH
                 }
             }
         }
+    }
+
+    private boolean isTimeOut(String date,String hour) {
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy hh:mm", Locale.getDefault());
+        try {
+            Date hourMin = sdf.parse(date +"/"+ context.getResources().getString(R.string.current_year) + " " + hour);
+            hourMin = addMinutesToDate(hourMin);
+            if(System.currentTimeMillis() > hourMin.getTime()){
+                return true;
+            }
+        } catch (ParseException e) {
+            return false;
+        }
+        return false;
+    }
+
+    private static Date addMinutesToDate(Date beforeTime){
+        final long ONE_MINUTE_IN_MILLIS = 60000;//millisecs
+
+        long curTimeInMs = beforeTime.getTime();
+        return new Date(curTimeInMs + (10 * ONE_MINUTE_IN_MILLIS));
     }
 
     public void setUri(Uri uri){

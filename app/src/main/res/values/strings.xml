@@ -9,7 +9,7 @@
     <string name="delate_bet_dialog_question_plural">Eliminare le Scommesse?</string>
     <string name="delete_bet_dialog_subtitle_plural">Non potrai più recuperarle</string>
     <string name="delete_bet_dialog_explaination_plural">tutti i dati di queste schedine \n andranno perduti</string>
-
+    <string name="no_result_found">Ops! Questo è imbarazzante.. \nNon conosco i risutati di questa partita!</string>
     <string name="add_new_match_dialog_title">Aggiungi nuova partita</string>
     <string name="delete_match_dialog_title">Eliminare </string>
     <string name="confirm">CONFERMA</string>
@@ -19,8 +19,8 @@
     <string name="totale_vincita">Totale vincita:</string>
     <string name="sistema_errori">Errori:</string>
     <string name="dialog_illustration_set_bet">Seleziona quello che hai scommesso su </string>
-    <string name="current_year">2017</string>
-    <string name="next_year">2018</string>
+    <string name="current_year">2018</string>
+    <string name="next_year">2019</string>
     <string name="drawer_open">Open Main Menu</string>
     <string name="drawer_close">Close ain Menu</string>
     <string name="whats_new_title">Check out what has changed</string>

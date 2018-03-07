@@ -19,8 +19,10 @@ public class ParcelableHiddenResult implements HiddenResult {
     public static final String ACTION_GOAL = "Goal";
     public static final String ACTION_YELLOWCARD = "Yellowcard";
     public static final String ACTION_REDCARD = "Redcard";
+    public static final String NO_MATCH_FOUND = "no_match_found";
     public static final int HOME_TEAM = 0;
     public static final int AWAY_TEAM = 1;
+    public static final int ERROR_TEAM = -1;
 
     public ParcelableHiddenResult(String playerName,String time,String action,int actionTeam){
         this.playerName = playerName;
