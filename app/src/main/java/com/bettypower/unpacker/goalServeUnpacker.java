@@ -6,6 +6,7 @@ import com.bettypower.entities.ParcelablePalimpsestMatch;
 import com.bettypower.entities.ParcelableTeam;
 import com.bettypower.entities.Team;
 
+import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
 
@@ -54,6 +55,10 @@ public class goalServeUnpacker implements Unpacker {
                     while (awayTeam.getName().startsWith(" ")) {
                         awayTeam.setName(awayTeam.getName().substring(1));
                     }
+                String homeTeamS = Normalizer.normalize(homeTeam.getName(), Normalizer.Form.NFD);
+                homeTeam.setName(homeTeamS.replaceAll("[^\\p{ASCII}]", "").toUpperCase());
+                String awayTeamS = Normalizer.normalize(awayTeam.getName(), Normalizer.Form.NFD);
+                awayTeam.setName(awayTeamS.replaceAll("[^\\p{ASCII}]", "").toUpperCase());
                 String resultTime = getTime(currentTeam);
                 if(resultTime.equalsIgnoreCase("ht")){
                     resultTime = "Intervallo";

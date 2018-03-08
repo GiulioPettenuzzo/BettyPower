@@ -36,11 +36,13 @@ public class RefreshAllResultThread extends Thread {
             for (PalimpsestMatch currentResultMatch:allPalimpsestMatch
                     ) {
                 if(currentMatch.compareTo(currentResultMatch)){
-                    currentMatch.setHomeResult(currentResultMatch.getHomeResult());
-                    currentMatch.setAwayResult(currentResultMatch.getAwayResult());
-                    currentMatch.setResultTime(currentResultMatch.getResultTime());
-                    currentMatch.setAllHiddenResult(currentResultMatch.getAllHiddenResult());
-                    break;
+                    if(!currentResultMatch.getHomeResult().equals("-") && ! currentResultMatch.getAwayResult().equals("-")) {
+                        currentMatch.setHomeResult(currentResultMatch.getHomeResult());
+                        currentMatch.setAwayResult(currentResultMatch.getAwayResult());
+                        currentMatch.setResultTime(currentResultMatch.getResultTime());
+                        currentMatch.setAllHiddenResult(currentResultMatch.getAllHiddenResult());
+                        break;
+                    }
                 }
             }
 

@@ -8,6 +8,7 @@ import com.bettypower.entities.ParcelablePalimpsestMatch;
 import com.bettypower.entities.ParcelableTeam;
 import com.renard.ocr.R;
 
+import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -120,6 +121,11 @@ public class AllMatchesUnpacker {
 
                         String resultTime = "";
                         Log.i("WORD",word + " + " + wordOne);
+                        homeTeam = Normalizer.normalize(homeTeam, Normalizer.Form.NFD);
+                        homeTeam = homeTeam.replaceAll("[^\\p{ASCII}]", "").toUpperCase();
+                        awayTeam = Normalizer.normalize(awayTeam, Normalizer.Form.NFD);
+                        awayTeam = awayTeam.replaceAll("[^\\p{ASCII}]", "").toUpperCase();
+
 
                         PalimpsestMatch palimpsestMatch = new ParcelablePalimpsestMatch(new ParcelableTeam(homeTeam),new ParcelableTeam(awayTeam),pali,event,date+" "+hour);
                         Map<String,String> allOdds = new HashMap<>();

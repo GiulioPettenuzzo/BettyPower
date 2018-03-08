@@ -31,7 +31,6 @@ public class AddMatchDialog extends Dialog {
     private Context context;
     private CustomTextView autoCompleteTextView;
     private ArrayList<PalimpsestMatch> allMatches;
-    private ArrayList<PalimpsestMatch> allMatchInBet;
     private PalimpsestMatch selectedPalimpsestMatch;
     private Button confirm;
     private ImageView homeImageView;
@@ -41,11 +40,10 @@ public class AddMatchDialog extends Dialog {
     private DropDownAutoCompleteTextViewAdapter dropDownAutoCompleteTextViewAdapter;
     private Activity activity;
 
-    public AddMatchDialog(@NonNull final Context context,ArrayList<PalimpsestMatch> allMatchesInBet,Activity activity) {
+    public AddMatchDialog(@NonNull final Context context,Activity activity) {
         super(context);
         setContentView(R.layout.dialog_add_new_match);
         this.context = context;
-        this.allMatchInBet = allMatchesInBet;
         this.activity = activity;
 
         autoCompleteTextView = (CustomTextView) findViewById(R.id.autoCompleteTextView);
@@ -88,28 +86,9 @@ public class AddMatchDialog extends Dialog {
         });
     }
 
-    ArrayList<PalimpsestMatch> nuova = new ArrayList<>();
 
     private void getMatchesAndSetAdapter(){
-        dropDownAutoCompleteTextViewAdapter = new DropDownAutoCompleteTextViewAdapter<>(context, R.layout.item_match_autocomplete ,nuova);
-        Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                for (PalimpsestMatch currentPalimpsestMatch:allMatches
-                        ) {
-                    if(!isMatchInList(allMatchInBet,currentPalimpsestMatch)){
-                        if(!isMatchInList(nuova,currentPalimpsestMatch)) {
-                            nuova.add(currentPalimpsestMatch);
-                            //dropDownAutoCompleteTextViewAdapter.add(currentPalimpsestMatch);
-                        }
-                    }
-                }
-                dropDownAutoCompleteTextViewAdapter.setAllMatches(nuova);
-            }
-        });
-        thread.start();
-
-
+        dropDownAutoCompleteTextViewAdapter = new DropDownAutoCompleteTextViewAdapter<>(activity,allMatches);
         dropDownAutoCompleteTextViewAdapter.setSelectedItemListener(new DropDownAutoCompleteTextViewAdapter.SelectItemListener() {
             @Override
             public void onMatchNotSelected() {
@@ -138,7 +117,6 @@ public class AddMatchDialog extends Dialog {
                         break;
                     }
                 }
-                Log.i("SELECTED ITEM",selectedPalimpsestMatch.getHomeTeam().getName());
                 confirm.setTextColor(context.getResources().getColor(R.color.green_for_dialog));
                 confirm.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -154,34 +132,11 @@ public class AddMatchDialog extends Dialog {
         });
     }
 
-    private boolean isMatchInList(ArrayList<PalimpsestMatch> allPalimpsestMatches, PalimpsestMatch match){
-        if(match.getHomeTeam().getName().startsWith(" ")){
-            match.getHomeTeam().setName(match.getHomeTeam().getName().substring(1));
-        }
-        if(match.getAwayTeam().getName().startsWith(" ")){
-            match.getAwayTeam().setName(match.getAwayTeam().getName().substring(1));
-        }
-        for (PalimpsestMatch currentMatchInBet:allPalimpsestMatches
-                ) {
-            if(currentMatchInBet.getHomeTeam().getName().startsWith(" ")){
-                currentMatchInBet.getHomeTeam().setName(currentMatchInBet.getHomeTeam().getName().substring(1));
-            }
-            if(currentMatchInBet.getAwayTeam().getName().startsWith(" ")){
-                currentMatchInBet.getAwayTeam().setName(currentMatchInBet.getAwayTeam().getName().substring(1));
-            }
-            if(currentMatchInBet.getHomeTeam().getName().equalsIgnoreCase(match.getHomeTeam().getName()) &&
-                    currentMatchInBet.getAwayTeam().getName().equalsIgnoreCase(match.getAwayTeam().getName()) &&
-                    currentMatchInBet.getTime().equalsIgnoreCase(match.getTime())){
-                return true;
-            }
-        }
-        return false;
-    }
-
     public void setOnAddNewItem(FinishEditDialog finishEditDialog){
         this.finishEditDialog = finishEditDialog;
     }
 
+    private boolean backPressed = false;
     /**
      * Called when the dialog has detected the user's press of the back
      * key.  The default implementation simply cancels the dialog (only if
@@ -189,16 +144,19 @@ public class AddMatchDialog extends Dialog {
      */
     @Override
     public void onBackPressed() {
-        if(autoCompleteTextView.isFocused()) {
+        if(autoCompleteTextView.isPopupShowing() && !backPressed) {
             InputMethodManager inputMethodManager =
                     (InputMethodManager) activity.getSystemService(
                             Activity.INPUT_METHOD_SERVICE);
-            if (inputMethodManager != null && activity.getCurrentFocus()!=null) {
+            if (inputMethodManager != null && activity.getCurrentFocus() != null) {
                 inputMethodManager.hideSoftInputFromWindow(
                         activity.getCurrentFocus().getWindowToken(), 0);
             }
-        }else {
-            super.onBackPressed();
+            backPressed = true;
+        }
+        else if(autoCompleteTextView.isPopupShowing() && backPressed){
+            autoCompleteTextView.dismissDropDown();
+            backPressed = false;
         }
     }
 

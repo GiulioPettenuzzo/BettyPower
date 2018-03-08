@@ -1,5 +1,7 @@
 package com.renard.ocr.documents.creation.crop;
 
+import android.util.Log;
+
 import com.bettypower.betMatchFinder.Assembler;
 import com.bettypower.betMatchFinder.Divider;
 import com.bettypower.betMatchFinder.Finder;
@@ -15,7 +17,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Locale;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -27,6 +32,33 @@ import static org.junit.Assert.assertTrue;
  */
 @RunWith(JUnit4.class)
 public class ParcingTest {
+
+    @Test
+    public void dateHourTest(){
+        Calendar c = Calendar.getInstance();
+        SimpleDateFormat sdfh = new SimpleDateFormat("HH:mm");
+        String getCurrentTime = sdfh.format(c.getTime());
+
+        String midnight = "00:00";
+        String oneOclock = "01:00";
+
+        String date = "";
+        if (getCurrentTime.compareTo(midnight) >= 0 && getCurrentTime.compareTo(oneOclock) <= 0)
+        {
+            Calendar cal = Calendar.getInstance();
+            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM", Locale.getDefault());
+            cal.add(Calendar.DATE, -1);
+            date = sdf.format(cal.getTime());
+        }
+        else
+        {
+            Calendar cal = Calendar.getInstance();
+            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM", Locale.getDefault());
+            date = sdf.format(cal.getTime());
+        }
+
+        assertEquals(date,"07/03");
+    }
 
     @Test
     public void fixPaliTest() {

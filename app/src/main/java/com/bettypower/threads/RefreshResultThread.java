@@ -1,5 +1,7 @@
 package com.bettypower.threads;
 
+import android.util.Log;
+
 import com.bettypower.entities.HiddenResult;
 import com.bettypower.entities.PalimpsestMatch;
 import com.bettypower.unpacker.Unpacker;
@@ -38,12 +40,16 @@ public class RefreshResultThread extends Thread{
             for (PalimpsestMatch goalServeMatch: allMatchOnGoalServe
                  ) {
                 if(isTheSameMatch(savedMatch,goalServeMatch)){
-                    savedMatch.setHomeResult(goalServeMatch.getHomeResult().replace("?","-"));
-                    savedMatch.setAwayResult(goalServeMatch.getAwayResult().replace("?","-"));
-                    savedMatch.setResultTime(goalServeMatch.getResultTime());
-                    ArrayList<HiddenResult> hidden = goalServeMatch.getAllHiddenResult();
-                    savedMatch.setAllHiddenResult(hidden);
-                    break;
+                    String homeResult = goalServeMatch.getHomeResult().replace("?","-");
+                    String awayResult = goalServeMatch.getAwayResult().replace("?","-");
+                    if(!homeResult.equals("-") && !awayResult.equals("-")) {
+                        savedMatch.setHomeResult(homeResult);
+                        savedMatch.setAwayResult(awayResult);
+                        savedMatch.setResultTime(goalServeMatch.getResultTime());
+                        ArrayList<HiddenResult> hidden = goalServeMatch.getAllHiddenResult();
+                        savedMatch.setAllHiddenResult(hidden);
+                        break;
+                    }
                 }
             }
         }
@@ -58,10 +64,16 @@ public class RefreshResultThread extends Thread{
     private boolean isTheSameMatch(PalimpsestMatch paliOne,PalimpsestMatch paliTwo){
 
         if(paliOne.getDate().equalsIgnoreCase(giveDate())) {
-            int commonHomeName = getNumberOfWordsInCommon(paliOne.getHomeTeam().getName(),paliTwo.getHomeTeam().getName());
-            int commonAwayName = getNumberOfWordsInCommon(paliOne.getHomeTeam().getName(),paliTwo.getHomeTeam().getName());
-            if (paliOne.getHomeTeam().getName().equalsIgnoreCase(paliTwo.getHomeTeam().getName()) ||
-                    paliOne.getAwayTeam().getName().equalsIgnoreCase(paliTwo.getAwayTeam().getName())) {
+            Log.i("FOUND",paliOne.getHomeTeam().getName()+" - "+paliTwo.getHomeTeam().getName());
+            String homeTeamOne = paliOne.getHomeTeam().getName().replace("-"," ");
+            String homeTeamTwo = paliTwo.getHomeTeam().getName().replace("-"," ");
+            String awayTeamOne = paliOne.getAwayTeam().getName().replace("-"," ");
+            String awayTeamTwo = paliTwo.getAwayTeam().getName().replace("-"," ");
+
+            int commonHomeName = getNumberOfWordsInCommon(homeTeamOne,homeTeamTwo);
+            int commonAwayName = getNumberOfWordsInCommon(awayTeamOne,awayTeamTwo);
+            if (homeTeamOne.equalsIgnoreCase(homeTeamTwo) ||
+                    awayTeamOne.equalsIgnoreCase(awayTeamTwo)) {
                 return true;
             }
             else if(commonHomeName>0 || commonAwayName>0){
@@ -87,9 +99,28 @@ public class RefreshResultThread extends Thread{
     }
 
     private String giveDate() {
-        Calendar cal = Calendar.getInstance();
-        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM", Locale.getDefault());
-        return sdf.format(cal.getTime());
+        Calendar c = Calendar.getInstance();
+        SimpleDateFormat sdfh = new SimpleDateFormat("HH:mm",Locale.getDefault());
+        String getCurrentTime = sdfh.format(c.getTime());
+
+        String midnight = "00:00";
+        String oneOclock = "01:00";
+
+        String date = "";
+        if (getCurrentTime.compareTo(midnight) >= 0 && getCurrentTime.compareTo(oneOclock) <= 0)
+        {
+            Calendar cal = Calendar.getInstance();
+            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM", Locale.getDefault());
+            cal.add(Calendar.DATE, -1);
+            date = sdf.format(cal.getTime());
+        }
+        else
+        {
+            Calendar cal = Calendar.getInstance();
+            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM", Locale.getDefault());
+            date = sdf.format(cal.getTime());
+        }
+        return date;
     }
 
     public interface LoadingListener{

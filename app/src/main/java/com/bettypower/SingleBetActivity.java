@@ -52,7 +52,11 @@ import com.bettypower.util.touchHelper.ItemTouchHelperCallback;
 import com.renard.ocr.R;
 import com.renard.ocr.TextFairyApplication;
 import com.renard.ocr.documents.viewing.DocumentContentProvider;
+
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Locale;
 
 /**
  * this is the activity that show the bet
@@ -122,11 +126,16 @@ public class SingleBetActivity extends AppCompatActivity {
         swipeRefreshLayout.setOnRefreshListener(new OnRefreshListener());
     }
 
+    private boolean fromPictureActivity = false;
     @Override
     protected void onRestart() {
         super.onRestart();
-        swipeRefreshLayout.setRefreshing(true);
-        makeVolleyForMatchInBet();
+        if(!fromPictureActivity) {
+            swipeRefreshLayout.setRefreshing(true);
+            makeVolleyForMatchInBet();
+        }else{
+            fromPictureActivity = false;
+        }
     }
 
     /**
@@ -215,6 +224,7 @@ public class SingleBetActivity extends AppCompatActivity {
                 Intent intent = new Intent(SingleBetActivity.this,SingleBetImageActivity.class);
                 intent.putExtra("image_uri",uri);
                 intent.putExtra("edit_mode",editMode);
+                fromPictureActivity = true;
                 startActivity(intent);
                 return true;
             case R.id.share_menu_item:
@@ -464,18 +474,67 @@ public class SingleBetActivity extends AppCompatActivity {
         Thread loadMatchesFromMemory = new Thread(new Runnable() {
             @Override
             public void run() {
-                Cursor c = getContentResolver().query(uri, new String[]{DocumentContentProvider.Columns.OCR_TEXT, DocumentContentProvider.Columns.IMPORTO_PAGAMENTO, DocumentContentProvider.Columns.IMPORTO_SCOMMESSO, DocumentContentProvider.Columns.ERROR_NUMBER}, null, null, null);
+                Cursor c = getContentResolver().query(uri, new String[]{DocumentContentProvider.Columns.OCR_TEXT, DocumentContentProvider.Columns.IMPORTO_PAGAMENTO, DocumentContentProvider.Columns.IMPORTO_SCOMMESSO, DocumentContentProvider.Columns.ERROR_NUMBER,DocumentContentProvider.Columns.ID}, null, null, null);
+                String id = "";
                 if (c != null) {
                     c.moveToFirst();
-                    String text = c.getString(c.getPosition());
-                    HashMatchUtil util = new HashMatchUtil();
-                    allMatch = util.fromStringToArray(text);
+                    id = c.getString(c.getColumnIndex(DocumentContentProvider.Columns.ID));
                     bet = new SingleBet(allMatch);
+                    if(!id.equals("91")) {
+                        String text = c.getString(c.getPosition());
+                        HashMatchUtil util = new HashMatchUtil();
+                        allMatch = util.fromStringToArray(text);
+                        bet = new SingleBet(allMatch);
+                        TextFairyApplication application = (TextFairyApplication) getApplication();
+
+                        if (application.isPalimpsestMatchLoaded) {
+                            ArrayList<PalimpsestMatch> allPalimpsestMatch = application.getAllPalimpsestMatch();
+                            checkForResult(allPalimpsestMatch);
+                        } else {
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    swipeRefreshLayout.setRefreshing(true);
+                                }
+                            });
+                            application.setAllMatchLoadListener(new TextFairyApplication.AllMatchLoadListener() {
+                                @Override
+                                public void onMatchLoaded(ArrayList<PalimpsestMatch> allPalimpsestMatch) {
+                                    checkForResult(allPalimpsestMatch);
+                                    runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            swipeRefreshLayout.setRefreshing(false);
+                                            singleBetAdapter.notifyDataSetChanged();
+                                        }
+                                    });
+                                }
+                            });
+                        }
+
+                        //NEXT LINE FOR TEST
+                        bet.setArrayMatch(allMatch);
+                        bet.setPuntata(c.getString(c.getColumnIndex(DocumentContentProvider.Columns.IMPORTO_SCOMMESSO)));
+                        bet.setVincita(c.getString(c.getColumnIndex(DocumentContentProvider.Columns.IMPORTO_PAGAMENTO)));
+                        bet.setErrors(c.getString(c.getColumnIndex(DocumentContentProvider.Columns.ERROR_NUMBER)));
+                        Log.i("IIIIIDDDD", c.getString(c.getColumnIndex(DocumentContentProvider.Columns.ID)));
+                    }
+                    c.close();
+                }
+                if(id.equals("91")){
                     TextFairyApplication application = (TextFairyApplication) getApplication();
 
                     if(application.isPalimpsestMatchLoaded){
                         ArrayList<PalimpsestMatch> allPalimpsestMatch = application.getAllPalimpsestMatch();
-                        checkForResult(allPalimpsestMatch);
+                        ArrayList<PalimpsestMatch> thisDate = new ArrayList<>();
+                        for (PalimpsestMatch currentPalimpses:allPalimpsestMatch
+                             ) {
+                            if(currentPalimpses.getDate().equals(giveDate())){
+                                thisDate.add(currentPalimpses);
+                            }
+                        }
+                        allMatch = thisDate;
+                        bet.setArrayMatch(allMatch);
                     }else{
                         runOnUiThread(new Runnable() {
                             @Override
@@ -486,7 +545,15 @@ public class SingleBetActivity extends AppCompatActivity {
                         application.setAllMatchLoadListener(new TextFairyApplication.AllMatchLoadListener() {
                             @Override
                             public void onMatchLoaded(ArrayList<PalimpsestMatch> allPalimpsestMatch) {
-                                checkForResult(allPalimpsestMatch);
+                                ArrayList<PalimpsestMatch> thisDate = new ArrayList<>();
+                                for (PalimpsestMatch currentPalimpses:allPalimpsestMatch
+                                        ) {
+                                    if(currentPalimpses.getDate().equals(giveDate())){
+                                        thisDate.add(currentPalimpses);
+                                    }
+                                }
+                                allMatch = thisDate;
+                                bet.setArrayMatch(allMatch);
                                 runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
@@ -497,13 +564,6 @@ public class SingleBetActivity extends AppCompatActivity {
                             }
                         });
                     }
-
-                    //NEXT LINE FOR TEST
-                    bet.setArrayMatch(allMatch);
-                    bet.setPuntata(c.getString(c.getColumnIndex(DocumentContentProvider.Columns.IMPORTO_SCOMMESSO)));
-                    bet.setVincita(c.getString(c.getColumnIndex(DocumentContentProvider.Columns.IMPORTO_PAGAMENTO)));
-                    bet.setErrors(c.getString(c.getColumnIndex(DocumentContentProvider.Columns.ERROR_NUMBER)));
-                    c.close();
                 }
                 singleBetAdapter = new SingleBetAdapter(SingleBetActivity.this, bet);
                 singleBetAdapter.setUri(uri);
@@ -521,13 +581,37 @@ public class SingleBetActivity extends AppCompatActivity {
         allMatchLoadListener.onMatchesLoaded();
     }
 
+    private String giveDate() {
+        Calendar c = Calendar.getInstance();
+        SimpleDateFormat sdfh = new SimpleDateFormat("HH:mm", Locale.getDefault());
+        String getCurrentTime = sdfh.format(c.getTime());
+
+        String midnight = "00:00";
+        String oneOclock = "01:00";
+
+        String date = "";
+        if (getCurrentTime.compareTo(midnight) >= 0 && getCurrentTime.compareTo(oneOclock) <= 0)
+        {
+            Calendar cal = Calendar.getInstance();
+            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM", Locale.getDefault());
+            cal.add(Calendar.DATE, -1);
+            date = sdf.format(cal.getTime());
+        }
+        else
+        {
+            Calendar cal = Calendar.getInstance();
+            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM", Locale.getDefault());
+            date = sdf.format(cal.getTime());
+        }
+        return date;
+    }
+
     //*********************************** INIT NEW BET FROM OCR ************************************
 
     private void initBetFromOCR(){
         allMatch = bet.getArrayMatch();
-        for (PalimpsestMatch currentMatch : allMatch) {
-            currentMatch.setAllHiddenResult(getHiddenResultForTest());
-        }
+        TextFairyApplication application = (TextFairyApplication) getApplication();
+        checkForResult(application.getAllPalimpsestMatch());
         singleBetAdapter = new SingleBetAdapter(SingleBetActivity.this, bet);
         singleBetAdapter.setUri(uri);
         rVSingleBet.setAdapter(singleBetAdapter);
@@ -711,7 +795,7 @@ public class SingleBetActivity extends AppCompatActivity {
     //********************************** INSERT NEW MATCH ***************************************
 
     private void setAddMatchDialog(){
-        final AddMatchDialog addMatchDialog = new AddMatchDialog(SingleBetActivity.this,bet.getArrayMatch(),SingleBetActivity.this);
+        final AddMatchDialog addMatchDialog = new AddMatchDialog(SingleBetActivity.this,SingleBetActivity.this);
         addMatchDialog.show();
         addMatchDialog.setCanceledOnTouchOutside(false);
         WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
@@ -759,12 +843,14 @@ public class SingleBetActivity extends AppCompatActivity {
             for (PalimpsestMatch currentResultMatch:allPalimpsestMatch
                     ) {
                 if(currentMatch.compareTo(currentResultMatch)){
-                    currentMatch.setHomeResult(currentResultMatch.getHomeResult());
-                    currentMatch.setAwayResult(currentResultMatch.getAwayResult());
-                    currentMatch.setResultTime(currentResultMatch.getResultTime());
-                    currentMatch.setAllHiddenResult(currentResultMatch.getAllHiddenResult());
-                    Log.i("match", "match trovato!!");
-                    break;
+                    if(!currentMatch.getHomeResult().equals("-") && !currentMatch.getAwayResult().equals("-")) {
+                        currentMatch.setHomeResult(currentResultMatch.getHomeResult());
+                        currentMatch.setAwayResult(currentResultMatch.getAwayResult());
+                        currentMatch.setResultTime(currentResultMatch.getResultTime());
+                        currentMatch.setAllHiddenResult(currentResultMatch.getAllHiddenResult());
+                        Log.i("match", "match trovato!!");
+                        break;
+                    }
                 }
             }
 
