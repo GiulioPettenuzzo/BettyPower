@@ -1,7 +1,14 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
 <resources>
+    <string name="match_terminated">Terminata</string>
+    <string name="match_posticipated">Posticipata</string>
+    <string name="match_annullato">Annullata</string>
+    <string name="match_break">Intervallo</string>
     <string name="delate_match_dialog_question">Devo aver sbagliato a leggere questa partita \n Mi dispiace! \n Sei sicuro di volerla eliminare?</string>
     <string name="autocomplete_textview_hint">"squadra in casa - squadra ospite"</string>
+    <string name="eventi_rimanenti">eventi rimanenti </string>
+    <string name="eventi_in_corso">in corso </string>
+    <string name="scommessa_completata">tutte le partite sono finite</string>
     <string name="delate_bet_dialog_question_singolar">Eliminare la Scommessa?</string>
     <string name="delete_bet_dialog_subtitle_singolar">Non potrai più recuperarla</string>
     <string name="delete_bet_dialog_explaination_singolar">tutti i dati di questa schedina \n andranno perduti</string>

@@ -3,9 +3,6 @@ package com.renard.ocr.util;
 import android.content.Context;
 import android.content.res.XmlResourceParser;
 import android.util.Log;
-
-import com.bettypower.entities.Match;
-
 import org.xmlpull.v1.XmlPullParser;
 
 import java.util.ArrayList;
@@ -64,16 +61,6 @@ public class ResourceUtils {
 
         return map;
     }
-
-    public void fromArrayToString(ArrayList<Match> allMatch) {
-        String result = "";
-
-    }
-
-    public ArrayList<Match> fromStringToArray() {
-        return null;
-    }
-
 
 }
 

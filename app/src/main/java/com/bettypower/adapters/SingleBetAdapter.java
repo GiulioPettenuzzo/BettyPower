@@ -1,7 +1,6 @@
 package com.bettypower.adapters;
 
 import android.annotation.SuppressLint;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.net.Uri;
@@ -31,20 +30,20 @@ import com.bettypower.dialog.SetBetDialog;
 import com.bettypower.entities.Bet;
 import com.bettypower.entities.HiddenResult;
 
+import java.io.File;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.Locale;
 
 import com.bettypower.entities.PalimpsestMatch;
 import com.bettypower.entities.ParcelableHiddenResult;
+import com.bettypower.entities.SingleBet;
+import com.bettypower.util.Helper;
 import com.bettypower.util.touchHelper.ItemTouchHelperAdapter;
 import com.renard.ocr.R;
 import com.renard.ocr.documents.viewing.DocumentContentProvider;
-import com.renard.ocr.util.Screen;
 import com.squareup.picasso.Picasso;
 
 /**
@@ -55,11 +54,11 @@ import com.squareup.picasso.Picasso;
 public class SingleBetAdapter extends RecyclerView.Adapter implements ItemTouchHelperAdapter {
 
     private Bet singleBet;
-    private ArrayList<PalimpsestMatch> allMatches = new ArrayList<>();
     private ArrayList<PalimpsestMatch> isSelected = new ArrayList<>();
     private boolean editMode = false;
     private boolean editModeConfirm = false;
     private static final int ELEVATION = 0;
+    private Helper helper;
     @SuppressLint("StaticFieldLeak")
     private static Context context;
     private Uri uri;
@@ -67,14 +66,14 @@ public class SingleBetAdapter extends RecyclerView.Adapter implements ItemTouchH
     //normal constructor.......
     public SingleBetAdapter(Context context, Bet singleBet){
         SingleBetAdapter.context = context;
+        helper = new Helper(context);
         this.singleBet = singleBet;
-        this.allMatches = singleBet.getArrayMatch();
     }
     //constructor for instance state
     public SingleBetAdapter(Context context, Bet singleBet, ArrayList<PalimpsestMatch> allSelectedMatch){
         SingleBetAdapter.context = context;
+        helper = new Helper(context);
         this.singleBet = singleBet;
-        this.allMatches = singleBet.getArrayMatch();
         isSelected = allSelectedMatch;
     }
     @Override
@@ -143,7 +142,7 @@ public class SingleBetAdapter extends RecyclerView.Adapter implements ItemTouchH
         switch (holder.getItemViewType()) {
             case 0:
                 SingleBetAdapter.ViewHolder viewHolder = (SingleBetAdapter.ViewHolder) holder;
-                viewHolder.setItemView(allMatches.get(position));
+                viewHolder.setItemView(singleBet.getArrayMatch().get(position));
                 break;
             case 1:
                 SingleBetAdapter.LastItemViewHolder lastItemViewHolder = (SingleBetAdapter.LastItemViewHolder) holder;
@@ -166,7 +165,7 @@ public class SingleBetAdapter extends RecyclerView.Adapter implements ItemTouchH
      */
     @Override
     public int getItemViewType(int position) {
-        if(position == allMatches.size()){
+        if(position == singleBet.getArrayMatch().size()){
             return 1;
         }
         else {
@@ -207,10 +206,6 @@ public class SingleBetAdapter extends RecyclerView.Adapter implements ItemTouchH
         return isSelected;
     }
 
-    public void setAllMatches(ArrayList<PalimpsestMatch> allMatches){
-        this.allMatches = allMatches;
-    }
-
     @Override
     public long getItemId(int position) {
         return position;
@@ -218,7 +213,7 @@ public class SingleBetAdapter extends RecyclerView.Adapter implements ItemTouchH
 
     @Override
     public int getItemCount() {
-        return allMatches.size() +1;
+        return singleBet.getArrayMatch().size() +1;
     }
 
     /**
@@ -228,14 +223,14 @@ public class SingleBetAdapter extends RecyclerView.Adapter implements ItemTouchH
      */
     @Override
     public void onItemSwiped(final int position) {
-        final DeleteMatchDialog deleteMatchDialog = new DeleteMatchDialog(context, allMatches.get(position));
+        final DeleteMatchDialog deleteMatchDialog = new DeleteMatchDialog(context, singleBet.getArrayMatch().get(position));
         Log.i("position" , String.valueOf(position));
         deleteMatchDialog.setDeleteMatchDialogListener(new DeleteMatchDialog.DeleteMatchDialogListener() {
             @Override
             public void onDeleteMatchConfirm() {
                 deleteMatchDialog.dismiss();
-                allMatches.remove(position);
-                notifyItemChanged(allMatches.size()+1);
+                singleBet.getArrayMatch().remove(position);
+                notifyItemChanged(singleBet.getArrayMatch().size()+1);
                 notifyItemRemoved(position);
             }
 
@@ -356,17 +351,7 @@ public class SingleBetAdapter extends RecyclerView.Adapter implements ItemTouchH
             homeScores.setText(match.getHomeResult());
             awayScores.setText(match.getAwayResult());
 
-
-           /* if(match.getResultTime()==null)
-                time.setText(match.getTime());
-            else {
-                if(!isNumber(match.getResultTime()))
-                    time.setText(match.getTime());
-                else
-                    time.setText(match.getResultTime());
-            }*/
-
-            if(match.getResultTime()==null){
+            if(match.getResultTime()==null || singleBet.areMatchesFinished()){
                 time.setText(match.getTime());
             }else{
                 if(!match.getResultTime().contains(":"))
@@ -475,7 +460,7 @@ public class SingleBetAdapter extends RecyclerView.Adapter implements ItemTouchH
                         match.setBetKind(editMatch.getBetKind());
                         match.setBet(editMatch.getBet());
                         match.setQuote(editMatch.getQuote());
-                        notifyItemChanged(allMatches.lastIndexOf(match));
+                        notifyItemChanged(singleBet.getArrayMatch().lastIndexOf(match));
                     }
                 });
                 selectBetDialog.show();
@@ -523,7 +508,7 @@ public class SingleBetAdapter extends RecyclerView.Adapter implements ItemTouchH
         }
 
         private void setItemView(){
-            String numberAvveniments = context.getResources().getString(R.string.number_avveniments) +" "+ String.valueOf(allMatches.size());
+            String numberAvveniments = context.getResources().getString(R.string.number_avveniments) +" "+ String.valueOf(singleBet.getArrayMatch().size());
             matchNumberTextView.setText(numberAvveniments);
             if(editMode){
                 itemView.setBackgroundColor(context.getResources().getColor(R.color.toolbar_background_light));
@@ -552,42 +537,33 @@ public class SingleBetAdapter extends RecyclerView.Adapter implements ItemTouchH
                 itemView.setBackgroundColor(context.getResources().getColor(R.color.toolbar_lighter));
                 if(editModeConfirm){
                     editModeConfirm = false;
-                    ContentValues values = new ContentValues();
                     if(!errorsEditText.getText().toString().equals("")) {
                         String errorText = errorsEditText.getText().toString();
-                        if(Integer.parseInt(errorText)>=allMatches.size())
-                            errorText = String.valueOf(allMatches.size()-1);
+                        if(Integer.parseInt(errorText)>=singleBet.getArrayMatch().size())
+                            errorText = String.valueOf(singleBet.getArrayMatch().size()-1);
                         String tmp = context.getResources().getString(R.string.sistema_errori) + " " + errorText;
                         errorsTextView.setText(tmp);
                         singleBet.setErrors(errorText);
-                        values.put(DocumentContentProvider.Columns.ERROR_NUMBER,singleBet.getErrors());
                     }else{
                         errorsTextView.setVisibility(View.GONE);
                         singleBet.setErrors(null);
-                        values.put(DocumentContentProvider.Columns.ERROR_NUMBER,(String)null);
                     }
                     if(!puntataEditText.getText().toString().equals("")) {
                         String tmp = context.getResources().getString(R.string.totale_importo_scommesso) + " " + fixEuroValue(puntataEditText.getText().toString()) + "€";
                         puntataTextView.setText(tmp);
                         singleBet.setPuntata(fixEuroValue(puntataEditText.getText().toString()));
-                        values.put(DocumentContentProvider.Columns.IMPORTO_SCOMMESSO,singleBet.getPuntata());
                     }else{
                         puntataTextView.setVisibility(View.GONE);
                         singleBet.setPuntata(null);
-                        values.put(DocumentContentProvider.Columns.IMPORTO_SCOMMESSO, (String) null);
                     }
                     if(!vincitaEditText.getText().toString().equals("")) {
                         String tmp = context.getResources().getString(R.string.totale_vincita) + " " + fixEuroValue(vincitaEditText.getText().toString()) + "€";
                         vincitaTextView.setText(tmp);
                         singleBet.setVincita(fixEuroValue(vincitaEditText.getText().toString()));
-                        values.put(DocumentContentProvider.Columns.IMPORTO_PAGAMENTO,singleBet.getVincita());
                     }else{
                         vincitaTextView.setVisibility(View.GONE);
                         singleBet.setVincita(null);
-                        values.put(DocumentContentProvider.Columns.IMPORTO_PAGAMENTO, (String) null);
                     }
-                    values.put(DocumentContentProvider.Columns.EVENT_NUMBER, String.valueOf(allMatches.size()));
-                    context.getContentResolver().update(uri,values,null,null);
                 }
                 else{
                     if(singleBet.getPuntata()!=null) {
@@ -605,7 +581,6 @@ public class SingleBetAdapter extends RecyclerView.Adapter implements ItemTouchH
                         errorsTextView.setText(tmp);
                         errorsEditText.setText(singleBet.getErrors());
                     }
-
                 }
                 vincitaEditText.setVisibility(View.GONE);
                 puntataEditText.setVisibility(View.GONE);
@@ -617,6 +592,13 @@ public class SingleBetAdapter extends RecyclerView.Adapter implements ItemTouchH
                 if(singleBet.getPuntata()==null || singleBet.getPuntata().isEmpty())
                     puntataTextView.setVisibility(View.GONE);
                 sistemaCheckBox.setVisibility(View.GONE);
+            }
+            int matchRemained = helper.getNumberMatchNotFinished(singleBet.getArrayMatch());
+            numberMatchNotFinished.setText(context.getResources().getString(R.string.eventi_rimanenti)+" "+String.valueOf(matchRemained));
+            if(matchRemained==0){
+                singleBet.setAreMatchFinished(true);
+            }else{
+                singleBet.setAreMatchFinished(false);
             }
         }
 
@@ -704,8 +686,8 @@ public class SingleBetAdapter extends RecyclerView.Adapter implements ItemTouchH
                 @Override
                 public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                     if(actionId == EditorInfo.IME_ACTION_DONE || actionId == EditorInfo.IME_ACTION_NEXT) {
-                        if(!errorsEditText.getText().toString().equals("") && Integer.parseInt(errorsEditText.getText().toString())>allMatches.size()){
-                            errorsEditText.setText(String.valueOf(allMatches.size()-1));
+                        if(!errorsEditText.getText().toString().equals("") && Integer.parseInt(errorsEditText.getText().toString())>singleBet.getArrayMatch().size()){
+                            errorsEditText.setText(String.valueOf(singleBet.getArrayMatch().size()-1));
                         }
                         if(!errorsEditText.getText().toString().equals("")){
                             singleBet.setErrors(errorsEditText.getText().toString());
@@ -728,8 +710,8 @@ public class SingleBetAdapter extends RecyclerView.Adapter implements ItemTouchH
                 @Override
                 public void onFocusChange(View v, boolean hasFocus) {
                     if(!hasFocus && !errorsEditText.getText().toString().equals("")) {
-                        if (Integer.parseInt(errorsEditText.getText().toString()) > allMatches.size()) {
-                            errorsEditText.setText(String.valueOf(allMatches.size() - 1));
+                        if (Integer.parseInt(errorsEditText.getText().toString()) > singleBet.getArrayMatch().size()) {
+                            errorsEditText.setText(String.valueOf(singleBet.getArrayMatch().size() - 1));
                         }
                         if(Integer.parseInt(errorsEditText.getText().toString()) <= 0){
                             errorsEditText.setText("");
@@ -763,7 +745,7 @@ public class SingleBetAdapter extends RecyclerView.Adapter implements ItemTouchH
                     notifyDataSetChanged();
                 } else {
                     singleBet.setSistema(false);
-                    for (PalimpsestMatch currentMatch : allMatches
+                    for (PalimpsestMatch currentMatch : singleBet.getArrayMatch()
                             ) {
                         currentMatch.setFissa(false);
                     }
@@ -771,6 +753,11 @@ public class SingleBetAdapter extends RecyclerView.Adapter implements ItemTouchH
                 }
             }
         }
+    }
+
+    public void setBet(Bet singleBet){
+        this.singleBet = singleBet;
+        notifyDataSetChanged();
     }
 
     private boolean isTimeOut(String date,String hour) {

@@ -35,6 +35,9 @@ public class LoadLogoThread extends Thread {
     private static final String FINAL_YAHOO_URL = "soccer+logo&fr=yfp-t-909&fr2=sb-top-it.images.search.yahoo.com&ei=UTF-8&n=60&x=wrt&imgty=clipart";
     private String url;
 
+    private RequestQueue imageQueue;
+    private RequestQueue yahooQueue;
+
 
 
     public LoadLogoThread(String teamname, LoadLogoListener loadLogoListener, Context context){
@@ -53,7 +56,9 @@ public class LoadLogoThread extends Thread {
     public void run() {
         super.run();
 
-        RequestQueue imageQueue = Volley.newRequestQueue(context);
+        if (imageQueue == null) {
+            imageQueue = Volley.newRequestQueue(context);
+        }
         StringRequest imageRequest = new StringRequest(Request.Method.GET, IMAGE_URL,
                 new Response.Listener<String>() {
                     @Override
@@ -110,7 +115,10 @@ public class LoadLogoThread extends Thread {
 
     private void loadLogoFromYahoo(){
         final ImageUrlUnpacker imageUrlUnpacker = new ImageUrlUnpacker();
-        RequestQueue queue = Volley.newRequestQueue(context);
+
+        if (yahooQueue == null) {
+            yahooQueue = Volley.newRequestQueue(context);
+        }
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
                 new Response.Listener<String>() {
                     @Override
@@ -126,7 +134,7 @@ public class LoadLogoThread extends Thread {
             public void onErrorResponse(VolleyError error) {
             }
         });
-        queue.add(stringRequest);
+        yahooQueue.add(stringRequest);
     }
 
     private Map<String,String> getAllServerUrl(String response){

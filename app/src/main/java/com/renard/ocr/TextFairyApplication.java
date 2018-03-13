@@ -16,7 +16,6 @@
 package com.renard.ocr;
 
 import com.bettypower.betMatchFinder.Resolver;
-import com.bettypower.entities.Match;
 import com.bettypower.entities.PalimpsestMatch;
 import com.crashlytics.android.Crashlytics;
 import com.crashlytics.android.ndk.CrashlyticsNdk;

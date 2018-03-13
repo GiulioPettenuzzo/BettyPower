@@ -1,10 +1,12 @@
 package com.renard.ocr.documents.creation.crop;
 
+import android.text.format.DateUtils;
 import android.util.Log;
 
 import com.bettypower.betMatchFinder.Assembler;
 import com.bettypower.betMatchFinder.Divider;
 import com.bettypower.betMatchFinder.Finder;
+import com.bettypower.betMatchFinder.entities.Date;
 import com.bettypower.util.Helper;
 import com.bettypower.betMatchFinder.entities.ConcreteMatchToFind;
 import com.bettypower.betMatchFinder.entities.MatchToFind;
@@ -17,6 +19,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -34,30 +37,41 @@ import static org.junit.Assert.assertTrue;
 public class ParcingTest {
 
     @Test
+
+
     public void dateHourTest(){
         Calendar c = Calendar.getInstance();
-        SimpleDateFormat sdfh = new SimpleDateFormat("HH:mm");
-        String getCurrentTime = sdfh.format(c.getTime());
-
-        String midnight = "00:00";
-        String oneOclock = "01:00";
-
-        String date = "";
-        if (getCurrentTime.compareTo(midnight) >= 0 && getCurrentTime.compareTo(oneOclock) <= 0)
-        {
-            Calendar cal = Calendar.getInstance();
-            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM", Locale.getDefault());
-            cal.add(Calendar.DATE, -1);
-            date = sdf.format(cal.getTime());
+        String One = "01/01 15:02"; //one is current date
+        String Two = "01/01 13:01";
+        SimpleDateFormat formatter1=new SimpleDateFormat("dd/MM HH:mm");
+        java.util.Date dateOne = null;
+        java.util.Date dateTwo = null;
+        boolean result = false;
+        try {
+            dateOne = formatter1.parse(One);
+            dateTwo = formatter1.parse(Two);
+        } catch (ParseException e) {
+            e.printStackTrace();
         }
-        else
-        {
-            Calendar cal = Calendar.getInstance();
-            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM", Locale.getDefault());
-            date = sdf.format(cal.getTime());
+        int monthOne = dateOne.getMonth();
+        int monthTwo = dateTwo.getMonth();
+        if(dateOne.getMonth()==11 && (dateTwo.getMonth()>=0 && dateTwo.getMonth()<9)){
+            result = false;
+        }
+        else if(dateOne.getMonth() == 0 && (dateTwo.getMonth() <= 11 && dateTwo.getMonth()>= 9)){
+            result = true;
+        }
+        else {
+            final long HOUR = 3600*1000;
+            dateTwo = new java.util.Date(dateTwo.getTime() + 2 * HOUR);
+            if (dateOne.after(dateTwo)) {
+                result = true;
+            } else {
+                result = false;
+            }
         }
 
-        assertEquals(date,"07/03");
+        assertEquals(true, result);
     }
 
     @Test
@@ -73,7 +87,6 @@ public class ParcingTest {
         ArrayList<PalimpsestMatch> allPali = new ArrayList<>();
         PalimpsestMatch paliOne = new ParcelablePalimpsestMatch(new ParcelableTeam("real madrid"),new ParcelableTeam("athletico madrid"));
         paliOne.setPalimpsest("21371");
-        paliOne.setEventNumber("1037");
         allPali.add(paliOne);
         Finder finder = new Finder(allPali);
         finder.isPalimpsest();
@@ -141,10 +154,6 @@ public class ParcingTest {
         PalimpsestMatch paliTwo = new ParcelablePalimpsestMatch(new ParcelableTeam("atalanta"),new ParcelableTeam("chievo verona"));
         PalimpsestMatch paliThree = new ParcelablePalimpsestMatch(new ParcelableTeam("real sociedad"),new ParcelableTeam("athletico bilbao"));
         PalimpsestMatch paliFour = new ParcelablePalimpsestMatch(new ParcelableTeam("real sociedad yankie"),new ParcelableTeam("athletico bilbao alloffame"));
-        paliOne.setEventNumber("1111111");
-        paliTwo.setEventNumber("2222222");
-        paliThree.setEventNumber("3333333");
-        paliFour.setEventNumber("4444444");
         paliOne.setPalimpsest("1111111");
         paliTwo.setPalimpsest("2222222");
         paliThree.setPalimpsest("3333333");
@@ -190,10 +199,7 @@ public class ParcingTest {
         PalimpsestMatch paliTwo = new ParcelablePalimpsestMatch(new ParcelableTeam("atalanta"),new ParcelableTeam("inter"));
         PalimpsestMatch paliThree = new ParcelablePalimpsestMatch(new ParcelableTeam("real sociedad"),new ParcelableTeam("athletico bilbao"));
         PalimpsestMatch paliFour = new ParcelablePalimpsestMatch(new ParcelableTeam("real sociedad yankie"),new ParcelableTeam("athletico bilbao alloffame"));
-        paliOne.setEventNumber("1111111");
-        paliTwo.setEventNumber("2222222");
-        paliThree.setEventNumber("3333333");
-        paliFour.setEventNumber("4444444");
+
         paliOne.setPalimpsest("1111111");
         paliTwo.setPalimpsest("2222222");
         paliThree.setPalimpsest("3333333");
@@ -227,11 +233,6 @@ public class ParcingTest {
         matchToFindTwo.setHomeTeamName("HOFFENHEIM");
         matchToFindTwo.setHour("13:30");
 
-        PalimpsestMatch paliOne = new ParcelablePalimpsestMatch(new ParcelableTeam("HOFFENHEIM"),new ParcelableTeam("HERTHA BERLINO"),"273711","529","17/09 13:30");
-        ArrayList<PalimpsestMatch> allPali = new ArrayList<>();
-        allPali.add(paliOne);
-        matchToFindOne.setPalimpsestMatch(allPali);
-        matchToFindTwo.setPalimpsestMatch(allPali);
         allMatchToFind.add(matchToFindOne);
         allMatchToFind.add(matchToFindTwo);
         Assembler assembler = new Assembler(allMatchToFind);
@@ -242,41 +243,6 @@ public class ParcingTest {
                 assembler.getAllMatchReassembled().get(0).getBet() + " " + assembler.getAllMatchReassembled().get(0).getBetKind());
     }
 
-    private ArrayList<PalimpsestMatch> addReplatz(ArrayList<PalimpsestMatch> allPalimpsestMatch){
-        PalimpsestMatch paliOne = new ParcelablePalimpsestMatch(new ParcelableTeam("JUVENTUS"),new ParcelableTeam("CAGLIARI"),"27331","4682","19/08 18:00");
-        PalimpsestMatch paliTwo = new ParcelablePalimpsestMatch(new ParcelableTeam("HELLAS VERONA"),new ParcelableTeam("NAPOLI"),"27331","4680","19/08 20:45");
-        PalimpsestMatch paliTheree = new ParcelablePalimpsestMatch(new ParcelableTeam("BOLOGNA"),new ParcelableTeam("TORINO"),"27331","4678","20/08 20:45");
-        PalimpsestMatch paliFour = new ParcelablePalimpsestMatch(new ParcelableTeam("INTER"),new ParcelableTeam("ACF FIORENTINA"),"27331","4681","20/08 20:45");
-        PalimpsestMatch paliFive = new ParcelablePalimpsestMatch(new ParcelableTeam("SASSUOLO"),new ParcelableTeam("GENOA"),"27331","4685","20/08 20:45");
-        PalimpsestMatch paliSix = new ParcelablePalimpsestMatch(new ParcelableTeam("UDINESE"),new ParcelableTeam("CHIEVO VERONA"),"27331","4686","20/08 20:45");
-        PalimpsestMatch paliSeven = new ParcelablePalimpsestMatch(new ParcelableTeam("SAMPDORIA"),new ParcelableTeam("BENEVENTO"),"27331","4712","20/08 20:45");
-        PalimpsestMatch paliEight = new ParcelablePalimpsestMatch(new ParcelableTeam("LAZIO"),new ParcelableTeam("SPAL"),"27331","4713","20/08 20:45");
-        PalimpsestMatch paliNine = new ParcelablePalimpsestMatch(new ParcelableTeam("ATALANTA"),new ParcelableTeam("ROMA"),"27331","4677","20/08 18:00");
-        PalimpsestMatch paliTen = new ParcelablePalimpsestMatch(new ParcelableTeam("CROTONE"),new ParcelableTeam("MILAN"),"27331","4679","21/08 20:45");
-        PalimpsestMatch paliEleven = new ParcelablePalimpsestMatch(new ParcelableTeam("BAYERN MONACO"),new ParcelableTeam("BAYERN LEVERKUSEN"),"27331","1760","18/08 20:30");
-        PalimpsestMatch paliTwelve = new ParcelablePalimpsestMatch(new ParcelableTeam("HOFFENHEIM"),new ParcelableTeam("WARDER BREMA"),"27331","1751","19/08 15:30");
-        PalimpsestMatch pailThirteen = new ParcelablePalimpsestMatch(new ParcelableTeam("AMBURGO"),new ParcelableTeam("AUGSBURG"),"27331","1769","19/08 15:30");
-        PalimpsestMatch paliFourteen = new ParcelablePalimpsestMatch(new ParcelableTeam("MAINZ 05"),new ParcelableTeam("HANNOVER"),"27331","1761","19/08 15:30");
-        PalimpsestMatch pailFifteen = new ParcelablePalimpsestMatch(new ParcelableTeam("WOLFSBURG"),new ParcelableTeam("BORUSSIA DORTMUND"),"27331","1763","19/08 15:30");
 
-
-        allPalimpsestMatch.add(paliOne);
-        allPalimpsestMatch.add(paliTwo);
-        allPalimpsestMatch.add(paliTheree);
-        allPalimpsestMatch.add(paliFour);
-        allPalimpsestMatch.add(paliFive);
-        allPalimpsestMatch.add(paliSix);
-        allPalimpsestMatch.add(paliSeven);
-        allPalimpsestMatch.add(paliEight);
-        allPalimpsestMatch.add(paliNine);
-        allPalimpsestMatch.add(paliTen);
-        allPalimpsestMatch.add(paliEleven);
-        allPalimpsestMatch.add(paliTwelve);
-        allPalimpsestMatch.add(pailThirteen);
-        allPalimpsestMatch.add(paliFourteen);
-        allPalimpsestMatch.add(pailFifteen);
-
-        return allPalimpsestMatch;
-    }
 
 }

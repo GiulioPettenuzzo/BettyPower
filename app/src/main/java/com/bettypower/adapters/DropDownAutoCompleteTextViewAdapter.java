@@ -2,6 +2,8 @@ package com.bettypower.adapters;
 
 import android.app.Activity;
 import android.content.Context;
+import android.icu.text.RelativeDateTimeFormatter;
+import android.icu.text.SimpleDateFormat;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
@@ -16,8 +18,15 @@ import com.bettypower.entities.PalimpsestMatch;
 import com.renard.ocr.R;
 
 
+import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.StringTokenizer;
+import java.util.stream.Stream;
 
 
 /**
@@ -110,33 +119,68 @@ public class DropDownAutoCompleteTextViewAdapter<M extends Parcelable> extends B
     }
 
     private ArrayList<PalimpsestMatch> setSuggestion(CharSequence constraint) {
-        ArrayList<PalimpsestMatch> matchSuggested = new ArrayList<>();
+        ArrayList<PalimpsestMatch> matchSuggestedWithStartWith = new ArrayList<>();
+        ArrayList<PalimpsestMatch> matchSuggestedWithEquals = new ArrayList<>();
         ArrayList<PalimpsestMatch> matchSuggestedWithContains = new ArrayList<>();
-        for (PalimpsestMatch currentCustomer : itemsAll) {
-            PalimpsestMatch customer = currentCustomer;
+
+        ArrayList<PalimpsestMatch> matchSuggestedEqualsEquals = new ArrayList<>();
+        ArrayList<PalimpsestMatch> matchSuggestedEqualsStartWith = new ArrayList<>();
+        ArrayList<PalimpsestMatch> matchSuggestedEqualsContains = new ArrayList<>();
+        ArrayList<PalimpsestMatch> matchSuggestedContainsEquals = new ArrayList<>();
+        ArrayList<PalimpsestMatch> matchSuggestedContainsStartWith = new ArrayList<>();
+        ArrayList<PalimpsestMatch> matchSuggestedContainsContains = new ArrayList<>();
+        boolean isSeparatorPresent = false;
+
+        for (PalimpsestMatch customer : itemsAll) {
             if (isHomeAwaySeparatorPresent(constraint.toString())) {
+                isSeparatorPresent = true;
                 String homeConstraint = constraint.subSequence(0, constraint.toString().indexOf("-") - 1).toString();
                 String awayConstraint = constraint.subSequence(constraint.toString().indexOf("-") + 2, constraint.length()).toString();
-                if (customer.getAwayTeam().getName().toLowerCase().startsWith(awayConstraint.toLowerCase()) && (customer.getHomeTeam().getName().contains(homeConstraint) || homeConstraint.isEmpty() || homeConstraint == null)) {
-                    matchSuggested.add(currentCustomer);
+                if(customer.getAwayTeam().getName().toLowerCase().equals(awayConstraint.toLowerCase()) && (customer.getHomeTeam().getName().equals(homeConstraint))){
+                    matchSuggestedEqualsEquals.add(customer);
+                } else if(customer.getAwayTeam().getName().toLowerCase().equals(awayConstraint.toLowerCase())&& (customer.getHomeTeam().getName().startsWith(homeConstraint) || homeConstraint.isEmpty() || homeConstraint == null)){
+                    matchSuggestedEqualsStartWith.add(customer);
+                } else if (customer.getAwayTeam().getName().toLowerCase().equals(awayConstraint.toLowerCase()) && (customer.getHomeTeam().getName().contains(homeConstraint) || homeConstraint.isEmpty() || homeConstraint == null)) {
+                    matchSuggestedEqualsContains.add(customer);
+                } else if (customer.getAwayTeam().getName().toLowerCase().contains(awayConstraint.toLowerCase()) && (customer.getHomeTeam().getName().equals(homeConstraint) || homeConstraint.isEmpty() || homeConstraint == null)) {
+                    matchSuggestedContainsEquals.add(customer);
+                } else if (customer.getAwayTeam().getName().toLowerCase().contains(awayConstraint.toLowerCase()) && (customer.getHomeTeam().getName().startsWith(homeConstraint) || homeConstraint.isEmpty() || homeConstraint == null)) {
+                    matchSuggestedContainsStartWith.add(customer);
                 } else if (customer.getAwayTeam().getName().toLowerCase().contains(awayConstraint.toLowerCase()) && (customer.getHomeTeam().getName().contains(homeConstraint) || homeConstraint.isEmpty() || homeConstraint == null)) {
-                    matchSuggestedWithContains.add(currentCustomer);
+                    matchSuggestedContainsContains.add(customer);
                 }
             } else {
-                if (customer.getHomeTeam().getName().toLowerCase().startsWith(constraint.toString().toLowerCase())) {
-                    matchSuggested.add(currentCustomer);
-                }else if (customer.getHomeTeam().getName().toLowerCase().contains(constraint.toString().toLowerCase())) {
-                    matchSuggestedWithContains.add(currentCustomer);
+                isSeparatorPresent = false;
+                if(customer.getHomeTeam().getName().toLowerCase().equals(constraint.toString().toLowerCase())){
+                    matchSuggestedWithEquals.add(customer);
+                } else if (customer.getHomeTeam().getName().toLowerCase().startsWith(constraint.toString().toLowerCase())) {
+                    matchSuggestedWithStartWith.add(customer);
+                } else if (customer.getHomeTeam().getName().toLowerCase().contains(constraint.toString().toLowerCase())) {
+                    matchSuggestedWithContains.add(customer);
                 }
             }
         }
-        for (PalimpsestMatch currentMatch:matchSuggestedWithContains
-             ) {
-            matchSuggested.add(currentMatch);
+
+        ArrayList<PalimpsestMatch> matchSuggested = new ArrayList<>();
+
+        if(!isSeparatorPresent) {
+            //ONLY HOME MATCH
+            matchSuggested.addAll(matchSuggestedWithEquals);
+            matchSuggested.addAll(matchSuggestedWithStartWith);
+            matchSuggested.addAll(matchSuggestedWithContains);
+        }
+
+        else{
+            //HOME AND AWAY MATCH
+            matchSuggested.addAll(matchSuggestedEqualsEquals);
+            matchSuggested.addAll(matchSuggestedEqualsStartWith);
+            matchSuggested.addAll(matchSuggestedEqualsContains);
+            matchSuggested.addAll(matchSuggestedContainsEquals);
+            matchSuggested.addAll(matchSuggestedContainsStartWith);
+            matchSuggested.addAll(matchSuggestedContainsContains);
         }
         return matchSuggested;
     }
-
 
 
     private boolean isHomeAwaySeparatorPresent(String constraint) {

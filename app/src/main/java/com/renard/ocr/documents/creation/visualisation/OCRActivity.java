@@ -19,10 +19,8 @@ import com.bettypower.SingleBetActivity;
 import com.bettypower.betMatchFinder.listeners.CompleteElaborationListener;
 import com.bettypower.betMatchFinder.listeners.PalimpsestLoadListener;
 import com.bettypower.entities.Bet;
-import com.bettypower.entities.Match;
 import com.bettypower.entities.PalimpsestMatch;
-import com.bettypower.entities.ParcelableMatch;
-import com.bettypower.util.HashMatchUtil;
+import com.google.gson.Gson;
 import com.googlecode.leptonica.android.Pix;
 import com.googlecode.leptonica.android.Pixa;
 import com.googlecode.tesseract.android.NativeBinding;
@@ -331,14 +329,13 @@ public class OCRActivity extends MonitoredActivity implements LayoutChoseListene
                         application.resolver.setCompleteElaborationListener(new CompleteElaborationListener() {
                             @Override
                             public void onElaborationComplete(Bet bet) {
-                                allMatch = bet.getArrayMatch();
+                                //allMatch = bet.getArrayMatch();
                                 //TODO serve un metodo che trasformi in blob
                                 //TODO SALVARE TUTTA LA BET
 
                                 try {
-                                    HashMatchUtil utils = new HashMatchUtil();
-                                    String stringArrayMatch = utils.fromArrayToString(allMatch);
-                                    //ArrayList<Match> arrayFromString = utils.fromStringToArray(stringArrayMatch);
+                                    Gson gson = new Gson();
+                                    String stringArrayMatch = gson.toJson(bet);
                                     documentUri = saveDocumentToDB(imageFile, hocrString, stringArrayMatch);
                                     if (imageFile != null) {
                                         Util.createThumbnail(OCRActivity.this, imageFile, Integer.valueOf(documentUri.getLastPathSegment()));

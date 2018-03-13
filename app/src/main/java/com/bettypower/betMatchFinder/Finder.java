@@ -432,7 +432,7 @@ public class Finder {
         ArrayList<Long> result = new ArrayList<>();
         for (PalimpsestMatch currentPalimpsestMatch:allPalimpsestMatch
              ) {
-            result.add(Long.parseLong(currentPalimpsestMatch.getCompletePalimpsest()));
+            result.add(Long.parseLong(currentPalimpsestMatch.getPalimpsest()));
         }
         Collections.sort(result);
         return result;

@@ -34,6 +34,8 @@ public class AllMatchesUnpacker {
         ArrayList<PalimpsestMatch> allPalimpsestMatch = new ArrayList<>();
         StringTokenizer token = new StringTokenizer(response);
         int i = 0;
+        long initWork = System.currentTimeMillis();
+        Log.i("MAIN WORK","START");
         while(token.hasMoreTokens()){
             String word = token.nextToken();
             if(word.equals("=>")){
@@ -95,15 +97,10 @@ public class AllMatchesUnpacker {
                                 word = token.nextToken();
                             }
                         }
-                        Log.i("TEAMS",homeTeam + " - " + awayTeam);
-                        Log.i("PALI",pali);
-                        Log.i("EVENT",event);
                         if(date.isEmpty()){
                             date = token.nextToken();
                         }
-                        Log.i("DATA",date);
                         String hour = token.nextToken();
-                        Log.i("HOUR",hour);
 
                         String betUno = token.nextToken();
                         String betX = token.nextToken();
@@ -120,14 +117,13 @@ public class AllMatchesUnpacker {
                         String wordOne = token.nextToken();
 
                         String resultTime = "";
-                        Log.i("WORD",word + " + " + wordOne);
                         homeTeam = Normalizer.normalize(homeTeam, Normalizer.Form.NFD);
                         homeTeam = homeTeam.replaceAll("[^\\p{ASCII}]", "").toUpperCase();
                         awayTeam = Normalizer.normalize(awayTeam, Normalizer.Form.NFD);
                         awayTeam = awayTeam.replaceAll("[^\\p{ASCII}]", "").toUpperCase();
 
 
-                        PalimpsestMatch palimpsestMatch = new ParcelablePalimpsestMatch(new ParcelableTeam(homeTeam),new ParcelableTeam(awayTeam),pali,event,date+" "+hour);
+                        PalimpsestMatch palimpsestMatch = new ParcelablePalimpsestMatch(new ParcelableTeam(homeTeam),new ParcelableTeam(awayTeam),pali+event,date+" "+hour);
                         Map<String,String> allOdds = new HashMap<>();
                         allOdds.put("1",betUno);
                         allOdds.put("X",betX);
@@ -149,8 +145,7 @@ public class AllMatchesUnpacker {
                             } else {
                                 resultTime = token.nextToken();
                             }
-                            if (!resultTime.equals("</pre><pre>")) {
-                                Log.i("RESULT TIME", resultTime);
+                            if (!resultTime.equals("</pre><pre>") && !resultTime.equals("Array")) {
                                 String result = "";
                                 if(resultTime.equalsIgnoreCase("ht")){
                                     resultTime = "Intervallo";
@@ -160,6 +155,9 @@ public class AllMatchesUnpacker {
                                 }
                                 if(resultTime.equalsIgnoreCase("postp.")){
                                     resultTime = "Posticipata";
+                                }
+                                if(resultTime.equalsIgnoreCase("Aban.")){
+                                    resultTime = "Annullata";
                                 }
                                 while (!(word.startsWith("[") && word.endsWith("]"))) {
                                     word = token.nextToken();
@@ -188,18 +186,6 @@ public class AllMatchesUnpacker {
                                         hiddenResult = "";
                                     }
                                 }
-                                Log.i("RISULTATO", result);
-                                for (HiddenResult currentHiddenResult : allHiddenResult
-                                        ) {
-                                   // Log.i("PLAYER", currentHiddenResult.getPlayerName());
-                                   // Log.i("TIME", currentHiddenResult.getTime());
-                                   // Log.i("ACTION", currentHiddenResult.getAction());
-                                   // Log.i("TEAM", String.valueOf(currentHiddenResult.getActionTeam()));
-                                    if (currentHiddenResult.getAction().equals("Goal")) {
-                                   //     Log.i("TEAM", String.valueOf(currentHiddenResult.getResult()));
-                                    }
-                                //    Log.i("----------", "-------------");
-                                }
                                 palimpsestMatch.setResultTime(resultTime);
                                 result = result.replace(":", " ");
                                 StringTokenizer resultToken = new StringTokenizer(result);
@@ -216,7 +202,29 @@ public class AllMatchesUnpacker {
                 }
             }
         }
-        Log.i("RESPONSE",response);
+
+        long finish = System.currentTimeMillis() - initWork;
+        Log.i("FINISH MAIN WORK",String.valueOf(finish));
+
+       /* StringTokenizer tokenTwo = new StringTokenizer(response);
+        long init = System.currentTimeMillis();
+        while(tokenTwo.hasMoreTokens()){
+            String word = tokenTwo.nextToken();
+            Log.i("RESPONSE",word);
+        }
+        long totalTime = System.currentTimeMillis() - init;
+
+        long startSplit = System.currentTimeMillis();
+        String[] splitter = response.split(" ");
+        int a = splitter.length;
+        long finishSplit = System.currentTimeMillis() - startSplit;
+
+        Log.i("FINISH MAIN WORK",String.valueOf(finish));
+        Log.i("WITHOUT OP",String.valueOf(totalTime));
+        Log.i("SPLIT",String.valueOf(finishSplit));
+
+*/
+
         return allPalimpsestMatch;
     }
 

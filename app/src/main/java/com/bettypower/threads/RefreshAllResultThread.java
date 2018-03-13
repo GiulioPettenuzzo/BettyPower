@@ -36,7 +36,7 @@ public class RefreshAllResultThread extends Thread {
             for (PalimpsestMatch currentResultMatch:allPalimpsestMatch
                     ) {
                 if(currentMatch.compareTo(currentResultMatch)){
-                    if(!currentResultMatch.getHomeResult().equals("-") && ! currentResultMatch.getAwayResult().equals("-")) {
+                    if(!currentResultMatch.getHomeResult().equals("-") && !currentResultMatch.getAwayResult().equals("-")) {
                         currentMatch.setHomeResult(currentResultMatch.getHomeResult());
                         currentMatch.setAwayResult(currentResultMatch.getAwayResult());
                         currentMatch.setResultTime(currentResultMatch.getResultTime());

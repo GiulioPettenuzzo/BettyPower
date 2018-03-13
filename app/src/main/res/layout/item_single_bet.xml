@@ -98,7 +98,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
+            android:layout_marginLeft="8dp"
             android:layout_marginRight="8dp"
+            android:layout_marginStart="8dp"
             android:textColor="@color/Tekt_dark_lighter"
             android:textSize="16sp"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -139,10 +141,8 @@
         android:id="@+id/bet_kind"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="0dp"
-        android:layout_marginLeft="0dp"
+        android:layout_marginEnd="8dp"
         android:layout_marginRight="8dp"
-        android:layout_marginTop="0dp"
         android:maxLines="2"
         android:minLines="1"
         android:text="Over 1.5 "
@@ -155,9 +155,7 @@
         app:layout_constraintLeft_toRightOf="@+id/home_logo"
         app:layout_constraintRight_toLeftOf="@+id/bet"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.5"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="0dp" />
+        app:layout_constraintVertical_bias="0.5" />
 
     <ImageView
         android:id="@+id/away_logo"

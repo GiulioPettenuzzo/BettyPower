@@ -19,6 +19,7 @@ public class SingleBet implements Bet {
     private String vincita;
     private String errors;
     private boolean isSistema;
+    private boolean areMatchesFinished;  // in order to know if all matches are finished
 
     public SingleBet(ArrayList<PalimpsestMatch> allMatches){
         this.allMatches = allMatches;
@@ -94,6 +95,16 @@ public class SingleBet implements Bet {
         this.isSistema = isSistema;
     }
 
+    @Override
+    public boolean areMatchesFinished() {
+        return areMatchesFinished;
+    }
+
+    @Override
+    public void setAreMatchFinished(boolean value) {
+        areMatchesFinished = value;
+    }
+
     public static final Creator<SingleBet> CREATOR = new Creator<SingleBet>(){
 
         @Override
@@ -117,6 +128,7 @@ public class SingleBet implements Bet {
         this.errors = source.readString();
         this.date = source.readString();
         this.isSistema = (Boolean) source.readValue(getClass().getClassLoader());
+        this.areMatchesFinished = (Boolean) source.readValue(getClass().getClassLoader());
     }
 
 
@@ -145,7 +157,6 @@ public class SingleBet implements Bet {
      */
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        //TODO
         dest.writeList(allMatches);
         dest.writeString(bookmaker);
         dest.writeString(puntata);
@@ -153,5 +164,6 @@ public class SingleBet implements Bet {
         dest.writeString(errors);
         dest.writeString(date);
         dest.writeValue(isSistema);
+        dest.writeValue(areMatchesFinished);
     }
 }

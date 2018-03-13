@@ -1,5 +1,7 @@
 package com.bettypower.unpacker;
 
+import android.graphics.Matrix;
+
 import com.bettypower.entities.HiddenResult;
 import com.bettypower.entities.PalimpsestMatch;
 import com.bettypower.entities.ParcelablePalimpsestMatch;
@@ -115,7 +117,7 @@ public class goalServeUnpacker implements Unpacker {
      * @return an array list that will be pircing
      */
     private String[][] getAllMatchesInHtml(){
-        String[][] allMatchesInHtml = new String[1000][1000];
+        String[][] allMatchesInHtml = new String[100][100];
         String matchInString = "";
         String word = "";
         String singleHidden = "";
@@ -132,6 +134,9 @@ public class goalServeUnpacker implements Unpacker {
                         matchInString = matchInString + " " + word;
                         word = tokenizer.nextToken();
                         if(word.compareTo("</tr>")==0){
+                            if(i>=allMatchesInHtml.length-1){
+                                allMatchesInHtml = resize(allMatchesInHtml,i*2,i*2);
+                            }
                             allMatchesInHtml[i][0]  = matchInString;
                             matchInString = "";
                             i++;
@@ -146,6 +151,9 @@ public class goalServeUnpacker implements Unpacker {
                             singleHidden = singleHidden + " " + word;
                             word = tokenizer.nextToken();
                             if (word.compareTo("</tr>") == 0) {
+                                if(i>=allMatchesInHtml[0].length-1){
+                                    allMatchesInHtml = resize(allMatchesInHtml,i*2,i*2);
+                                }
                                 allMatchesInHtml[i-1][j] = singleHidden;
                                 j++;
                                 singleHidden = "";
@@ -158,6 +166,14 @@ public class goalServeUnpacker implements Unpacker {
         return allMatchesInHtml;
     }
 
+    private static String[][] resize(String[][] matrix, int w, int h) {
+        String[][] temp = new String[h][w];
+        h = Math.min(h, matrix.length);
+        w = Math.min(w, matrix[0].length);
+        for (int i = 0; i < h; i++)
+            System.arraycopy(matrix[i], 0, temp[i], 0, w);
+        return temp;
+    }
     /**
      * this method is able to sort out the homeTeam from a match in html
      * @return the home team in the match in html

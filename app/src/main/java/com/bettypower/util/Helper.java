@@ -1,9 +1,16 @@
 package com.bettypower.util;
 
+import android.content.Context;
+
 import com.bettypower.entities.PalimpsestMatch;
 import com.bettypower.entities.Team;
+import com.renard.ocr.R;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Locale;
 import java.util.StringTokenizer;
 
 /**
@@ -13,14 +20,20 @@ import java.util.StringTokenizer;
 public class Helper {
 
     private ArrayList<PalimpsestMatch> allPalimpsestMatch;
+    private Context context;
 
     public Helper(ArrayList<PalimpsestMatch> allPalimpsestMatch){
         this.allPalimpsestMatch = allPalimpsestMatch;
     }
 
+    public Helper(Context context){
+        this.context = context;
+    }
+
     public Helper(){
 
     }
+
 
     /**
      * check if the word given in param is a number or not
@@ -134,6 +147,83 @@ public class Helper {
             listOne.add(current);
         }
         return listOne;
+    }
+
+    public int getNumberMatchNotFinished(ArrayList<PalimpsestMatch> allPalimpsestMatch) {
+        int numberMatchRemained = 0;
+        for (PalimpsestMatch currentMatch:allPalimpsestMatch
+                ) {
+            if (!isMatchFinish(currentMatch)) {
+                numberMatchRemained++;
+            }
+        }
+        return numberMatchRemained;
+    }
+
+    private boolean isMatchFinish(PalimpsestMatch palimpsestMatch){
+        if(palimpsestMatch.getResultTime()!=null && (palimpsestMatch.getResultTime().equalsIgnoreCase(context.getResources().getString(R.string.match_terminated)) ||
+                palimpsestMatch.getResultTime().equalsIgnoreCase(context.getResources().getString(R.string.match_annullato)) ||
+                        palimpsestMatch.getResultTime().equalsIgnoreCase(context.getResources().getString(R.string.match_posticipated)))){
+            return true;
+        }
+        String One = giveDate(); //one is current date
+        String Two = palimpsestMatch.getTime();
+        SimpleDateFormat formatter1=new SimpleDateFormat("dd/MM HH:mm",Locale.getDefault());
+        java.util.Date dateOne = null;
+        java.util.Date dateTwo = null;
+        boolean result = false;
+        try {
+            dateOne = formatter1.parse(One);
+            dateTwo = formatter1.parse(Two);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        int monthOne = dateOne.getMonth();
+        int monthTwo = dateTwo.getMonth();
+
+        if(dateOne.getMonth()==11 && (dateTwo.getMonth()>=0 && dateTwo.getMonth()<9)){
+            result = false;
+        }
+        else if(dateOne.getMonth() == 0 && (dateTwo.getMonth() <= 11 && dateTwo.getMonth()>= 9)){
+            result = true;
+        }
+        else {
+            final long HOUR = 3600*1000;
+            dateTwo = new java.util.Date(dateTwo.getTime() + 2 * HOUR);
+            if (dateOne.after(dateTwo)) {
+                result = true;
+            } else {
+                result = false;
+            }
+        }
+
+        return result;
+
+    }
+
+    private String giveDate() {
+        Calendar c = Calendar.getInstance();
+        SimpleDateFormat sdfh = new SimpleDateFormat("HH:mm", Locale.getDefault());
+        String getCurrentTime = sdfh.format(c.getTime());
+
+        Calendar cal = Calendar.getInstance();
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM", Locale.getDefault());
+        String date = sdf.format(cal.getTime());
+
+	/*	if (getCurrentTime.compareTo(midnight) >= 0 && getCurrentTime.compareTo(oneOclock) <= 0)
+		{
+			Calendar cal = Calendar.getInstance();
+			SimpleDateFormat sdf = new SimpleDateFormat("dd/MM", Locale.getDefault());
+			cal.add(Calendar.DATE, -1);
+			date = sdf.format(cal.getTime());
+		}
+		else
+		{
+			Calendar cal = Calendar.getInstance();
+			SimpleDateFormat sdf = new SimpleDateFormat("dd/MM", Locale.getDefault());
+			date = sdf.format(cal.getTime());
+		}*/
+        return date + " " + getCurrentTime;
     }
 
 }

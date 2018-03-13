@@ -29,4 +29,7 @@ public interface Bet extends Parcelable{
 
     boolean isSistema();
     void setSistema(boolean isSistema);
+
+    boolean areMatchesFinished();
+    void setAreMatchFinished(boolean value);
 }

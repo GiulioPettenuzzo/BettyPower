@@ -6,6 +6,7 @@ import com.bettypower.entities.HiddenResult;
 import com.bettypower.entities.PalimpsestMatch;
 import com.bettypower.unpacker.Unpacker;
 import com.bettypower.unpacker.goalServeUnpacker;
+import com.bettypower.util.HashMatchMap;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -13,6 +14,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 /**
  * Created by giuliopettenuzzo on 21/07/17.
@@ -24,6 +26,7 @@ public class RefreshResultThread extends Thread{
     private ArrayList<PalimpsestMatch> allSavedMatch = new ArrayList<>();
     private String response;
     private LoadingListener loadingListener;
+    private HashMatchMap hashMatchMap = new HashMatchMap();
 
     public RefreshResultThread(String response, ArrayList<PalimpsestMatch> allSavedMatch, LoadingListener loadingListener){
         this.response = response;
@@ -65,20 +68,28 @@ public class RefreshResultThread extends Thread{
 
         if(paliOne.getDate().equalsIgnoreCase(giveDate())) {
             Log.i("FOUND",paliOne.getHomeTeam().getName()+" - "+paliTwo.getHomeTeam().getName());
-            String homeTeamOne = paliOne.getHomeTeam().getName().replace("-"," ");
-            String homeTeamTwo = paliTwo.getHomeTeam().getName().replace("-"," ");
-            String awayTeamOne = paliOne.getAwayTeam().getName().replace("-"," ");
-            String awayTeamTwo = paliTwo.getAwayTeam().getName().replace("-"," ");
-
-            int commonHomeName = getNumberOfWordsInCommon(homeTeamOne,homeTeamTwo);
-            int commonAwayName = getNumberOfWordsInCommon(awayTeamOne,awayTeamTwo);
-            if (homeTeamOne.equalsIgnoreCase(homeTeamTwo) ||
-                    awayTeamOne.equalsIgnoreCase(awayTeamTwo)) {
+            String homeTeamOne = paliOne.getHomeTeam().getName().replace("-"," ").toUpperCase();
+            String homeTeamTwo = paliTwo.getHomeTeam().getName().replace("-"," ").toUpperCase();
+            String awayTeamOne = paliOne.getAwayTeam().getName().replace("-"," ").toUpperCase();
+            String awayTeamTwo = paliTwo.getAwayTeam().getName().replace("-"," ").toUpperCase();
+            Map<String,String> allHashMatch = hashMatchMap.getHashMatchMap();
+            if(allHashMatch.containsKey(homeTeamOne) && allHashMatch.get(homeTeamOne).equals(homeTeamTwo) &&
+                    allHashMatch.containsKey(homeTeamOne) && allHashMatch.get(homeTeamOne).equals(homeTeamTwo)){
                 return true;
-            }
-            else if(commonHomeName>0 || commonAwayName>0){
-                if(commonHomeName + commonAwayName >= 2){
+            }else if(allHashMatch.containsKey(homeTeamOne) && allHashMatch.get(homeTeamOne).equals(homeTeamTwo)){
+                return true;
+            }else if(allHashMatch.containsKey(awayTeamOne) && allHashMatch.get(awayTeamOne).equals(awayTeamTwo)){
+                return true;
+            }else {
+                int commonHomeName = getNumberOfWordsInCommon(homeTeamOne, homeTeamTwo);
+                int commonAwayName = getNumberOfWordsInCommon(awayTeamOne, awayTeamTwo);
+                if (homeTeamOne.equalsIgnoreCase(homeTeamTwo) ||
+                        awayTeamOne.equalsIgnoreCase(awayTeamTwo)) {
                     return true;
+                } else if (commonHomeName > 0 || commonAwayName > 0) {
+                    if (commonHomeName + commonAwayName >= 2) {
+                        return true;
+                    }
                 }
             }
         }

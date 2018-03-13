@@ -16,11 +16,16 @@
 
 package com.renard.ocr.documents.viewing.grid;
 
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Random;
 import java.util.Set;
+import java.util.StringTokenizer;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -37,7 +42,18 @@ import android.widget.AbsListView;
 import android.widget.CursorAdapter;
 import android.widget.TextView;
 
+import com.bettypower.entities.Bet;
+import com.bettypower.entities.HiddenResult;
+import com.bettypower.entities.PalimpsestMatch;
+import com.bettypower.entities.SingleBet;
+import com.bettypower.entities.Team;
+import com.bettypower.entities.deserialized.HiddenResultDeserialized;
+import com.bettypower.entities.deserialized.PalimpsestMatchDeserialized;
+import com.bettypower.entities.deserialized.TeamDeserialized;
+import com.bettypower.util.Helper;
 import com.bettypower.util.touchHelper.ItemTouchHelperAdapter;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.renard.ocr.documents.viewing.DocumentContentProvider;
 import com.renard.ocr.R;
 import com.renard.ocr.documents.viewing.grid.CheckableGridElement.OnCheckedChangeListener;
@@ -58,7 +74,7 @@ public class DocumentGridAdapter extends CursorAdapter implements OnCheckedChang
 		void onCheckedChanged(final Set<Integer> checkedIds);
 	}
 
-	private final static String[] PROJECTION = { Columns.ID, Columns.TITLE, Columns.OCR_TEXT, Columns.CREATED, Columns.PHOTO_PATH,Columns.CHILD_COUNT,Columns.EVENT_NUMBER,Columns.IMPORTO_SCOMMESSO,Columns.IMPORTO_PAGAMENTO,Columns.HOCR_TEXT };
+	private final static String[] PROJECTION = { Columns.ID, Columns.TITLE, Columns.OCR_TEXT, Columns.CREATED, Columns.PHOTO_PATH,Columns.CHILD_COUNT,Columns.HOCR_TEXT };
 
 	private Set<Integer> mSelectedDocuments = new HashSet<Integer>();
 	private LayoutInflater mInflater;
@@ -69,10 +85,12 @@ public class DocumentGridAdapter extends CursorAdapter implements OnCheckedChang
 	private int mIndexTitle;
 	private int mIndexID;
 	private int mChildCountID;
-	private int mEventNumber;
-	private int mTotaleImportoScommesso;
-	private int mTotaleImportoPagamento;
+
+	private int betIndex;
 	private OnCheckedChangeListener mCheckedChangeListener = null;
+	private Helper helper;
+
+	private Gson gson;
 
 	static class DocumentViewHolder {
 
@@ -115,11 +133,15 @@ public class DocumentGridAdapter extends CursorAdapter implements OnCheckedChang
 		mIndexID = c.getColumnIndex(Columns.ID);
 		mIndexTitle = c.getColumnIndex(Columns.TITLE);
 		mChildCountID = c.getColumnIndex(Columns.CHILD_COUNT);
-		mEventNumber = c.getColumnIndex(Columns.EVENT_NUMBER);
-		mTotaleImportoPagamento = c.getColumnIndex(Columns.IMPORTO_PAGAMENTO);
-		mTotaleImportoScommesso = c.getColumnIndex(Columns.IMPORTO_SCOMMESSO);
+		betIndex = c.getColumnIndex(Columns.OCR_TEXT);
 		indexHocrForManual = c.getColumnIndex(Columns.HOCR_TEXT);
 		mCheckedChangeListener = listener;
+		helper = new Helper(activity.getApplicationContext());
+		GsonBuilder gsonBuilder = new GsonBuilder();
+		gsonBuilder.registerTypeAdapter(HiddenResult.class,new HiddenResultDeserialized());
+		gsonBuilder.registerTypeAdapter(Team.class,new TeamDeserialized());
+		gsonBuilder.registerTypeAdapter(PalimpsestMatch.class,new PalimpsestMatchDeserialized());
+		gson = gsonBuilder.create();
 	}
 
 	@Override
@@ -171,13 +193,24 @@ public class DocumentGridAdapter extends CursorAdapter implements OnCheckedChang
 			}
 		}
 
-		String eventNumber = cursor.getString(mEventNumber);
-		//Log.i("event number",eventNumber);
-		String importoPagamento = cursor.getString(mTotaleImportoPagamento);
-	//	Log.i("importo pagamento",importoPagamento);
-		String importoScommesso = cursor.getString(mTotaleImportoScommesso);
-	//	Log.i("importo scommesso",importoScommesso);
+		String betText = cursor.getString(betIndex);
+		Bet bet = gson.fromJson(betText, SingleBet.class);
 
+
+		String eventNumber = String.valueOf(bet.getArrayMatch().size());
+
+		int numberMatchRemained = helper.getNumberMatchNotFinished(bet.getArrayMatch());
+		//Log.i("event number",eventNumber);
+		String importoPagamento = bet.getVincita();
+	//	Log.i("importo pagamento",importoPagamento);
+		String importoScommesso = bet.getPuntata();
+	//	Log.i("importo scommesso",importoScommesso);
+		if(numberMatchRemained != 0) {
+			holder.dailyInformations.setText(context.getResources().getString(R.string.eventi_rimanenti)+" "+String.valueOf(numberMatchRemained));
+		}
+		else{
+			holder.dailyInformations.setText(context.getResources().getString(R.string.scommessa_completata));
+		}
 
 		if(eventNumber!=null){
 			holder.eventNumberTextView.setText(context.getResources().getString(R.string.number_avveniments) + " " +eventNumber);
@@ -198,6 +231,7 @@ public class DocumentGridAdapter extends CursorAdapter implements OnCheckedChang
 		if(!mSelectedDocuments.contains(documentId))
 			holder.gridElement.setChecked(false);
 	};
+
 	
 	@Override
 	public long getItemId(int position) {

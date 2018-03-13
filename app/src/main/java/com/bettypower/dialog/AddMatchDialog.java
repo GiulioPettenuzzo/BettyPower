@@ -19,7 +19,13 @@ import com.bettypower.entities.PalimpsestMatch;
 import com.bettypower.threads.LoadLogoThread;
 import com.renard.ocr.R;
 import com.renard.ocr.TextFairyApplication;
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.Picasso;
+
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.StringTokenizer;
 
 /**
  * Created by giuliopettenuzzo on 27/01/18.
@@ -88,6 +94,16 @@ public class AddMatchDialog extends Dialog {
 
 
     private void getMatchesAndSetAdapter(){
+        Collections.sort(allMatches, new Comparator<PalimpsestMatch>() {
+            @Override
+            public int compare(PalimpsestMatch o1, PalimpsestMatch o2) {
+                String[] parts = o1.getDate().split("/", 2);
+                String dateOne = parts[1]+parts[0];
+                String[] partsTwo = o2.getDate().split("/", 2);
+                String dateTwo = partsTwo[1]+partsTwo[0];
+                return dateTwo.compareTo(dateOne);
+            }
+        });
         dropDownAutoCompleteTextViewAdapter = new DropDownAutoCompleteTextViewAdapter<>(activity,allMatches);
         dropDownAutoCompleteTextViewAdapter.setSelectedItemListener(new DropDownAutoCompleteTextViewAdapter.SelectItemListener() {
             @Override
@@ -164,20 +180,40 @@ public class AddMatchDialog extends Dialog {
         void onAddNewItem(PalimpsestMatch newMatch);
     }
 
-    private void loadMatchLogos(PalimpsestMatch match){
-            LoadLogoThread homeThread = new LoadLogoThread(match.getHomeTeam().getName(), new LoadLogoThread.LoadLogoListener() {
-                @Override
-                public void onLoadLogoFinish(Bitmap bitmap) {
-                    homeImageView.setImageBitmap(bitmap);
-                }
-            },context);
-            homeThread.start();
-            LoadLogoThread awayThread = new LoadLogoThread(match.getAwayTeam().getName(), new LoadLogoThread.LoadLogoListener() {
-                @Override
-                public void onLoadLogoFinish(Bitmap bitmap) {
-                    awayImageView.setImageBitmap(bitmap);
-                }
-            },context);
-            awayThread.start();
+    private void loadMatchLogos(final PalimpsestMatch match){
+        Picasso.with(context).load("file:"+context.getDir("logo_images", Context.MODE_PRIVATE).getPath()+"/"+match.getHomeTeam().getName() + ".png").placeholder(context.getResources().getDrawable(R.drawable.ic_shield_with_castle_inside)).into(homeImageView, new Callback() {
+            @Override
+            public void onSuccess() {
+
+            }
+
+            @Override
+            public void onError() {
+                LoadLogoThread homeThread = new LoadLogoThread(match.getHomeTeam().getName(), new LoadLogoThread.LoadLogoListener() {
+                    @Override
+                    public void onLoadLogoFinish(Bitmap bitmap) {
+                        homeImageView.setImageBitmap(bitmap);
+                    }
+                },context);
+                homeThread.start();
+            }
+        });
+        Picasso.with(context).load("file:"+context.getDir("logo_images", Context.MODE_PRIVATE).getPath()+"/"+match.getAwayTeam().getName() + ".png").placeholder(context.getResources().getDrawable(R.drawable.ic_eagle_shield)).into(awayImageView, new Callback() {
+            @Override
+            public void onSuccess() {
+
+            }
+
+            @Override
+            public void onError() {
+                LoadLogoThread awayThread = new LoadLogoThread(match.getAwayTeam().getName(), new LoadLogoThread.LoadLogoListener() {
+                    @Override
+                    public void onLoadLogoFinish(Bitmap bitmap) {
+                        awayImageView.setImageBitmap(bitmap);
+                    }
+                },context);
+                awayThread.start();
+            }
+        });
     }
 }

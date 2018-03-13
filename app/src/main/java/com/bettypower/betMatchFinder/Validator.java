@@ -23,7 +23,7 @@ public class Validator {
         ArrayList<PalimpsestMatch> result = new ArrayList<>();
         for (PalimpsestMatch currentMatch:allPossibleMatches
              ) {
-            if(palimpsest.equals(currentMatch.getCompletePalimpsest())){
+            if(palimpsest.equals(currentMatch.getPalimpsest())){
                 result.add(currentMatch);
                 return result;
             }

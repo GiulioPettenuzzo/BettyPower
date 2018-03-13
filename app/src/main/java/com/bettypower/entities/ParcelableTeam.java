@@ -10,10 +10,13 @@ import android.os.Parcel;
 public class ParcelableTeam implements Team {
 
     String name;
-    Bitmap bitmap;
 
     public ParcelableTeam(String name){
         this.name = name;
+    }
+
+    ParcelableTeam(){
+    super();
     }
 
     public static final Creator<ParcelableTeam> CREATOR = new Creator<ParcelableTeam>(){
@@ -31,7 +34,6 @@ public class ParcelableTeam implements Team {
 
     public ParcelableTeam(Parcel source){
         this(source.readString());
-        bitmap = Bitmap.CREATOR.createFromParcel(source);
     }
 
     @Override
@@ -52,6 +54,5 @@ public class ParcelableTeam implements Team {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(name);
-        bitmap.writeToParcel(dest,0);
     }
 }

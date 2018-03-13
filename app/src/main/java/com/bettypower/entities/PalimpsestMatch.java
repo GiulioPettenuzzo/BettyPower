@@ -15,12 +15,6 @@ public interface PalimpsestMatch extends Parcelable{
     String getPalimpsest();
     void setPalimpsest(String palimpsest);
 
-    String getEventNumber();
-    void setEventNumber(String eventNumber);
-
-    String getCompletePalimpsest();
-    void setCompletePalimpsest(String completePalimpsest);
-
     Team getHomeTeam();
     void setHomeTeam(Team homeTeam);
 

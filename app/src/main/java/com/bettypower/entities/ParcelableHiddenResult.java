@@ -3,6 +3,8 @@ package com.bettypower.entities;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.io.Serializable;
+
 /**
  * red card, yellow card and gal informations of a match
  * Created by giuliopettenuzzo on 28/06/17.
@@ -29,6 +31,10 @@ public class ParcelableHiddenResult implements HiddenResult {
         this.time = time;
         this.action = action;
         this.actionTeam = actionTeam;
+    }
+
+    ParcelableHiddenResult(){
+super();
     }
 
     @Override

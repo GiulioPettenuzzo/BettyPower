@@ -34,7 +34,7 @@ public class MatchpointUnpacker {
             String pali = findPalimpsestCode(palimpsests.get(allTeams.lastIndexOf(current)));
             String event = findEventCode(palimpsests.get(allTeams.lastIndexOf(current)));
             String time = allTime.get(allTeams.lastIndexOf(current));
-            PalimpsestMatch palimpsestMatch = new ParcelablePalimpsestMatch(homeTeam,awayTeam,pali,event,time);
+            PalimpsestMatch palimpsestMatch = new ParcelablePalimpsestMatch(homeTeam,awayTeam,pali +event,time);
             allMatchpointMatch.add(palimpsestMatch);
         }
     }
