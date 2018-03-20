@@ -128,7 +128,9 @@ public class DocumentGridActivity extends NewDocumentActivity implements Documen
     Gson gson;
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        sendVolleyForPalimpsestMatch();
+        //sendVolleyForPalimpsestMatch();
+        TextFairyApplication application = (TextFairyApplication) getApplication();
+        application.setPalimpsest();
         setContentView(R.layout.activity_document_grid);
         initToolbar();
         initNavigationDrawer();
@@ -139,7 +141,7 @@ public class DocumentGridActivity extends NewDocumentActivity implements Documen
         }
 
         //BET
-        gson = new Gson();
+       /* gson = new Gson();
         ArrayList<PalimpsestMatch> allMatch = new ArrayList<>();
         for(int i = 0; i<20;i++){
             PalimpsestMatch pali = new ParcelablePalimpsestMatch(new ParcelableTeam(String.valueOf(i)),new ParcelableTeam(String.valueOf(i)));
@@ -168,7 +170,7 @@ public class DocumentGridActivity extends NewDocumentActivity implements Documen
         gsonBuilder.registerTypeAdapter(PalimpsestMatch.class,new PalimpsestMatchDeserialized());
         gson = gsonBuilder.create();
         Bet betTwo = gson.fromJson(provaString,SingleBet.class);
-        String x = "";
+        String x = "";*/
 
         //PALIMPSEST MATCH
         /*
@@ -212,7 +214,7 @@ public class DocumentGridActivity extends NewDocumentActivity implements Documen
         final TextFairyApplication application = (TextFairyApplication) getApplicationContext();
 
         RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
-        final StringRequest stringRequest = new StringRequest(Request.Method.GET, "http://www.fishtagram.it/bettypower/result_data.php",
+        final StringRequest stringRequest = new StringRequest(Request.Method.GET, "http://www.fishtagram.it/bettypower/all_result.txt",
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(final String response) {
@@ -223,7 +225,7 @@ public class DocumentGridActivity extends NewDocumentActivity implements Documen
                             AllMatchesUnpacker allMatchesUnpacker = new AllMatchesUnpacker(response);
                             ArrayList<PalimpsestMatch> allPalimpsestMatches = allMatchesUnpacker.getAllMatches();
                             application.setAllPalimpsestMatch(allPalimpsestMatches);
-                            application.isPalimpsestMatchLoaded = true;
+                          //  application.isPalimpsestMatchLoaded = true;
                             if(application.allMatchLoadListener!=null)
                                  application.allMatchLoadListener.onMatchLoaded(allPalimpsestMatches);
                         }

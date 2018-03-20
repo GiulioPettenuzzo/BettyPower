@@ -1,5 +1,7 @@
 package com.bettypower.threads;
 
+import android.util.Log;
+
 import com.bettypower.entities.PalimpsestMatch;
 import com.bettypower.unpacker.AllMatchesUnpacker;
 
@@ -23,6 +25,8 @@ public class RefreshAllResultThread extends Thread {
     }
     @Override
     public void run() {
+        Log.i("PARTITO","PARTITO");
+
         AllMatchesUnpacker allMatchesUnpacker = new AllMatchesUnpacker(response);
         ArrayList<PalimpsestMatch> allPalimpsestMatch = allMatchesUnpacker.getAllMatches();
         loadingListener.onAllPalimpsestReady(allPalimpsestMatch);
@@ -36,7 +40,7 @@ public class RefreshAllResultThread extends Thread {
             for (PalimpsestMatch currentResultMatch:allPalimpsestMatch
                     ) {
                 if(currentMatch.compareTo(currentResultMatch)){
-                    if(!currentResultMatch.getHomeResult().equals("-") && !currentResultMatch.getAwayResult().equals("-")) {
+                    if((!currentResultMatch.getHomeResult().equals("-") && !currentResultMatch.getAwayResult().equals("-"))) {
                         currentMatch.setHomeResult(currentResultMatch.getHomeResult());
                         currentMatch.setAwayResult(currentResultMatch.getAwayResult());
                         currentMatch.setResultTime(currentResultMatch.getResultTime());

@@ -85,8 +85,9 @@ public class AddMatchDialog extends Dialog {
         delete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                TextFairyApplication application = (TextFairyApplication) context.getApplicationContext();
-                allMatches = application.getAllPalimpsestMatch();
+                //non no perchè ho messo queste righe
+               // TextFairyApplication application = (TextFairyApplication) context.getApplicationContext();
+               // allMatches = application.getAllPalimpsestMatch();
                 dismiss();
             }
         });

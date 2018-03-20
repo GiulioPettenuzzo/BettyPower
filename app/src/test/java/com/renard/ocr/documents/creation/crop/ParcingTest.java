@@ -3,6 +3,7 @@ package com.renard.ocr.documents.creation.crop;
 import android.text.format.DateUtils;
 import android.util.Log;
 
+import com.bettypower.betChecker.ConcreteChecker;
 import com.bettypower.betMatchFinder.Assembler;
 import com.bettypower.betMatchFinder.Divider;
 import com.bettypower.betMatchFinder.Finder;
@@ -37,12 +38,128 @@ import static org.junit.Assert.assertTrue;
 public class ParcingTest {
 
     @Test
+    public void resultThread(){
+        int home = 3;
+        int away = 1;
+        ConcreteChecker concreteChecker = new ConcreteChecker(home,away);
+        boolean result = concreteChecker.handicap101();
+        assertEquals(true,result);
+    }
+
+    @Test
+    public void existNumber(){
+        String prova = "ciao";
+        boolean result = false;
+        if(prova.matches(".*\\d+.*")){
+            result = true;
+        }
+        else{
+            result = false;
+        }
+        assertEquals(true,result);
+    }
+
+    @Test
+    public void mustUpdateDate(){
+        String One = "00:30"; //one is current date
+        String Two = "03:00";
+        String lastHourUpdate = "03:59";
+
+        SimpleDateFormat formatter1=new SimpleDateFormat("HH:mm",Locale.getDefault());
+        java.util.Date dateOne = null;
+        java.util.Date dateTwo = null;
+        java.util.Date lastUpdateDate = null;
+
+        java.util.Date now = Calendar.getInstance().getTime();
+        String nowHour = String.valueOf(now.getHours());
+        String nowminute = String.valueOf(now.getMinutes());
+        String thisTime = nowHour+":"+nowminute;
+        java.util.Date dateNow = null;
 
 
+        try {
+            dateOne = formatter1.parse(One); //ora minore
+            dateTwo = formatter1.parse(Two); //or maggiore
+            dateNow = formatter1.parse(thisTime); //ora corrente
+            lastUpdateDate = formatter1.parse(lastHourUpdate);//ultimo aggiornamento
+            String thisHour = String.valueOf(lastUpdateDate.getHours());
+            String thisminute = String.valueOf(lastUpdateDate.getMinutes());
+            lastHourUpdate = thisHour+":"+thisminute;
+            lastUpdateDate = formatter1.parse(lastHourUpdate);
+
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        boolean resultdate = false;
+
+        if(lastUpdateDate.after(dateOne)&&dateTwo.after(lastUpdateDate)&&dateNow.after(dateTwo)){
+            resultdate = true;
+        }
+        else if(lastUpdateDate.after(dateOne)&&dateTwo.after(lastUpdateDate)&&dateTwo.after(dateNow)){
+            resultdate = false;
+        }
+        assertEquals(true,resultdate);
+    }
+
+
+    @Test
+    public void afterThreeOclock(){
+        String One = "11:00";
+        java.util.Date now = Calendar.getInstance().getTime();
+        String thisHour = String.valueOf(now.getHours());
+        String thisminute = String.valueOf(now.getMinutes());
+        String thisTime = thisHour+":"+thisminute;
+        SimpleDateFormat formatter1=new SimpleDateFormat("HH:mm");
+        java.util.Date dateOne = null;
+        java.util.Date dateNow = null;
+        try {
+            dateOne = formatter1.parse(One);
+            dateNow = formatter1.parse(thisTime);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        boolean resultdate = false;
+
+        if(dateNow.after(dateOne)){
+            resultdate = true;
+        }
+
+        assertEquals(true,resultdate);
+    }
+    @Test
+    public void updateDateTest(){
+        String One = "10:30"; //one is current date
+        String Two = "16:30";
+        java.util.Date now = Calendar.getInstance().getTime();
+        String thisHour = String.valueOf(now.getHours());
+        String thisminute = String.valueOf(now.getMinutes());
+        String thisTime = thisHour+":"+thisminute;
+        SimpleDateFormat formatter1=new SimpleDateFormat("HH:mm");
+        java.util.Date dateOne = null;
+        java.util.Date dateTwo = null;
+        java.util.Date dateNow = null;
+        try {
+            dateOne = formatter1.parse(One);
+            dateTwo = formatter1.parse(Two);
+            dateNow = formatter1.parse(thisTime);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        boolean resultdate = false;
+        if(dateNow.after(dateOne) && dateTwo.after(dateNow)){
+            resultdate = true;
+        }
+        assertEquals(true,resultdate);
+    }
+
+
+    @Test
     public void dateHourTest(){
         Calendar c = Calendar.getInstance();
-        String One = "01/01 15:02"; //one is current date
-        String Two = "01/01 13:01";
+        String One = "01:00"; //one is current date
+        String Two = "03:00";
         SimpleDateFormat formatter1=new SimpleDateFormat("dd/MM HH:mm");
         java.util.Date dateOne = null;
         java.util.Date dateTwo = null;

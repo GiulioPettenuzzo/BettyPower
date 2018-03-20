@@ -59,8 +59,8 @@ public class BetLabelSet {
         map.put("1 + over 1.5",unoPiuOverUnoEMezzo);
 
         ArrayList<String> unoPiuHendicap = new ArrayList<>();
-        unoPiuOverUnoEMezzo.add("1 + hendicap");
-        map.put("1 hendicap",unoPiuOverUnoEMezzo);
+        unoPiuHendicap.add("1 + hendicap");
+        map.put("1 hendicap",unoPiuHendicap);
 
         return map;
     }
@@ -104,8 +104,8 @@ public class BetLabelSet {
         map.put("Doppia Chance",arrayListTwo);
 
         ArrayList<String> arrayListThree = new ArrayList<>();
-        arrayListThree.add("goal");
-        arrayListThree.add("nogoal");
+        arrayListThree.add("Goal");
+        arrayListThree.add("No Goal");
         map.put("Goal / NoGoal",arrayListThree);
 
         ArrayList<String> arrayListFour = new ArrayList<>();
@@ -464,5 +464,4 @@ public class BetLabelSet {
         map.put("Squadra ospite vince entrambi i tempi",arrayListThirtySeven);
         return map;
     }
-    //TODO tornera molto utile un metodo che mappi i betkind in bet per vedere tutte le scommesse a quale gruppo appartengno
 }

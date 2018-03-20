@@ -1,5 +1,6 @@
 package com.bettypower.unpacker;
 
+import android.text.Html;
 import android.util.Log;
 
 import com.bettypower.entities.HiddenResult;
@@ -12,7 +13,9 @@ import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.StringTokenizer;
+import java.util.regex.Pattern;
 
 /**
  * from <img src="http://fishtagram.it/football_logos/realsociedad.png" alt="real sociedad"> to arraylist of PalimpsestMatch
@@ -113,8 +116,10 @@ public class AllMatchesUnpacker {
                         String betGoal = token.nextToken();
                         String betNoGoal = token.nextToken();
 
-                        word = token.nextToken();
-                        String wordOne = token.nextToken();
+                        if(token.hasMoreTokens()) {
+                            word = token.nextToken();
+                        }
+                        //String wordOne = token.nextToken();
 
                         String resultTime = "";
                         homeTeam = Normalizer.normalize(homeTeam, Normalizer.Form.NFD);
@@ -139,13 +144,14 @@ public class AllMatchesUnpacker {
                         palimpsestMatch.setHomeResult("-");
                         palimpsestMatch.setAwayResult("-");
 
-                        if(word.equals("===>") || wordOne.equals("===>")) {
-                            if (word.equals("===>")) {
+                        if(word.equals("===>")){// || wordOne.equals("===>")) {
+                          /*  if (word.equals("===>")) {
                                 resultTime = wordOne;
                             } else {
                                 resultTime = token.nextToken();
-                            }
-                            if (!resultTime.equals("</pre><pre>") && !resultTime.equals("Array")) {
+                            }*/
+                          resultTime = token.nextToken();
+                            if (!resultTime.startsWith("[") && !resultTime.endsWith("]") && !resultTime.equals("Array")) {
                                 String result = "";
                                 if(resultTime.equalsIgnoreCase("ht")){
                                     resultTime = "Intervallo";
@@ -189,10 +195,15 @@ public class AllMatchesUnpacker {
                                 palimpsestMatch.setResultTime(resultTime);
                                 result = result.replace(":", " ");
                                 StringTokenizer resultToken = new StringTokenizer(result);
-                                String homeResult = resultToken.nextToken();
-                                String awayResult = resultToken.nextToken();
-                                palimpsestMatch.setHomeResult(homeResult);
-                                palimpsestMatch.setAwayResult(awayResult);
+                                try {
+                                    String homeResult = resultToken.nextToken();
+                                    String awayResult = resultToken.nextToken();
+                                    palimpsestMatch.setHomeResult(homeResult);
+                                    palimpsestMatch.setAwayResult(awayResult);
+                                } catch (NoSuchElementException e){
+                                    String x = "";
+                                }
+
                                 palimpsestMatch.setAllHiddenResult(allHiddenResult);
 
                             }
@@ -223,10 +234,103 @@ public class AllMatchesUnpacker {
         Log.i("WITHOUT OP",String.valueOf(totalTime));
         Log.i("SPLIT",String.valueOf(finishSplit));
 
-*/
+
+DIVIDE IL TEST IN TRE PARTI, CI METTE POCO PIU DI TRE SECONDI
+
+        /*Pattern p = Pattern.compile("</pre><pre>");
+        String[] ptn = p.split(response);
+        for(String pi:ptn){
+            Log.i("ARRAY" , pi);
+        }*/
+
+   /*     long init = System.currentTimeMillis();
+        response = response.replaceAll("\\s+"," ");
+
+        String[] array = response.split(" ");
+        int quarter = array.length/4;
+        String[] last = new String[quarter*2];
+        System.arraycopy(array,array.length-quarter,last,0,quarter);
+
+        int t = 0;
+        int lenth = quarter;
+        while(true){
+            String word = last[t];
+            if(word.startsWith("[")&&word.endsWith("]")) {
+                t++;
+                word = last[t];
+                if (word.equals("=>")) {
+                    t++;
+                    word = last[t];
+                    t++;
+                    if (word.startsWith("[") && word.endsWith("]") && last[t].equals("=>")) {
+                        t++;
+                        word = last[t];
+                        t++;
+                        if (word.startsWith("[") && word.endsWith("]") && last[t].equals("=>")) {
+                            break;
+                        }
+                    }
+                }
+            }
+            quarter--;
+            lenth++;
+            System.arraycopy(array,array.length-lenth,last,0,lenth);
+            t=0;
+        }
+        long totalTime = System.currentTimeMillis() - init;
+
+        Log.i("PART 1",String.valueOf(totalTime));
+        for (int i = 0;i<last.length;i++){
+            if(last[i]!=null) {
+                Log.i("res", last[i]);
+            }
+        }
+
+        String[] lastTwo = new String[quarter*2];
+        int quarterTwo = 2*quarter;
+        System.arraycopy(array,array.length-quarterTwo,lastTwo,0,quarter);
+        t = 0;
+        while(true){
+            String word = lastTwo[t];
+            if(word.startsWith("[")&&word.endsWith("]")) {
+                t++;
+                word = lastTwo[t];
+                if (word.equals("=>")) {
+                    t++;
+                    word = lastTwo[t];
+                    t++;
+                    if (word.startsWith("[") && word.endsWith("]") && lastTwo[t].equals("=>")) {
+                        t++;
+                        word = lastTwo[t];
+                        t++;
+                        if (word.startsWith("[") && word.endsWith("]") && lastTwo[t].equals("=>")) {
+                            break;
+                        }
+                    }
+                }
+            }
+            quarterTwo--;
+            quarter++;
+            System.arraycopy(array,array.length-quarterTwo,lastTwo,0,quarter);
+            t=0;
+        }
+
+        totalTime = System.currentTimeMillis() - init;
+
+        Log.i("PART 2",String.valueOf(totalTime));
+        // String[] parts = {response.substring(0, halfOne),response.substring(halfOne)};
+        for (int i = 0;i<lastTwo.length;i++){
+            if(lastTwo[i]!=null) {
+                Log.i("resTwo", lastTwo[i]);
+            }
+        }*/
+       // Log.i("PART 2",parts[1]);
+
+
 
         return allPalimpsestMatch;
     }
+
 
     private boolean isNumber(String word){
         try{

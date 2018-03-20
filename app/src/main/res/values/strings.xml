@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
 <resources>
+    <string name="event_win">Eventi vinti: </string>
+    <string name="event_lost">Eventi persi: </string>
     <string name="match_terminated">Terminata</string>
     <string name="match_posticipated">Posticipata</string>
     <string name="match_annullato">Annullata</string>

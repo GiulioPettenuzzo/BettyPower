@@ -30,6 +30,8 @@ import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
+
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -57,11 +59,22 @@ import com.google.gson.GsonBuilder;
 import com.renard.ocr.R;
 import com.renard.ocr.TextFairyApplication;
 import com.renard.ocr.documents.viewing.DocumentContentProvider;
+
+import org.w3c.dom.Document;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+
 import java.io.File;
-import java.text.SimpleDateFormat;
+import java.io.IOException;
+import java.io.StringReader;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Locale;
+
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 
 /**
  * this is the activity that show the bet
@@ -86,7 +99,7 @@ public class SingleBetActivity extends AppCompatActivity {
     private Gson gsonGetter;//to use fromjson
 
 
-    private static final String ALL_MATCH_URL = "http://www.fishtagram.it/bettypower/result_data.php";
+    private static final String ALL_MATCH_URL = "http://www.fishtagram.it/bettypower/all_result.txt";
     private static final String MATCH_URL = "http://www.goalserve.com/updaters/soccerupdate.aspx";
     private static final String ALL_MATCH_STATE = "save_all_match";
     private static final String ALL_MATCH_SELECTED_STATE = "all_match_selected_state";
@@ -123,11 +136,11 @@ public class SingleBetActivity extends AppCompatActivity {
             rVSingleBet.setAdapter(singleBetAdapter);
             singleBetAdapter.setExpandCollapseClickMode(new ExpandCollapseItemClickModeListener());
             setRefreshLayoutEnabled(true);
+            setHideScrollListener(true);
         } else {
             setMatchLoadListener(new MatchLoadListener());
             firstTimeMatchLoader();
         }
-        rVSingleBet.setOnScrollListener(new HidingScrollListener());
         swipeRefreshLayout.setOnRefreshListener(new OnRefreshListener());
     }
 
@@ -137,7 +150,10 @@ public class SingleBetActivity extends AppCompatActivity {
         super.onRestart();
         if(!fromPictureActivity) {
             swipeRefreshLayout.setRefreshing(true);
-            makeVolleyForMatchInBet();
+            setRefreshLayoutEnabled(true);
+            if(swipeRefreshLayout.isEnabled()) {
+                makeVolleyForMatchInBet();
+            }
         }else{
             fromPictureActivity = false;
         }
@@ -150,7 +166,6 @@ public class SingleBetActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         try {
-
             String jsonBet = gson.toJson(bet);
             ContentValues values = new ContentValues();
             values.put(DocumentContentProvider.Columns.OCR_TEXT, jsonBet);
@@ -295,7 +310,7 @@ public class SingleBetActivity extends AppCompatActivity {
             getWindow().setStatusBarColor(getResources().getColor(R.color.action_bar_edit_mode));
         }
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        rVSingleBet.setOnScrollListener(null);
+        setHideScrollListener(false);
         setRefreshLayoutEnabled(false);
         ItemTouchHelperCallback myItemTouchHelper = new ItemTouchHelperCallback(singleBetAdapter);
         itemTouchHelper = new ItemTouchHelper(myItemTouchHelper);
@@ -327,8 +342,10 @@ public class SingleBetActivity extends AppCompatActivity {
             imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
         }
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
-        rVSingleBet.setOnScrollListener(new HidingScrollListener());
+        setHideScrollListener(true);
+        swipeRefreshLayout.setRefreshing(true);
         setRefreshLayoutEnabled(true);
+        makeVolleyForMatchInBet();
         itemTouchHelper.attachToRecyclerView(null);
     }
 
@@ -464,6 +481,7 @@ public class SingleBetActivity extends AppCompatActivity {
         setAddMatchDialog();
         singleBetAdapter.setUri(uri);
         rVSingleBet.setAdapter(singleBetAdapter);
+        setHideScrollListener(true);
         setRefreshLayoutEnabled(true);
     }
 
@@ -503,14 +521,22 @@ public class SingleBetActivity extends AppCompatActivity {
                     bet = gsonGetter.fromJson(text, SingleBet.class);
                     TextFairyApplication application = (TextFairyApplication) getApplication();
 
-                    if (application.isPalimpsestMatchLoaded) {
+
+                    if (application.getAllPalimpsestMatch()!=null) {
                         ArrayList<PalimpsestMatch> allPalimpsestMatch = application.getAllPalimpsestMatch();
+                        //TODO il problema è che se aggiorno e torno dentro qui torna indietro.
                         checkForResult(allPalimpsestMatch);
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                makeVolleyForMatchInBet();
+                            }
+                        });
                     } else {
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                swipeRefreshLayout.setRefreshing(true);
+                                makeVolleyForMatchInBet();
                             }
                         });
                         application.setAllMatchLoadListener(new TextFairyApplication.AllMatchLoadListener() {
@@ -520,7 +546,6 @@ public class SingleBetActivity extends AppCompatActivity {
                                 runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
-                                        swipeRefreshLayout.setRefreshing(false);
                                         singleBetAdapter.notifyDataSetChanged();
                                     }
                                 });
@@ -538,7 +563,9 @@ public class SingleBetActivity extends AppCompatActivity {
                     public void run() {
                         rVSingleBet.setAdapter(singleBetAdapter);
                         allMatchLoadListener.onMatchesLoaded();
+                        swipeRefreshLayout.setRefreshing(true);
                         setRefreshLayoutEnabled(true);
+                        setHideScrollListener(true);
                     }
                 });
             }
@@ -556,7 +583,10 @@ public class SingleBetActivity extends AppCompatActivity {
         rVSingleBet.setAdapter(singleBetAdapter);
         allMatchLoadListener.onMatchesLoaded();
         singleBetAdapter.setExpandCollapseClickMode(new ExpandCollapseItemClickModeListener());
+        swipeRefreshLayout.setRefreshing(true);
         setRefreshLayoutEnabled(true);
+        makeVolleyForMatchInBet();
+        setHideScrollListener(true);
     }
 
     /* *********************************************************************************************
@@ -640,88 +670,63 @@ public class SingleBetActivity extends AppCompatActivity {
     }
 
     private void makeVolleyForMatchInBet(){
-        RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, MATCH_URL,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        Log.i("response = ",response);
-                        RefreshResultThread refreshResultThread = new RefreshResultThread(response, bet.getArrayMatch(), new RefreshResultThread.LoadingListener() {
-                            @Override
-                            public void onFinishLoading(final ArrayList<PalimpsestMatch> allMatches) {
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        bet.setArrayMatch(allMatches);
-                                        swipeRefreshLayout.setRefreshing(false);
-                                        singleBetAdapter.notifyDataSetChanged();
-                                    }
-                                });
-                            }
-                        });
-                        refreshResultThread.start();
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                makeVolleyForAllPalimpsest(true);
-            }
-        });
-        stringRequest.setShouldCache(false);
-        queue.add(stringRequest);
-
-    }
-
-    private void makeVolleyForAllPalimpsest(final boolean goalServeError){
-        RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, ALL_MATCH_URL, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                RefreshAllResultThread refreshAllResultThread = new RefreshAllResultThread(response, bet.getArrayMatch(), new RefreshAllResultThread.LoadingListener() {
-                    @Override
-                    public void onAllPalimpsestReady(final ArrayList<PalimpsestMatch> allMatches) {
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                TextFairyApplication application = (TextFairyApplication) getApplication();
-                                application.setAllPalimpsestMatch(allMatches);
-                            }
-                        });
-                    }
-
-                    @Override
-                    public void onBetPalimpsestReady(final ArrayList<PalimpsestMatch> allMatches) {
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                if(goalServeError){
-                                    bet.setArrayMatch(allMatches);
-                                    swipeRefreshLayout.setRefreshing(false);
-                                    singleBetAdapter.notifyDataSetChanged();
-                                }
-                            }
-                        });
-                    }
-                });
-                refreshAllResultThread.start();
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                if(goalServeError) {
-                    runOnUiThread(new Runnable() {
+        if(!bet.areMatchesFinished()) {
+            RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
+            StringRequest stringRequest = new StringRequest(Request.Method.GET, MATCH_URL,
+                    new Response.Listener<String>() {
                         @Override
-                        public void run() {
-                            swipeRefreshLayout.setRefreshing(false);
-                            Toast toast = Toast.makeText(getApplicationContext(), R.string.no_connection, Toast.LENGTH_SHORT);
-                            toast.show();
+                        public void onResponse(String response) {
+                            Log.i("response = ", response);
+                            RefreshResultThread refreshResultThread = new RefreshResultThread(response, bet.getArrayMatch(), new RefreshResultThread.LoadingListener() {
+                                @Override
+                                public void onFinishLoading(final ArrayList<PalimpsestMatch> allMatches) {
+                                    runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            bet.setArrayMatch(allMatches);
+                                            swipeRefreshLayout.setRefreshing(false);
+                                            singleBetAdapter.setBet(bet);
+
+                                        }
+                                    });
+                                }
+                            });
+                            refreshResultThread.start();
+                        /*
+                        Document doc = null;
+                        try {
+                            doc = DocumentBuilderFactory.newInstance()
+                                    .newDocumentBuilder().parse(new InputSource(new StringReader(response)));
+                            XPathExpression xpath = XPathFactory.newInstance()
+                                    .newXPath().compile("//td[text()=\"Description\"]/following-sibling::td[2]");
+
+                            String result = (String) xpath.evaluate(doc, XPathConstants.STRING);
+                        } catch (SAXException e) {
+                            e.printStackTrace();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        } catch (ParserConfigurationException e) {
+                            e.printStackTrace();
+                        } catch (XPathExpressionException e) {
+                            e.printStackTrace();
                         }
-                    });
+*/
+
+                        }
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    swipeRefreshLayout.setRefreshing(false);
+                    Toast toast = Toast.makeText(getApplicationContext(), R.string.no_connection, Toast.LENGTH_SHORT);
+                    toast.show();
                 }
-            }
-        });
-        stringRequest.setShouldCache(false);
-        queue.add(stringRequest);
+            });
+            stringRequest.setRetryPolicy(new DefaultRetryPolicy(DefaultRetryPolicy.DEFAULT_TIMEOUT_MS * 48,
+                    2, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+            stringRequest.setShouldCache(false);
+            queue.add(stringRequest);
+        }
+
     }
 
     //********************************** INSERT NEW MATCH ***************************************
@@ -742,15 +747,23 @@ public class SingleBetActivity extends AppCompatActivity {
         addMatchDialog.setOnAddNewItem(new AddMatchDialog.FinishEditDialog() {
             @Override
             public void onAddNewItem(final PalimpsestMatch match) {
-                addMatchDialog.dismiss();
-                bet.getArrayMatch().add(match);
-                singleBetAdapter.notifyItemInserted(bet.getArrayMatch().lastIndexOf(match));
-                singleBetAdapter.notifyItemChanged(bet.getArrayMatch().size());
-                singleBetAdapter.setExpandCollapseClickMode(new ExpandCollapseItemClickModeListener());
-                startImageThreadIfImageNotFound(match);
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        addMatchDialog.dismiss();
+                        bet.getArrayMatch().add(match);
+                        singleBetAdapter.notifyItemInserted(bet.getArrayMatch().lastIndexOf(match));
+                        singleBetAdapter.notifyItemChanged(bet.getArrayMatch().size());
+                        singleBetAdapter.setExpandCollapseClickMode(new ExpandCollapseItemClickModeListener());
+                        //makeVolleyForMatchInBet();
+                        setRefreshLayoutEnabled(true);
+                        startImageThreadIfImageNotFound(match);
+                    }
+                });
             }
         });
     }
+
 
     private void checkForResult(ArrayList<PalimpsestMatch> allPalimpsestMatch){
         for (PalimpsestMatch currentMatch : bet.getArrayMatch()
@@ -762,7 +775,7 @@ public class SingleBetActivity extends AppCompatActivity {
             for (PalimpsestMatch currentResultMatch:allPalimpsestMatch
                     ) {
                 if(currentMatch.compareTo(currentResultMatch)){
-                    if(!currentMatch.getHomeResult().equals("-") && !currentMatch.getAwayResult().equals("-")) {
+                    if(!currentResultMatch.getAwayResult().equals("-")&&!currentResultMatch.getHomeResult().equals("-")&& currentMatch.getHomeResult().equals("-") && currentMatch.getAwayResult().equals("-") && (currentMatch.getResultTime()==null || (!currentMatch.getResultTime().matches(".*\\d+.*") && !currentMatch.getResultTime().equalsIgnoreCase(getApplicationContext().getResources().getString(R.string.intervallo))))) {
                         currentMatch.setHomeResult(currentResultMatch.getHomeResult());
                         currentMatch.setAwayResult(currentResultMatch.getAwayResult());
                         currentMatch.setResultTime(currentResultMatch.getResultTime());
@@ -790,6 +803,14 @@ public class SingleBetActivity extends AppCompatActivity {
         @Override
         public void onShow() {
             toolbar.animate().translationY(0).setInterpolator(new DecelerateInterpolator(2));
+        }
+    }
+
+    private void setHideScrollListener(boolean value){
+        if(value && bet.getArrayMatch().size()>3){
+            rVSingleBet.setOnScrollListener(new HidingScrollListener());
+        }else{
+            rVSingleBet.setOnScrollListener(null);
         }
     }
 

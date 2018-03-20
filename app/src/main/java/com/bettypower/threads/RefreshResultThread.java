@@ -8,6 +8,7 @@ import com.bettypower.unpacker.Unpacker;
 import com.bettypower.unpacker.goalServeUnpacker;
 import com.bettypower.util.HashMatchMap;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -65,31 +66,45 @@ public class RefreshResultThread extends Thread{
      * @return
      */
     private boolean isTheSameMatch(PalimpsestMatch paliOne,PalimpsestMatch paliTwo){
+        Calendar cal = Calendar.getInstance();
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM", Locale.getDefault());
+        cal.add(Calendar.DATE, -1);
+        String date = sdf.format(cal.getTime());
+        if(isTimeUnderThree()){
+            if(paliOne.getDate().equalsIgnoreCase(giveDate()) || paliOne.getDate().equalsIgnoreCase(date)){
+                return areMatchCompatible(paliOne,paliTwo);
+            }
+        }
+        else {
+            if (paliOne.getDate().equalsIgnoreCase(giveDate())) {
+                return areMatchCompatible(paliOne,paliTwo);
+            }
+        }
+        return false;
+    }
 
-        if(paliOne.getDate().equalsIgnoreCase(giveDate())) {
-            Log.i("FOUND",paliOne.getHomeTeam().getName()+" - "+paliTwo.getHomeTeam().getName());
-            String homeTeamOne = paliOne.getHomeTeam().getName().replace("-"," ").toUpperCase();
-            String homeTeamTwo = paliTwo.getHomeTeam().getName().replace("-"," ").toUpperCase();
-            String awayTeamOne = paliOne.getAwayTeam().getName().replace("-"," ").toUpperCase();
-            String awayTeamTwo = paliTwo.getAwayTeam().getName().replace("-"," ").toUpperCase();
-            Map<String,String> allHashMatch = hashMatchMap.getHashMatchMap();
-            if(allHashMatch.containsKey(homeTeamOne) && allHashMatch.get(homeTeamOne).equals(homeTeamTwo) &&
-                    allHashMatch.containsKey(homeTeamOne) && allHashMatch.get(homeTeamOne).equals(homeTeamTwo)){
+    private boolean areMatchCompatible(PalimpsestMatch paliOne,PalimpsestMatch paliTwo){
+        String homeTeamOne = paliOne.getHomeTeam().getName().replace("-", " ").toUpperCase();
+        String homeTeamTwo = paliTwo.getHomeTeam().getName().replace("-", " ").toUpperCase();
+        String awayTeamOne = paliOne.getAwayTeam().getName().replace("-", " ").toUpperCase();
+        String awayTeamTwo = paliTwo.getAwayTeam().getName().replace("-", " ").toUpperCase();
+        Map<String, String> allHashMatch = hashMatchMap.getHashMatchMap();
+        if (allHashMatch.containsKey(homeTeamOne) && allHashMatch.get(homeTeamOne).equals(homeTeamTwo) &&
+                allHashMatch.containsKey(homeTeamOne) && allHashMatch.get(homeTeamOne).equals(homeTeamTwo)) {
+            return true;
+        } else if (allHashMatch.containsKey(homeTeamOne) && allHashMatch.get(homeTeamOne).equals(homeTeamTwo)) {
+            return true;
+        } else if (allHashMatch.containsKey(awayTeamOne) && allHashMatch.get(awayTeamOne).equals(awayTeamTwo)) {
+            return true;
+        } else {
+            int commonHomeName = getNumberOfWordsInCommon(homeTeamOne, homeTeamTwo);
+            int commonAwayName = getNumberOfWordsInCommon(awayTeamOne, awayTeamTwo);
+            if (homeTeamOne.equalsIgnoreCase(homeTeamTwo) ||
+                    awayTeamOne.equalsIgnoreCase(awayTeamTwo)) {
                 return true;
-            }else if(allHashMatch.containsKey(homeTeamOne) && allHashMatch.get(homeTeamOne).equals(homeTeamTwo)){
-                return true;
-            }else if(allHashMatch.containsKey(awayTeamOne) && allHashMatch.get(awayTeamOne).equals(awayTeamTwo)){
-                return true;
-            }else {
-                int commonHomeName = getNumberOfWordsInCommon(homeTeamOne, homeTeamTwo);
-                int commonAwayName = getNumberOfWordsInCommon(awayTeamOne, awayTeamTwo);
-                if (homeTeamOne.equalsIgnoreCase(homeTeamTwo) ||
-                        awayTeamOne.equalsIgnoreCase(awayTeamTwo)) {
+            } else if (commonHomeName > 0 || commonAwayName > 0) {
+                if (commonHomeName + commonAwayName >= 2) {
                     return true;
-                } else if (commonHomeName > 0 || commonAwayName > 0) {
-                    if (commonHomeName + commonAwayName >= 2) {
-                        return true;
-                    }
                 }
             }
         }
@@ -107,6 +122,32 @@ public class RefreshResultThread extends Thread{
                 i++;
         }
         return i;
+    }
+
+    private boolean isTimeUnderThree(){
+        String One = "01:00"; //one is current date
+        String Two = "03:00";
+        java.util.Date now = Calendar.getInstance().getTime();
+        String thisHour = String.valueOf(now.getHours());
+        String thisminute = String.valueOf(now.getMinutes());
+        String thisTime = thisHour+":"+thisminute;
+        SimpleDateFormat formatter1=new SimpleDateFormat("HH:mm",Locale.getDefault());
+        java.util.Date dateOne = null;
+        java.util.Date dateTwo = null;
+        java.util.Date dateNow = null;
+        try {
+            dateOne = formatter1.parse(One);
+            dateTwo = formatter1.parse(Two);
+            dateNow = formatter1.parse(thisTime);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        boolean resultdate = false;
+        if(dateNow.after(dateOne) && dateTwo.after(dateNow)){
+            resultdate = true;
+        }
+        return resultdate;
     }
 
     private String giveDate() {

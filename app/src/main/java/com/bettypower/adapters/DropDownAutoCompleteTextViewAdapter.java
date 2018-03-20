@@ -48,11 +48,6 @@ public class DropDownAutoCompleteTextViewAdapter<M extends Parcelable> extends B
         this.activity = activity;
     }
 
-    public void setAllMatches(ArrayList<PalimpsestMatch> itemsAll) {
-        this.itemsAll = itemsAll;
-        notifyDataSetChanged();
-    }
-
     /**
      * How many items are in the data set represented by this Adapter.
      *
@@ -207,18 +202,22 @@ public class DropDownAutoCompleteTextViewAdapter<M extends Parcelable> extends B
         }
 
         @Override
-        protected FilterResults performFiltering(CharSequence constraint) {
-            selectItemListener.onMatchNotSelected();
-            if (constraint != null) {
-                suggestions.clear();
-                suggestions = setSuggestion(constraint);
-                FilterResults filterResults = new FilterResults();
-                filterResults.values = suggestions;
-                filterResults.count = suggestions.size();
-                return filterResults;
-            } else {
-                return new FilterResults();
-            }
+        protected FilterResults performFiltering(final CharSequence constraint) {
+            final FilterResults filterResults = new FilterResults();
+            final ArrayList<PalimpsestMatch> suggested = setSuggestion(constraint);
+            activity.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    selectItemListener.onMatchNotSelected();
+                    if (constraint != null) {
+                        suggestions.clear();
+                        suggestions = suggested;
+                        filterResults.values = suggestions;
+                        filterResults.count = suggestions.size();
+                    }
+                }
+            });
+            return filterResults;
         }
 
         @Override

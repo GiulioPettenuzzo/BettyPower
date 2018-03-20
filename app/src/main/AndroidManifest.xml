@@ -31,7 +31,6 @@
             android:name=".documents.viewing.DocumentContentProvider"
             android:authorities="com.renard.ocr"
             android:exported="false" />
-
         <activity
             android:name=".documents.creation.visualisation.OCRActivity"
             android:launchMode="singleTop" />

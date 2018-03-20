@@ -160,7 +160,7 @@ public class Helper {
         return numberMatchRemained;
     }
 
-    private boolean isMatchFinish(PalimpsestMatch palimpsestMatch){
+    public boolean isMatchFinish(PalimpsestMatch palimpsestMatch){
         if(palimpsestMatch.getResultTime()!=null && (palimpsestMatch.getResultTime().equalsIgnoreCase(context.getResources().getString(R.string.match_terminated)) ||
                 palimpsestMatch.getResultTime().equalsIgnoreCase(context.getResources().getString(R.string.match_annullato)) ||
                         palimpsestMatch.getResultTime().equalsIgnoreCase(context.getResources().getString(R.string.match_posticipated)))){

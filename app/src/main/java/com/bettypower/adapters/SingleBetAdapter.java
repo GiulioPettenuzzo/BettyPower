@@ -25,12 +25,13 @@ import android.widget.TextView;
 import com.bettypower.HiddenResultLayout;
 import com.bettypower.adapters.helpers.CorrectionToUserWatcher;
 import com.bettypower.adapters.helpers.ExpandCollapseClickExecutor;
+import com.bettypower.betChecker.BetChecker;
+import com.bettypower.betChecker.MatchChecker;
 import com.bettypower.dialog.DeleteMatchDialog;
 import com.bettypower.dialog.SetBetDialog;
 import com.bettypower.entities.Bet;
 import com.bettypower.entities.HiddenResult;
 
-import java.io.File;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -39,11 +40,9 @@ import java.util.Locale;
 
 import com.bettypower.entities.PalimpsestMatch;
 import com.bettypower.entities.ParcelableHiddenResult;
-import com.bettypower.entities.SingleBet;
 import com.bettypower.util.Helper;
 import com.bettypower.util.touchHelper.ItemTouchHelperAdapter;
 import com.renard.ocr.R;
-import com.renard.ocr.documents.viewing.DocumentContentProvider;
 import com.squareup.picasso.Picasso;
 
 /**
@@ -59,6 +58,8 @@ public class SingleBetAdapter extends RecyclerView.Adapter implements ItemTouchH
     private boolean editModeConfirm = false;
     private static final int ELEVATION = 0;
     private Helper helper;
+    private MatchChecker matchChecer = new MatchChecker();
+    private BetChecker betChecker = new BetChecker();
     @SuppressLint("StaticFieldLeak")
     private static Context context;
     private Uri uri;
@@ -339,8 +340,8 @@ public class SingleBetAdapter extends RecyclerView.Adapter implements ItemTouchH
 
         private void setItemView(PalimpsestMatch mmatch){
             this.match = mmatch;
-            homeTeam.setText(match.getHomeTeam().getName());
-            awayTeam.setText(match.getAwayTeam().getName());
+            homeTeam.setText(capitalizeString(match.getHomeTeam().getName()));
+            awayTeam.setText(capitalizeString(match.getAwayTeam().getName()));
             if(isTimeOut(match.getDate(),match.getHour()) && match.getHomeResult().equalsIgnoreCase("-") && match.getAwayResult().equalsIgnoreCase("-")){ //FUNZIONA ORA DEVO INSERIRE L'HIDDEN RESULT
                 HiddenResult hiddenResult = new ParcelableHiddenResult("","",ParcelableHiddenResult.NO_MATCH_FOUND,ParcelableHiddenResult.ERROR_TEAM);
                 ArrayList<HiddenResult> allHiddenResult = new ArrayList<>();
@@ -358,6 +359,12 @@ public class SingleBetAdapter extends RecyclerView.Adapter implements ItemTouchH
                     time.setText(match.getResultTime());
                 else
                     time.setText(match.getTime());
+            }
+            bet.setTextColor(context.getResources().getColor(android.R.color.holo_green_light));
+            if(helper.isMatchFinish(match) && match.getBet()!=null){
+                if(!matchChecer.isMatchWin(match.getHomeResult(),match.getAwayResult(),match.getBet())){
+                    bet.setTextColor(context.getResources().getColor(android.R.color.holo_red_dark));
+                }
             }
             bet.setText(match.getBet());
             betKind.setText(match.getBetKind());
@@ -582,6 +589,11 @@ public class SingleBetAdapter extends RecyclerView.Adapter implements ItemTouchH
                         errorsEditText.setText(singleBet.getErrors());
                     }
                 }
+                if(!betChecker.isBetWin(singleBet)){
+                    itemView.setBackgroundColor(context.getResources().getColor(android.R.color.holo_red_dark));
+                }
+                numberMatchWinTextView.setText(context.getResources().getString(R.string.event_win)+" "+String.valueOf(betChecker.getWinNumber(singleBet)));
+                numberMatchLostTextView.setText(context.getResources().getString(R.string.event_lost)+" "+String.valueOf(betChecker.getErrorNumber(singleBet)));
                 vincitaEditText.setVisibility(View.GONE);
                 puntataEditText.setVisibility(View.GONE);
                 errorsEditText.setVisibility(View.GONE);
@@ -773,6 +785,21 @@ public class SingleBetAdapter extends RecyclerView.Adapter implements ItemTouchH
         }
         return false;
     }
+
+    public static String capitalizeString(String string) {
+        char[] chars = string.toLowerCase().toCharArray();
+        boolean found = false;
+        for (int i = 0; i < chars.length; i++) {
+            if (!found && Character.isLetter(chars[i])) {
+                chars[i] = Character.toUpperCase(chars[i]);
+                found = true;
+            } else if (Character.isWhitespace(chars[i]) || chars[i]=='.' || chars[i]=='\'') { // You can add other chars here
+                found = false;
+            }
+        }
+        return String.valueOf(chars);
+    }
+
 
     private static Date addMinutesToDate(Date beforeTime){
         final long ONE_MINUTE_IN_MILLIS = 60000;//millisecs
