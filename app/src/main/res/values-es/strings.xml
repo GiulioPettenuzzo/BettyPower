@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
 <resources>
+    <string name="facebook_app_id">1545587202205385</string>
+
     <string name="whats_new_title">Mirá que hay de nuevo</string>
     <string name="whats_new">Notas de la versión</string>
     <string name="text_was_copied_to_clipboard">Texto copiado en portapapeles.</string>

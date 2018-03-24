@@ -29,6 +29,7 @@ android {
     buildToolsVersion '26.0.2'
     flavorDimensions "versionCode"
 
+    useLibrary 'org.apache.http.legacy'
     dexOptions {
         // Skip pre-dexing when running on Travis CI or when disabled via -Dpre-dex=false.
         preDexLibraries = preDexEnabled && !travisBuild
@@ -117,6 +118,8 @@ if (propFile.canRead()) {
 buildscript {
     repositories {
         jcenter()
+        mavenCentral()
+
     }
 }
 
@@ -145,7 +148,7 @@ dependencies {
     compile "com.jakewharton:butterknife:${versions.butterknife}"
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.4.0'
     compile 'com.google.android.gms:play-services-vision:9.4.0+'
-
+    compile group: 'com.facebook.android', name: 'facebook-android-sdk', version: '4.25.0'
 
 
 

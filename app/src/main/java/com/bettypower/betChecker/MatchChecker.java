@@ -13,6 +13,9 @@ public class MatchChecker {
     private ConcreteChecker concreteChecker;
 
     public boolean isMatchWin(String homeResult, String awayResult, String bet){
+        if(homeResult.equals("-") || awayResult.equals("-")){
+            return true;
+        }
         this.homeResult = Integer.parseInt(homeResult);
         this.awayResult = Integer.parseInt(awayResult);
         this.bet = bet;

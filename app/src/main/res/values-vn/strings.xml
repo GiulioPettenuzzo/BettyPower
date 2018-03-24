@@ -1,4 +1,5 @@
 <resources>
+    <string name="facebook_app_id">1545587202205385</string>
     <string name="drawer_open">"Mở Trình đơn chính"</string>
     <string name="drawer_close">"Đóng trình đơn chính "</string>
     <string name="whats_new_title">"Kiểm tra những gì đã thay đổi"</string>

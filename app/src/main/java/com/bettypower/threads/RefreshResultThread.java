@@ -28,21 +28,55 @@ public class RefreshResultThread extends Thread{
     private String response;
     private LoadingListener loadingListener;
     private HashMatchMap hashMatchMap = new HashMatchMap();
+    String yesterdayDate;
+    String dateFromGive;
+    boolean isTimeUnderThree;
+    Map<String, String> allHashMatch = hashMatchMap.getHashMatchMap();
+
 
     public RefreshResultThread(String response, ArrayList<PalimpsestMatch> allSavedMatch, LoadingListener loadingListener){
         this.response = response;
         this.allSavedMatch = allSavedMatch;
         this.loadingListener = loadingListener;
+        Calendar cal = Calendar.getInstance();
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM", Locale.getDefault());
+        cal.add(Calendar.DATE, -1);
+        this.yesterdayDate = sdf.format(cal.getTime());
+        this.dateFromGive = giveDate();
+        this.isTimeUnderThree = isTimeUnderThree();
     }
 
     @Override
     public void run() {
+        long normalInit = System.currentTimeMillis();
         Unpacker unpacker = new goalServeUnpacker(response);
         ArrayList<PalimpsestMatch> allMatchOnGoalServe = unpacker.getAllMatches();
+        long normalFin = System.currentTimeMillis();
+        long timeNormal = normalFin - normalInit;
+        Log.i("time normale",String.valueOf(timeNormal));
+
+        long intellijInit = System.currentTimeMillis();
+        String responseMaiusc = response.toUpperCase();
+        int i = responseMaiusc.lastIndexOf("FIORENTINA");
+        long intellijFin = System.currentTimeMillis();
+        long totalTime = intellijFin - intellijInit;
+        Log.i("time intellij",String.valueOf(totalTime) + " i = " + String.valueOf(i));
+
+
+        Calendar cal = Calendar.getInstance();
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM", Locale.getDefault());
+        cal.add(Calendar.DATE, -1);
+        String yesterdyDate = sdf.format(cal.getTime());
+        String dateFromGive = giveDate();
+
+        long initCycle = System.currentTimeMillis();
+
         for (PalimpsestMatch savedMatch:allSavedMatch
              ) {
             for (PalimpsestMatch goalServeMatch: allMatchOnGoalServe
                  ) {
+                //String x = "";
+                //TODO è questo il metodo che butta via na vita di tempo
                 if(isTheSameMatch(savedMatch,goalServeMatch)){
                     String homeResult = goalServeMatch.getHomeResult().replace("?","-");
                     String awayResult = goalServeMatch.getAwayResult().replace("?","-");
@@ -57,6 +91,11 @@ public class RefreshResultThread extends Thread{
                 }
             }
         }
+
+        long finCycle = System.currentTimeMillis();
+        long totalCycle = finCycle-initCycle;
+        Log.i("ciclo:" ,String.valueOf(totalCycle));
+
         loadingListener.onFinishLoading(allSavedMatch);
     }
 
@@ -66,17 +105,14 @@ public class RefreshResultThread extends Thread{
      * @return
      */
     private boolean isTheSameMatch(PalimpsestMatch paliOne,PalimpsestMatch paliTwo){
-        Calendar cal = Calendar.getInstance();
-        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM", Locale.getDefault());
-        cal.add(Calendar.DATE, -1);
-        String date = sdf.format(cal.getTime());
-        if(isTimeUnderThree()){
-            if(paliOne.getDate().equalsIgnoreCase(giveDate()) || paliOne.getDate().equalsIgnoreCase(date)){
+
+        if(isTimeUnderThree){
+            if(paliOne.getDate().equalsIgnoreCase(dateFromGive) || paliOne.getDate().equalsIgnoreCase(yesterdayDate)){
                 return areMatchCompatible(paliOne,paliTwo);
             }
         }
         else {
-            if (paliOne.getDate().equalsIgnoreCase(giveDate())) {
+            if (paliOne.getDate().equalsIgnoreCase(dateFromGive)) {
                 return areMatchCompatible(paliOne,paliTwo);
             }
         }
@@ -88,7 +124,6 @@ public class RefreshResultThread extends Thread{
         String homeTeamTwo = paliTwo.getHomeTeam().getName().replace("-", " ").toUpperCase();
         String awayTeamOne = paliOne.getAwayTeam().getName().replace("-", " ").toUpperCase();
         String awayTeamTwo = paliTwo.getAwayTeam().getName().replace("-", " ").toUpperCase();
-        Map<String, String> allHashMatch = hashMatchMap.getHashMatchMap();
         if (allHashMatch.containsKey(homeTeamOne) && allHashMatch.get(homeTeamOne).equals(homeTeamTwo) &&
                 allHashMatch.containsKey(homeTeamOne) && allHashMatch.get(homeTeamOne).equals(homeTeamTwo)) {
             return true;
@@ -155,7 +190,8 @@ public class RefreshResultThread extends Thread{
         SimpleDateFormat sdfh = new SimpleDateFormat("HH:mm",Locale.getDefault());
         String getCurrentTime = sdfh.format(c.getTime());
 
-        String midnight = "00:00";
+        String midnight = "00:00"; //TODO se la partita comincia a mezzanotte non funziona nulla fino all'una
+        //questo è dovuto al fatto che molte volte a mezzanotte segnano che le partite sono il giorno prima stronzi dimmmerda
         String oneOclock = "01:00";
 
         String date = "";

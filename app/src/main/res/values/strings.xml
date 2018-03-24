@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
 <resources>
+    <string name="facebook_app_id">1545587202205385</string>
+    <string name="socal_post">Hey segui qui la mia schedina</string>
+    <string name="share_with">Condividi la schedina con..</string>
     <string name="event_win">Eventi vinti: </string>
     <string name="event_lost">Eventi persi: </string>
     <string name="match_terminated">Terminata</string>
@@ -309,4 +312,5 @@
     <string name="the_photo_of_the_bet">the photo of the bet</string>
     <string name="home_team_image_logo">home team image logo</string>
     <string name="away_team_image_logo">away team image logo</string>
+    <string name="asset_statements" translatable="false">[{\n  \"relation\": [\"delegate_permission/common.handle_all_urls\"],\n  \"target\": {\n    \"namespace\": \"web\",\n    \"site\": \"https://www.fishtagram.it\",\n  }\n}]</string>
 </resources>

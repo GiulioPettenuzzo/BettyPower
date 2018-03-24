@@ -8,6 +8,8 @@ import android.content.pm.ActivityInfo;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.drawable.ColorDrawable;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -51,8 +53,8 @@ import com.bettypower.entities.deserialized.PalimpsestMatchDeserialized;
 import com.bettypower.entities.deserialized.TeamDeserialized;
 import com.bettypower.listeners.PreLoadingLinearLayoutManager;
 import com.bettypower.threads.LoadLogoThread;
-import com.bettypower.threads.RefreshAllResultThread;
 import com.bettypower.threads.RefreshResultThread;
+import com.bettypower.threads.ShareBetThread;
 import com.bettypower.util.touchHelper.ItemTouchHelperCallback;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -60,21 +62,8 @@ import com.renard.ocr.R;
 import com.renard.ocr.TextFairyApplication;
 import com.renard.ocr.documents.viewing.DocumentContentProvider;
 
-import org.w3c.dom.Document;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-
 import java.io.File;
-import java.io.IOException;
-import java.io.StringReader;
 import java.util.ArrayList;
-
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpression;
-import javax.xml.xpath.XPathExpressionException;
-import javax.xml.xpath.XPathFactory;
 
 /**
  * this is the activity that show the bet
@@ -98,8 +87,8 @@ public class SingleBetActivity extends AppCompatActivity {
     private Gson gson = new Gson(); //to use tojson
     private Gson gsonGetter;//to use fromjson
 
-
-    private static final String ALL_MATCH_URL = "http://www.fishtagram.it/bettypower/all_result.txt";
+    private static final String APPLICATION_LINK = "http://www.fishtagram.it/bettypower/app_link.php?";
+    private static final String SHARING_LINK = "http://www.fishtagram.it/bettypower/bet_shering/sharing_executor.php";
     private static final String MATCH_URL = "http://www.goalserve.com/updaters/soccerupdate.aspx";
     private static final String ALL_MATCH_STATE = "save_all_match";
     private static final String ALL_MATCH_SELECTED_STATE = "all_match_selected_state";
@@ -116,20 +105,19 @@ public class SingleBetActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_single_bet);
         setRecyclerAndManager();
-        if(savedInstanceState!=null && savedInstanceState.containsKey(ALL_MATCH_STATE)){
+        if (savedInstanceState != null && savedInstanceState.containsKey(ALL_MATCH_STATE)) {
             bet = savedInstanceState.getParcelable(ALL_MATCH_STATE);
-            if(savedInstanceState.containsKey(ALL_MATCH_SELECTED_STATE)){
+            if (savedInstanceState.containsKey(ALL_MATCH_SELECTED_STATE)) {
                 allMatchSelected = savedInstanceState.getParcelableArrayList(ALL_MATCH_SELECTED_STATE);
-                singleBetAdapter = new SingleBetAdapter(SingleBetActivity.this,bet,allMatchSelected);
-            }
-            else{
-                singleBetAdapter = new SingleBetAdapter(SingleBetActivity.this,bet);
+                singleBetAdapter = new SingleBetAdapter(SingleBetActivity.this, bet, allMatchSelected);
+            } else {
+                singleBetAdapter = new SingleBetAdapter(SingleBetActivity.this, bet);
             }
             if (savedInstanceState.containsKey(EDIT_MODE)) {
                 editMode = savedInstanceState.getBoolean(EDIT_MODE);
                 singleBetAdapter.setEditMode(editMode);
             }
-            if(savedInstanceState.containsKey(IMAGE_URI)) {
+            if (savedInstanceState.containsKey(IMAGE_URI)) {
                 uri = savedInstanceState.getParcelable(IMAGE_URI);
                 singleBetAdapter.setUri(uri);
             }
@@ -142,6 +130,8 @@ public class SingleBetActivity extends AppCompatActivity {
             firstTimeMatchLoader();
         }
         swipeRefreshLayout.setOnRefreshListener(new OnRefreshListener());
+        // ATTENTION: This was auto-generated to handle app links.
+        handleIntent(getIntent());
     }
 
     private boolean fromPictureActivity = false;
@@ -212,6 +202,13 @@ public class SingleBetActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        handleIntent(intent);
+    }
+
+
     //*********************************** SET MENU *************************************************
 
     MenuItem switchMenuItem;
@@ -253,7 +250,15 @@ public class SingleBetActivity extends AppCompatActivity {
                 startActivity(intent);
                 return true;
             case R.id.share_menu_item:
-                Log.i("share_menu_item","share_menu_item");
+
+                if(isConnected()){
+                    new ShareBetThread(SingleBetActivity.this,bet).execute(SHARING_LINK);
+                }
+                else{
+                    Toast toast = Toast.makeText(getApplicationContext(), R.string.no_connection, Toast.LENGTH_SHORT);
+                    toast.show();
+                }
+
                 return true;
             case R.id.edit_menu_item:
                 if(!editMode) {
@@ -291,6 +296,23 @@ public class SingleBetActivity extends AppCompatActivity {
                 return super.onOptionsItemSelected(item);
         }
     }
+
+
+
+
+   /* private void shareIt(String fileName) {
+        Uri uri = Uri.fromFile(imagePath);
+        Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
+        sharingIntent.setType("image/*");
+        String shareBody = "http://www.fishtagram.it/bettypower/app_link.php?";
+        //String text = gson.toJson(bet);
+        shareBody = shareBody + fileName;
+        sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "My Tweecher score");
+        sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, shareBody);
+        sharingIntent.putExtra(Intent.EXTRA_STREAM, uri);
+
+        startActivity(Intent.createChooser(sharingIntent, "Share via"));
+    }*/
 
     //*********************************** EDIT MOOD *************************************************
 
@@ -457,7 +479,9 @@ public class SingleBetActivity extends AppCompatActivity {
             bet = intent.getParcelableExtra("all_match");
             uri = intent.getData();
             if (bet == null) {
-                initBetFromMemory();
+                if(!Intent.ACTION_VIEW.equals(uri)) {
+                    initBetFromMemory();
+                }
             } else {
                 initBetFromOCR();
             }
@@ -524,7 +548,6 @@ public class SingleBetActivity extends AppCompatActivity {
 
                     if (application.getAllPalimpsestMatch()!=null) {
                         ArrayList<PalimpsestMatch> allPalimpsestMatch = application.getAllPalimpsestMatch();
-                        //TODO il problema è che se aggiorno e torno dentro qui torna indietro.
                         checkForResult(allPalimpsestMatch);
                         runOnUiThread(new Runnable() {
                             @Override
@@ -669,6 +692,7 @@ public class SingleBetActivity extends AppCompatActivity {
         }
     }
 
+
     private void makeVolleyForMatchInBet(){
         if(!bet.areMatchesFinished()) {
             RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
@@ -692,26 +716,6 @@ public class SingleBetActivity extends AppCompatActivity {
                                 }
                             });
                             refreshResultThread.start();
-                        /*
-                        Document doc = null;
-                        try {
-                            doc = DocumentBuilderFactory.newInstance()
-                                    .newDocumentBuilder().parse(new InputSource(new StringReader(response)));
-                            XPathExpression xpath = XPathFactory.newInstance()
-                                    .newXPath().compile("//td[text()=\"Description\"]/following-sibling::td[2]");
-
-                            String result = (String) xpath.evaluate(doc, XPathConstants.STRING);
-                        } catch (SAXException e) {
-                            e.printStackTrace();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        } catch (ParserConfigurationException e) {
-                            e.printStackTrace();
-                        } catch (XPathExpressionException e) {
-                            e.printStackTrace();
-                        }
-*/
-
                         }
                     }, new Response.ErrorListener() {
                 @Override
@@ -775,7 +779,8 @@ public class SingleBetActivity extends AppCompatActivity {
             for (PalimpsestMatch currentResultMatch:allPalimpsestMatch
                     ) {
                 if(currentMatch.compareTo(currentResultMatch)){
-                    if(!currentResultMatch.getAwayResult().equals("-")&&!currentResultMatch.getHomeResult().equals("-")&& currentMatch.getHomeResult().equals("-") && currentMatch.getAwayResult().equals("-") && (currentMatch.getResultTime()==null || (!currentMatch.getResultTime().matches(".*\\d+.*") && !currentMatch.getResultTime().equalsIgnoreCase(getApplicationContext().getResources().getString(R.string.intervallo))))) {
+                    //if(!currentResultMatch.getAwayResult().equals("-")&&!currentResultMatch.getHomeResult().equals("-")&& currentMatch.getHomeResult().equals("-") && currentMatch.getAwayResult().equals("-") && (currentMatch.getResultTime()==null || (!currentMatch.getResultTime().matches(".*\\d+.*") && !currentMatch.getResultTime().equalsIgnoreCase(getApplicationContext().getResources().getString(R.string.intervallo))))) {
+                    if(!currentResultMatch.getAwayResult().equals("-")&&!currentResultMatch.getHomeResult().equals("-")){
                         currentMatch.setHomeResult(currentResultMatch.getHomeResult());
                         currentMatch.setAwayResult(currentResultMatch.getAwayResult());
                         currentMatch.setResultTime(currentResultMatch.getResultTime());
@@ -813,6 +818,69 @@ public class SingleBetActivity extends AppCompatActivity {
             rVSingleBet.setOnScrollListener(null);
         }
     }
+    /* *********************************************************************************************
+     ***************************************   SHARING BET   **************************************
+     **********************************************************************************************/
+
+    private void handleIntent(Intent intent) {
+        String appLinkAction = intent.getAction();
+        Uri appLinkData = intent.getData();
+        if (Intent.ACTION_VIEW.equals(appLinkAction) && appLinkData != null){
+            //String recipeId = appLinkData.getLastPathSegment();
+            int index = appLinkData.toString().lastIndexOf("?");
+            String fileName = appLinkData.toString().substring(index+1);
+            String completeUrl = "http://www.fishtagram.it/bettypower/bet_shering/bet_shared/"+fileName;
+            bet = new SingleBet(new ArrayList<PalimpsestMatch>());
+
+            RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
+            StringRequest stringRequest = new StringRequest(Request.Method.GET, completeUrl,
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(final String response) {
+                            Log.i("response=",response);
+                            GsonBuilder gsonBuilder = new GsonBuilder();
+                            gsonBuilder.registerTypeAdapter(HiddenResult.class,new HiddenResultDeserialized());
+                            gsonBuilder.registerTypeAdapter(Team.class,new TeamDeserialized());
+                            gsonBuilder.registerTypeAdapter(PalimpsestMatch.class,new PalimpsestMatchDeserialized());
+                            gsonGetter = gsonBuilder.create();
+                            bet = gsonGetter.fromJson(response,SingleBet.class);
+                            singleBetAdapter.setBet(bet);
+                            swipeRefreshLayout.setRefreshing(false);
+                            Thread saveToDb = new Thread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    try {
+                                        uri = saveDocumentToDB(response);
+                                    } catch (RemoteException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            });
+                            saveToDb.start();
+                        }
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    swipeRefreshLayout.setRefreshing(false);
+                    Toast toast = Toast.makeText(getApplicationContext(), R.string.no_connection, Toast.LENGTH_SHORT);
+                    toast.show();
+                }
+            });
+            stringRequest.setRetryPolicy(new DefaultRetryPolicy(DefaultRetryPolicy.DEFAULT_TIMEOUT_MS * 48,
+                    2, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+            stringRequest.setShouldCache(false);
+            queue.add(stringRequest);
+        }
+    }
+
+    public boolean isConnected(){
+        ConnectivityManager connMgr = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = null;
+        if (connMgr != null) {
+            networkInfo = connMgr.getActiveNetworkInfo();
+        }
+        return networkInfo != null && networkInfo.isConnected();
+    }
 
     /* *********************************************************************************************
      *********************************   LISTENER AND CLASS   **************************************
@@ -835,4 +903,5 @@ public class SingleBetActivity extends AppCompatActivity {
             loadAllLogos();
         }
     }
+
 }

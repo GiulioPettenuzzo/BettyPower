@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="facebook_app_id">1545587202205385</string>
 
     <string name="number_avveniments">Numero avvenimenti: </string>
     <string name="drawer_open">Open Main Menu</string>
