@@ -330,8 +330,6 @@ public class OCRActivity extends MonitoredActivity implements LayoutChoseListene
                             @Override
                             public void onElaborationComplete(Bet bet) {
                                 //allMatch = bet.getArrayMatch();
-                                //TODO serve un metodo che trasformi in blob
-                                //TODO SALVARE TUTTA LA BET
 
                                 try {
                                     Gson gson = new Gson();

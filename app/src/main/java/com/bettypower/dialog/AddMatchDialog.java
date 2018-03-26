@@ -68,6 +68,8 @@ public class AddMatchDialog extends Dialog {
         if(allMatches!=null){
             getMatchesAndSetAdapter();
         }else{
+            //TODO testare questa riga, se i match stanno caricando da internet deve prenderli dalla memoria
+            allMatches = application.getAllMatchFromMemory();
             Toast toast = Toast.makeText(context, R.string.no_connection, Toast.LENGTH_SHORT);
             toast.show();
             application.setAllMatchLoadListener(new TextFairyApplication.AllMatchLoadListener() {

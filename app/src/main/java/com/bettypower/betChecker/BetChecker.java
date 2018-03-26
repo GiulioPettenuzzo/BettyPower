@@ -23,7 +23,7 @@ public class BetChecker {
         int nummberOfError = 0;
         for (PalimpsestMatch currentPalimpsest:bet.getArrayMatch()
                 ) {
-            if(currentPalimpsest.getBet()!=null && !matchChecker.isMatchWin(currentPalimpsest.getHomeResult(),currentPalimpsest.getAwayResult(),currentPalimpsest.getBet())){
+            if(currentPalimpsest.getBet()!=null && !matchChecker.isMatchWin(currentPalimpsest.getHomeResult(),currentPalimpsest.getAwayResult(),currentPalimpsest.getBet(),currentPalimpsest.getBetKind(),currentPalimpsest.getResultTime())){
                 nummberOfError++;
             }
         }
@@ -34,7 +34,7 @@ public class BetChecker {
         int winNumber = 0;
         for (PalimpsestMatch currentPalimpsest:bet.getArrayMatch()
                 ) {
-            if(currentPalimpsest.getBet()!=null && matchChecker.isMatchWin(currentPalimpsest.getHomeResult(),currentPalimpsest.getAwayResult(),currentPalimpsest.getBet())){
+            if(currentPalimpsest.getBet()!=null && matchChecker.isMatchWin(currentPalimpsest.getHomeResult(),currentPalimpsest.getAwayResult(),currentPalimpsest.getBet(),currentPalimpsest.getBetKind(),currentPalimpsest.getResultTime())){
                 winNumber++;
             }
         }
@@ -45,10 +45,10 @@ public class BetChecker {
         int nummberOfError = 0;
         for (PalimpsestMatch currentPalimpsest:bet.getArrayMatch()
              ) {
-            if(currentPalimpsest.getBet()!=null && !matchChecker.isMatchWin(currentPalimpsest.getHomeResult(),currentPalimpsest.getAwayResult(),currentPalimpsest.getBet()) && !currentPalimpsest.isFissa()){
+            if(currentPalimpsest.getBet()!=null && !matchChecker.isMatchWin(currentPalimpsest.getHomeResult(),currentPalimpsest.getAwayResult(),currentPalimpsest.getBet(),currentPalimpsest.getBetKind(),currentPalimpsest.getResultTime()) && !currentPalimpsest.isFissa()){
                 nummberOfError++;
             }
-            else if(currentPalimpsest.getBet()!=null && !matchChecker.isMatchWin(currentPalimpsest.getHomeResult(),currentPalimpsest.getAwayResult(),currentPalimpsest.getBet()) && currentPalimpsest.isFissa()){
+            else if(currentPalimpsest.getBet()!=null && !matchChecker.isMatchWin(currentPalimpsest.getHomeResult(),currentPalimpsest.getAwayResult(),currentPalimpsest.getBet(),currentPalimpsest.getBetKind(),currentPalimpsest.getResultTime()) && currentPalimpsest.isFissa()){
                 return false;
             }
         }

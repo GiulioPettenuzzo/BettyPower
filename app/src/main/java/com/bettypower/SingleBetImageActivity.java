@@ -1,34 +1,49 @@
 package com.bettypower;
 
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.ImageView;
+import android.widget.Toast;
 
+import com.bettypower.entities.Bet;
+import com.bettypower.threads.ShareBetThread;
 import com.renard.ocr.R;
 import com.renard.ocr.documents.viewing.DocumentContentProvider;
+
+import java.io.File;
 
 public class SingleBetImageActivity extends AppCompatActivity {
 
     private MenuItem shareImage;
     private boolean editMode;
-    Bitmap myBitmap;
-    Intent intent;
-    ImageView imageView;
+    private Bitmap myBitmap;
+    private Intent intent;
+    private ImageView imageView;
+    private Bet bet;
+    private  Uri uri;
 
-    private static final String EDIT_MODE = "edit_mode";
-    private static final String IMAGE_URI = "image_uri";
+
+    public static final String EDIT_MODE = "edit_mode";
+    public static final String IMAGE_URI = "image_uri";
+    public static final String BET = "bet";
+    //private static final String SHARING_LINK = "http://www.fishtagram.it/bettypower/bet_shering/sharing_executor.php";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,10 +57,11 @@ public class SingleBetImageActivity extends AppCompatActivity {
         else {
             editMode = intent.getBooleanExtra(EDIT_MODE, false);
         }
+        bet = intent.getParcelableExtra(BET);
         Thread loadBitmap = new Thread(new Runnable() {
             @Override
             public void run() {
-                Uri uri = intent.getParcelableExtra(IMAGE_URI);
+                uri = intent.getParcelableExtra(IMAGE_URI);
                 Cursor c = getContentResolver().query(uri, new String[]{DocumentContentProvider.Columns.PHOTO_PATH}, null, null, null);
                 if (c != null) {
                     c.moveToFirst();
@@ -55,6 +71,21 @@ public class SingleBetImageActivity extends AppCompatActivity {
                         @Override
                         public void run() {
                             imageView.setImageBitmap(myBitmap);
+                        }
+                    });
+                }
+                else{
+                    File file = new File(uri.toString());
+                    if(file.exists())
+                        Log.i("esiste",uri.toString());
+                    else{
+                        Log.i("non esiste",uri.toString());
+                    }
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Drawable d = Drawable.createFromPath(uri.toString() );
+                            imageView.setImageDrawable(d);
                         }
                     });
                 }
@@ -88,11 +119,26 @@ public class SingleBetImageActivity extends AppCompatActivity {
                 return true;
 
             case R.id.share_image:
-                //TODO
+                if(isConnected()){
+                    new ShareBetThread(SingleBetImageActivity.this,bet,myBitmap).execute(SingleBetActivity.SHARING_LINK);
+                }
+                else{
+                    Toast toast = Toast.makeText(getApplicationContext(), R.string.no_connection, Toast.LENGTH_SHORT);
+                    toast.show();
+                }
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    public boolean isConnected(){
+        ConnectivityManager connMgr = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = null;
+        if (connMgr != null) {
+            networkInfo = connMgr.getActiveNetworkInfo();
+        }
+        return networkInfo != null && networkInfo.isConnected();
     }
 
     @Override

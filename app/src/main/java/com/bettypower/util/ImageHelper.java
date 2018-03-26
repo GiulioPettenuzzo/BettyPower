@@ -71,7 +71,7 @@ public class ImageHelper {
         if(!directory.exists() && !directory.mkdirs()){
             Log.e("ImageSaver","Error creating directory " + directory);
         }
-
+        Log.i("image path",directory+"/"+fileName);
         return new File(directory, fileName);
     }
 

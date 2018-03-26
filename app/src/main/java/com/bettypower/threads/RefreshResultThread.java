@@ -28,10 +28,10 @@ public class RefreshResultThread extends Thread{
     private String response;
     private LoadingListener loadingListener;
     private HashMatchMap hashMatchMap = new HashMatchMap();
-    String yesterdayDate;
-    String dateFromGive;
-    boolean isTimeUnderThree;
-    Map<String, String> allHashMatch = hashMatchMap.getHashMatchMap();
+    private String yesterdayDate;
+    private String dateFromGive;
+    private boolean isTimeUnderThree;
+    private Map<String, String> allHashMatch = hashMatchMap.getHashMatchMap();
 
 
     public RefreshResultThread(String response, ArrayList<PalimpsestMatch> allSavedMatch, LoadingListener loadingListener){
@@ -62,13 +62,6 @@ public class RefreshResultThread extends Thread{
         long totalTime = intellijFin - intellijInit;
         Log.i("time intellij",String.valueOf(totalTime) + " i = " + String.valueOf(i));
 
-
-        Calendar cal = Calendar.getInstance();
-        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM", Locale.getDefault());
-        cal.add(Calendar.DATE, -1);
-        String yesterdyDate = sdf.format(cal.getTime());
-        String dateFromGive = giveDate();
-
         long initCycle = System.currentTimeMillis();
 
         for (PalimpsestMatch savedMatch:allSavedMatch
@@ -76,7 +69,6 @@ public class RefreshResultThread extends Thread{
             for (PalimpsestMatch goalServeMatch: allMatchOnGoalServe
                  ) {
                 //String x = "";
-                //TODO è questo il metodo che butta via na vita di tempo
                 if(isTheSameMatch(savedMatch,goalServeMatch)){
                     String homeResult = goalServeMatch.getHomeResult().replace("?","-");
                     String awayResult = goalServeMatch.getAwayResult().replace("?","-");
@@ -100,30 +92,30 @@ public class RefreshResultThread extends Thread{
     }
 
     /*
-     * @param paliOne palimpsest from current bet
-     * @param paliTwo palimpsest from goal serve thread
+     * @param betPalimpsest palimpsest from current bet
+     * @param goalServePalimpsest palimpsest from goal serve thread
      * @return
      */
-    private boolean isTheSameMatch(PalimpsestMatch paliOne,PalimpsestMatch paliTwo){
+    private boolean isTheSameMatch(PalimpsestMatch betPalimpsest,PalimpsestMatch goalServePalimpsest){
 
         if(isTimeUnderThree){
-            if(paliOne.getDate().equalsIgnoreCase(dateFromGive) || paliOne.getDate().equalsIgnoreCase(yesterdayDate)){
-                return areMatchCompatible(paliOne,paliTwo);
+            if(betPalimpsest.getDate().equalsIgnoreCase(dateFromGive) || betPalimpsest.getDate().equalsIgnoreCase(yesterdayDate)){
+                return areMatchCompatible(betPalimpsest,goalServePalimpsest);
             }
         }
         else {
-            if (paliOne.getDate().equalsIgnoreCase(dateFromGive)) {
-                return areMatchCompatible(paliOne,paliTwo);
+            if (betPalimpsest.getDate().equalsIgnoreCase(dateFromGive)) {
+                return areMatchCompatible(betPalimpsest,goalServePalimpsest);
             }
         }
         return false;
     }
 
-    private boolean areMatchCompatible(PalimpsestMatch paliOne,PalimpsestMatch paliTwo){
-        String homeTeamOne = paliOne.getHomeTeam().getName().replace("-", " ").toUpperCase();
-        String homeTeamTwo = paliTwo.getHomeTeam().getName().replace("-", " ").toUpperCase();
-        String awayTeamOne = paliOne.getAwayTeam().getName().replace("-", " ").toUpperCase();
-        String awayTeamTwo = paliTwo.getAwayTeam().getName().replace("-", " ").toUpperCase();
+    private boolean areMatchCompatible(PalimpsestMatch betPalimpsest,PalimpsestMatch goalServePalimpsest){
+        String homeTeamOne = betPalimpsest.getHomeTeam().getName().replace("-", " ").toUpperCase();
+        String homeTeamTwo = goalServePalimpsest.getHomeTeam().getName().replace("-", " ").toUpperCase();
+        String awayTeamOne = betPalimpsest.getAwayTeam().getName().replace("-", " ").toUpperCase();
+        String awayTeamTwo = goalServePalimpsest.getAwayTeam().getName().replace("-", " ").toUpperCase();
         if (allHashMatch.containsKey(homeTeamOne) && allHashMatch.get(homeTeamOne).equals(homeTeamTwo) &&
                 allHashMatch.containsKey(homeTeamOne) && allHashMatch.get(homeTeamOne).equals(homeTeamTwo)) {
             return true;

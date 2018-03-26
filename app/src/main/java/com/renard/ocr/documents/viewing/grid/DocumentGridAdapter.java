@@ -16,6 +16,7 @@
 
 package com.renard.ocr.documents.viewing.grid;
 
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -85,6 +86,7 @@ public class DocumentGridAdapter extends CursorAdapter implements OnCheckedChang
 	private int mIndexTitle;
 	private int mIndexID;
 	private int mChildCountID;
+	private int photoPath;
 
 	private int betIndex;
 	private OnCheckedChangeListener mCheckedChangeListener = null;
@@ -135,6 +137,7 @@ public class DocumentGridAdapter extends CursorAdapter implements OnCheckedChang
 		mChildCountID = c.getColumnIndex(Columns.CHILD_COUNT);
 		betIndex = c.getColumnIndex(Columns.OCR_TEXT);
 		indexHocrForManual = c.getColumnIndex(Columns.HOCR_TEXT);
+		photoPath = c.getColumnIndex(Columns.PHOTO_PATH);
 		mCheckedChangeListener = listener;
 		helper = new Helper(activity.getApplicationContext());
 		GsonBuilder gsonBuilder = new GsonBuilder();
@@ -168,13 +171,19 @@ public class DocumentGridAdapter extends CursorAdapter implements OnCheckedChang
 
 		if (holder.gridElement != null) {
 			if(hocrForManual!=null) {
-				if (mActivity.getScrollState() == AbsListView.OnScrollListener.SCROLL_STATE_FLING || mActivity.isPendingThumbnailUpdate()) {
-					holder.gridElement.setImage(Util.sDefaultDocumentThumbnail);
-					holder.updateThumbnail = true;
-				} else {
-					final Drawable d = Util.getDocumentThumbnail(documentId);
+				if(hocrForManual.equals("image_shared")){
+					String photoPathString = cursor.getString(photoPath);
+					Drawable d = Drawable.createFromPath(photoPathString);
 					holder.gridElement.setImage(d);
-					holder.updateThumbnail = false;
+				}else {
+					if (mActivity.getScrollState() == AbsListView.OnScrollListener.SCROLL_STATE_FLING || mActivity.isPendingThumbnailUpdate()) {
+						holder.gridElement.setImage(Util.sDefaultDocumentThumbnail);
+						holder.updateThumbnail = true;
+					} else {
+						final Drawable d = Util.getDocumentThumbnail(documentId);
+						holder.gridElement.setImage(d);
+						holder.updateThumbnail = false;
+					}
 				}
 			}else{
 				int resId[]={R.drawable.ic_soccer_player_yellow_green_silhouette
@@ -195,7 +204,6 @@ public class DocumentGridAdapter extends CursorAdapter implements OnCheckedChang
 
 		String betText = cursor.getString(betIndex);
 		Bet bet = gson.fromJson(betText, SingleBet.class);
-
 
 		String eventNumber = String.valueOf(bet.getArrayMatch().size());
 

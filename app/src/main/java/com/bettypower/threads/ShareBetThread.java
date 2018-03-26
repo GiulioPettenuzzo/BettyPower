@@ -1,6 +1,7 @@
 package com.bettypower.threads;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ResolveInfo;
@@ -10,6 +11,7 @@ import android.os.AsyncTask;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v7.app.AlertDialog;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 
@@ -28,12 +30,15 @@ import com.google.gson.Gson;
 import com.renard.ocr.R;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
@@ -46,27 +51,35 @@ import java.util.List;
  * Created by giuliopettenuzzo on 22/03/18.
  */
 
-//TODO serve un modo per capire se la schedina è già presente nel database
 //TODO inserire il codice per condividere bene su facebook
+//TODO se l'utente riceve l'immagine e poi scarica l'app, alla prima apertura, l'applicazione dovrebbe motrare la schedina dell'amico
 
 public class ShareBetThread extends AsyncTask<String, Void, String> {
 
     private static final String APPLICATION_LINK = "http://www.fishtagram.it/bettypower/app_link.php?";
     private static final int CONNECTION_TIMEOUT = 15 * 1000;
+    public static final String SHARE_CODES_FILE_NAMES = "share_code_file_name";
 
 
     private File imagePath;
     private Activity activity;
     private Bet bet;
     private Intent sharingIntent;
+    private Bitmap bitmap;
 
     private String appLink;
     private List<ResolveInfo> activities;
 
-    public ShareBetThread(Activity activity,Bet bet){
+    public ShareBetThread(Activity activity,Bet bet,Bitmap bitmap){
         this.activity = activity;
         this.bet = bet;
-        Bitmap bitmap = takeScreenshot();
+        if(bitmap==null) {
+            bitmap = takeScreenshot();
+        }
+        else{
+            //TODO condividere nel database anche la bitmap e poi recuperarla
+            this.bitmap = bitmap;
+        }
         saveBitmap(bitmap);
         shareSub();
     }
@@ -74,19 +87,28 @@ public class ShareBetThread extends AsyncTask<String, Void, String> {
 
     @Override
     protected String doInBackground(String... urls) {
-        return POST(urls[0],bet);
+        return POST(urls[0],bet,bitmap);
     }
     // onPostExecute displays the results of the AsyncTask.
     @Override
     protected void onPostExecute(String result) {
         this.appLink = APPLICATION_LINK + result;
+        //writeToFile(appLink,activity);
     }
 
-    private static String POST(String url_string,Bet bet){
+    private static String POST(String url_string,Bet bet,Bitmap bitmap){
         String result = "";
         try {
             Gson gson = new Gson();
             String postData = gson.toJson(bet);
+            if(bitmap!=null) {
+                //TODO scrivere nel server solo quando ho ottenuto l'id del file cosi va piu veloce
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos); //bm is the bitmap object
+                byte[] b = baos.toByteArray();
+                String encoded = Base64.encodeToString(b, Base64.DEFAULT);
+                postData = postData + " --> " + encoded;
+            }
             Log.i("sent = ",postData);
             URL url = new URL(url_string);
 
@@ -306,6 +328,49 @@ public class ShareBetThread extends AsyncTask<String, Void, String> {
                 }
             }
         }
+    }
+
+    private void writeToFile(String data,Context context) {
+        try {
+            String text = readFromFile(context);
+            text = text + " " + data;
+            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(context.openFileOutput(SHARE_CODES_FILE_NAMES, Context.MODE_PRIVATE));
+            outputStreamWriter.write(text);
+            outputStreamWriter.close();
+        }
+        catch (IOException e) {
+            Log.e("Exception", "File write failed: " + e.toString());
+        }
+    }
+
+    public String readFromFile(Context context) {
+
+        String ret = "";
+
+        try {
+            InputStream inputStream = context.openFileInput(SHARE_CODES_FILE_NAMES);
+
+            if ( inputStream != null ) {
+                InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+                String receiveString = "";
+                StringBuilder stringBuilder = new StringBuilder();
+
+                while ( (receiveString = bufferedReader.readLine()) != null ) {
+                    stringBuilder.append(receiveString);
+                }
+
+                inputStream.close();
+                ret = stringBuilder.toString();
+            }
+        }
+        catch (FileNotFoundException e) {
+            Log.e("login activity", "File not found: " + e.toString());
+        } catch (IOException e) {
+            Log.e("login activity", "Can not read file: " + e.toString());
+        }
+
+        return ret;
     }
 
 

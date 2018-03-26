@@ -122,8 +122,8 @@ public class Resolver {
                 PalimpsestMatch palimpsestMatch = currentMatch.getPalimpsestMatch().get(0);
                 //Match currentMatch = new ParcelableMatch(palimpsestMatch.getHomeTeam(),palimpsestMatch.getAwayTeam());
                 //currentMatch.setTime(currentMatch.getDate() + " " + currentMatch.getHour());
-                palimpsestMatch.setHomeResult("1");
-                palimpsestMatch.setAwayResult("1");
+                palimpsestMatch.setHomeResult("-");
+                palimpsestMatch.setAwayResult("-");
                 if(palimpsestMatch.getBet()!=null) {
                     palimpsestMatch.setBet(currentMatch.getBet());
                 }

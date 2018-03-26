@@ -146,7 +146,7 @@ public class BetLabelSet {
         arrayListSix.add("Dispari");
         arrayListSix.add("Pari");
         arrayListSix.add("Dispari 1T");
-        arrayListSix.add("Pari 2T");
+        arrayListSix.add("Pari 1T");
         map.put("Pari / Dispari",arrayListSix);
 
         ArrayList<String> arrayListSeven = new ArrayList<>();
@@ -343,7 +343,7 @@ public class BetLabelSet {
         arrayListTwentyFive.add("X2 & NoGol");
         arrayListTwentyFive.add("12 & Gol");
         arrayListTwentyFive.add("12 & NoGol");
-        map.put("Esito finale + Gol / NoGol",arrayListTwentyFive);
+        map.put("Doppia Chance + Gol / NoGol",arrayListTwentyFive);
 
         ArrayList<String> arrayListTwentySix = new ArrayList<>();
         arrayListTwentySix.add("1X & Under 1.5");

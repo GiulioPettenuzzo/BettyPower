@@ -40,9 +40,9 @@ public class ParcingTest {
     @Test
     public void resultThread(){
         int home = 3;
-        int away = 1;
+        int away = 2;
         ConcreteChecker concreteChecker = new ConcreteChecker(home,away);
-        boolean result = concreteChecker.handicap101();
+        boolean result = concreteChecker.casaVittoriaZeroNO();
         assertEquals(true,result);
     }
 

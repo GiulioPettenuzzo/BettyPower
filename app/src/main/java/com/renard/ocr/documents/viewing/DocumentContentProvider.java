@@ -39,13 +39,13 @@ public class DocumentContentProvider extends ContentProvider {
 
     public static class Columns {
 
-        public static final String ID = "_id";
+        public static final String ID = "_id";//id
         public static final String PARENT_ID = "parent_id";
-        public static final String CREATED = "created";
-        public static final String PHOTO_PATH = "photo_path";
+        public static final String CREATED = "created";//date of creation
+        public static final String PHOTO_PATH = "photo_path";//path of photo
         public static final String TITLE = "title";
-        public static final String OCR_TEXT = "ocr_text";
-        public static final String HOCR_TEXT = "hocr_text";
+        public static final String OCR_TEXT = "ocr_text";//the bet in json
+        public static final String HOCR_TEXT = "hocr_text"; //to understand if the bet where insert in manual mode or phto mode
         public static final String CHILD_COUNT = "child_count";
         public static final String OCR_LANG = "ocr_lang";
     }
