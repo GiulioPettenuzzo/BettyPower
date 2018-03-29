@@ -1,9 +1,16 @@
 package com.bettypower.betChecker;
 
+import android.content.Context;
+
 import com.bettypower.entities.Bet;
 import com.bettypower.entities.PalimpsestMatch;
+import com.bettypower.util.Helper;
+import com.renard.ocr.R;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Locale;
 
 /**
  * Created by giuliopettenuzzo on 18/03/18.
@@ -13,9 +20,11 @@ public class BetChecker {
 
     private Bet bet;
     private MatchChecker matchChecker = new MatchChecker();
+    private Helper helper;
 
-    public boolean isBetWin(Bet bet){
+    public boolean isBetWin(Bet bet,Context context){
         this.bet = bet;
+        helper = new Helper(context);
         return checkBet();
     }
 
@@ -23,7 +32,7 @@ public class BetChecker {
         int nummberOfError = 0;
         for (PalimpsestMatch currentPalimpsest:bet.getArrayMatch()
                 ) {
-            if(currentPalimpsest.getBet()!=null && !matchChecker.isMatchWin(currentPalimpsest.getHomeResult(),currentPalimpsest.getAwayResult(),currentPalimpsest.getBet(),currentPalimpsest.getBetKind(),currentPalimpsest.getResultTime())){
+            if(currentPalimpsest.getBet()!=null && !matchChecker.isMatchWin(currentPalimpsest)){
                 nummberOfError++;
             }
         }
@@ -34,7 +43,7 @@ public class BetChecker {
         int winNumber = 0;
         for (PalimpsestMatch currentPalimpsest:bet.getArrayMatch()
                 ) {
-            if(currentPalimpsest.getBet()!=null && matchChecker.isMatchWin(currentPalimpsest.getHomeResult(),currentPalimpsest.getAwayResult(),currentPalimpsest.getBet(),currentPalimpsest.getBetKind(),currentPalimpsest.getResultTime())){
+            if(currentPalimpsest.getBet()!=null && matchChecker.isMatchWin(currentPalimpsest) && helper.isMatchFinish(currentPalimpsest)){
                 winNumber++;
             }
         }
@@ -45,10 +54,10 @@ public class BetChecker {
         int nummberOfError = 0;
         for (PalimpsestMatch currentPalimpsest:bet.getArrayMatch()
              ) {
-            if(currentPalimpsest.getBet()!=null && !matchChecker.isMatchWin(currentPalimpsest.getHomeResult(),currentPalimpsest.getAwayResult(),currentPalimpsest.getBet(),currentPalimpsest.getBetKind(),currentPalimpsest.getResultTime()) && !currentPalimpsest.isFissa()){
+            if(currentPalimpsest.getBet()!=null && !matchChecker.isMatchWin(currentPalimpsest)){
                 nummberOfError++;
             }
-            else if(currentPalimpsest.getBet()!=null && !matchChecker.isMatchWin(currentPalimpsest.getHomeResult(),currentPalimpsest.getAwayResult(),currentPalimpsest.getBet(),currentPalimpsest.getBetKind(),currentPalimpsest.getResultTime()) && currentPalimpsest.isFissa()){
+            if(currentPalimpsest.getBet()!=null && !matchChecker.isMatchWin(currentPalimpsest) && currentPalimpsest.isFissa()){
                 return false;
             }
         }
@@ -60,7 +69,6 @@ public class BetChecker {
 
         return nummberOfError <= 0;
     }
-
 
 
 

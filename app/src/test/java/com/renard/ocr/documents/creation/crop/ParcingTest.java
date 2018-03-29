@@ -1,13 +1,9 @@
 package com.renard.ocr.documents.creation.crop;
 
-import android.text.format.DateUtils;
-import android.util.Log;
-
 import com.bettypower.betChecker.ConcreteChecker;
 import com.bettypower.betMatchFinder.Assembler;
 import com.bettypower.betMatchFinder.Divider;
 import com.bettypower.betMatchFinder.Finder;
-import com.bettypower.betMatchFinder.entities.Date;
 import com.bettypower.util.Helper;
 import com.bettypower.betMatchFinder.entities.ConcreteMatchToFind;
 import com.bettypower.betMatchFinder.entities.MatchToFind;
@@ -41,7 +37,7 @@ public class ParcingTest {
     public void resultThread(){
         int home = 3;
         int away = 2;
-        ConcreteChecker concreteChecker = new ConcreteChecker(home,away);
+        ConcreteChecker concreteChecker = new ConcreteChecker(home,away, this.firstTimeHomeResult, this.firstTimeAwayResult, this.secondTimeHomeResult, this.secondTimeAwayResult);
         boolean result = concreteChecker.casaVittoriaZeroNO();
         assertEquals(true,result);
     }

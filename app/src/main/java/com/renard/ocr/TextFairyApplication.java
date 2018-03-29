@@ -223,7 +223,9 @@ public class TextFairyApplication extends Application {
         Gson gsonGetter = gsonBuilder.create();
 
         Bet bet = gsonGetter.fromJson(text, SingleBet.class);
-        allPalimpsestMatch = bet.getArrayMatch();
+        if(bet!=null) {
+            allPalimpsestMatch = bet.getArrayMatch();
+        }
 
         return allPalimpsestMatch;
     }
@@ -241,18 +243,16 @@ public class TextFairyApplication extends Application {
             lastHour = token.nextToken();
         }
 
-        if(today.equalsIgnoreCase(lastUpdate) && !isMustDateUpdate(lastHour)){
-            Thread loadPalimpsestFromMemory = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    ArrayList<PalimpsestMatch> allPali = getAllMatchFromMemory();
-                    if(allMatchLoadListener!=null)
-                        allMatchLoadListener.onMatchLoaded(allPali);
-                }
-            });
-            loadPalimpsestFromMemory.start();
-        }
-        else{
+        Thread loadPalimpsestFromMemory = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                ArrayList<PalimpsestMatch> allPali = getAllMatchFromMemory();
+                if(allMatchLoadListener!=null)
+                    allMatchLoadListener.onMatchLoaded(allPali);
+            }
+        });
+        loadPalimpsestFromMemory.start();
+        if(!(today.equalsIgnoreCase(lastUpdate) && !isMustDateUpdate(lastHour))){
             //TODO l'ocr e l'aggiunta di partite deve poter funzionare anche se questo non va
             RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
             final StringRequest stringRequest = new StringRequest(Request.Method.GET, "http://www.fishtagram.it/bettypower/all_result.txt",

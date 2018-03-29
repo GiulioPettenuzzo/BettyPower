@@ -20,6 +20,8 @@
         android:theme="@style/AppTheme">
 
         <meta-data android:name="com.facebook.sdk.ApplicationId" android:value="@string/facebook_app_id"/>
+        <service android:name="com.bettypower.threads.sharing.UploadBitmapService" />
+
 
         <provider android:authorities="com.facebook.app.FacebookContentProviderYOURFBAPPID"
             android:name="com.facebook.FacebookContentProvider"

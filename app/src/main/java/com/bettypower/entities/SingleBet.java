@@ -3,8 +3,13 @@ package com.bettypower.entities;
 import android.graphics.Bitmap;
 import android.os.Parcel;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+import java.util.StringTokenizer;
 
 /**
  * Created by giuliopettenuzzo on 13/10/17.
@@ -103,6 +108,22 @@ public class SingleBet implements Bet {
     @Override
     public void setAreMatchFinished(boolean value) {
         areMatchesFinished = value;
+    }
+
+    @Override
+    public boolean areThereMatchToday() {
+        DateFormat dateFormat = new SimpleDateFormat("dd/MM", Locale.getDefault());
+        Date date = new Date();
+        String dateString = dateFormat.format(date);
+        for (PalimpsestMatch currentPalimpsest:allMatches
+             ) {
+            StringTokenizer token = new StringTokenizer(currentPalimpsest.getDate());
+            String monthDay = token.nextToken();
+            if (dateString.equalsIgnoreCase(monthDay)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public static final Creator<SingleBet> CREATOR = new Creator<SingleBet>(){

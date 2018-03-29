@@ -23,7 +23,7 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.bettypower.entities.Bet;
-import com.bettypower.threads.ShareBetThread;
+import com.bettypower.threads.sharing.ShareBetThread;
 import com.renard.ocr.R;
 import com.renard.ocr.documents.viewing.DocumentContentProvider;
 
@@ -120,7 +120,7 @@ public class SingleBetImageActivity extends AppCompatActivity {
 
             case R.id.share_image:
                 if(isConnected()){
-                    new ShareBetThread(SingleBetImageActivity.this,bet,myBitmap).execute(SingleBetActivity.SHARING_LINK);
+                    new ShareBetThread(SingleBetImageActivity.this,bet,uri).execute("");
                 }
                 else{
                     Toast toast = Toast.makeText(getApplicationContext(), R.string.no_connection, Toast.LENGTH_SHORT);

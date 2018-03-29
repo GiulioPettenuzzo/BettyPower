@@ -41,6 +41,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.CursorAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bettypower.entities.Bet;
@@ -60,6 +61,7 @@ import com.renard.ocr.R;
 import com.renard.ocr.documents.viewing.grid.CheckableGridElement.OnCheckedChangeListener;
 import com.renard.ocr.documents.viewing.DocumentContentProvider.Columns;
 import com.renard.ocr.util.Util;
+import com.squareup.picasso.Picasso;
 
 import org.w3c.dom.Text;
 
@@ -171,11 +173,16 @@ public class DocumentGridAdapter extends CursorAdapter implements OnCheckedChang
 
 		if (holder.gridElement != null) {
 			if(hocrForManual!=null) {
-				if(hocrForManual.equals("image_shared")){
+			/*	if(hocrForManual.equals("image_shared")){
+					Picasso.with(context).load(photoPath).into(holder.imageView);
+
 					String photoPathString = cursor.getString(photoPath);
 					Drawable d = Drawable.createFromPath(photoPathString);
 					holder.gridElement.setImage(d);
-				}else {
+
+
+
+				}else {*/
 					if (mActivity.getScrollState() == AbsListView.OnScrollListener.SCROLL_STATE_FLING || mActivity.isPendingThumbnailUpdate()) {
 						holder.gridElement.setImage(Util.sDefaultDocumentThumbnail);
 						holder.updateThumbnail = true;
@@ -184,7 +191,7 @@ public class DocumentGridAdapter extends CursorAdapter implements OnCheckedChang
 						holder.gridElement.setImage(d);
 						holder.updateThumbnail = false;
 					}
-				}
+			//	}
 			}else{
 				int resId[]={R.drawable.ic_soccer_player_yellow_green_silhouette
 						,R.drawable.ic_soccer_player_dark_green_silhouette

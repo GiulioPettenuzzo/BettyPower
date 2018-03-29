@@ -13,6 +13,8 @@ public class HashMatchMap {
     public Map<String,String> getHashMatchMap(){
         Map<String,String> map = new HashMap<>();
 
+        //TODO fare girare result_provider.php quando è passato un mese
+
         map.put("BRISBA CITY","BRISBANE CITY");
         map.put("BRISB (Y)","BRISBANE U21");
         map.put("CAD","CADIZ CF");

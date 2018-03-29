@@ -65,11 +65,9 @@ public class AddMatchDialog extends Dialog {
 
         matchDateTextView.setVisibility(View.INVISIBLE);
         this.allMatches = application.getAllPalimpsestMatch();
-        if(allMatches!=null){
+        if(allMatches!=null && allMatches.size()!=0){
             getMatchesAndSetAdapter();
         }else{
-            //TODO testare questa riga, se i match stanno caricando da internet deve prenderli dalla memoria
-            allMatches = application.getAllMatchFromMemory();
             Toast toast = Toast.makeText(context, R.string.no_connection, Toast.LENGTH_SHORT);
             toast.show();
             application.setAllMatchLoadListener(new TextFairyApplication.AllMatchLoadListener() {

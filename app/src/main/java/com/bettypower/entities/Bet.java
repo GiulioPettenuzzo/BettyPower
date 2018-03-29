@@ -32,4 +32,6 @@ public interface Bet extends Parcelable{
 
     boolean areMatchesFinished();
     void setAreMatchFinished(boolean value);
+
+    boolean areThereMatchToday();
 }

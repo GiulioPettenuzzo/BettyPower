@@ -396,15 +396,15 @@ public class BetLabelSet {
         arrayListTwentyEight.add("4-6 Gol");
         arrayListTwentyEight.add("5-6 Gol");
         arrayListTwentyEight.add("7+ Gol");
-        map.put("Multi Gol",arrayListTwentySeven);
+        map.put("Multi Gol",arrayListTwentyEight);
 
         ArrayList<String> arrayListTwentyNine = new ArrayList<>();
         arrayListTwentyNine.add("1-2 Gol Primo Tempo");
         arrayListTwentyNine.add("1-3 Gol Primo Tempo");
         arrayListTwentyNine.add("2-3 Gol Primo Tempo");
         arrayListTwentyNine.add("1-2 Gol Secondo Tempo");
-        arrayListTwentyNine.add("1-3 Gol Primo Tempo");
-        arrayListTwentyNine.add("2-3 Gol Primo Tempo");
+        arrayListTwentyNine.add("1-3 Gol Secondo Tempo");
+        arrayListTwentyNine.add("2-3 Gol Secondo Tempo");
         map.put("Multi Gol 1/2",arrayListTwentyNine);
 
         ArrayList<String> arrayListThirty = new ArrayList<>();

@@ -151,7 +151,8 @@ public class AllMatchesUnpacker {
                                 resultTime = token.nextToken();
                             }*/
                           resultTime = token.nextToken();
-                            if (!resultTime.startsWith("[") && !resultTime.endsWith("]") && !resultTime.equals("Array")) {
+                          //TODO bisognerebbe capire perchè va ad aggiungere questi anche se non mi servono
+                            if (!resultTime.startsWith("[") && !resultTime.endsWith("]") && !resultTime.equals("Array") && !resultTime.equalsIgnoreCase("===>")) {
                                 String result = "";
                                 if(resultTime.equalsIgnoreCase("ht")){
                                     resultTime = "Intervallo";

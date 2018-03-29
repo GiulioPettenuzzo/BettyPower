@@ -17,9 +17,11 @@ package com.google.android.gms.samples.vision.ocrreader.ui.camera;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.hardware.Camera;
 import android.support.annotation.RequiresPermission;
+import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.Display;
@@ -131,28 +133,30 @@ public class CameraSourcePreview extends ViewGroup {
 
         @Override
         public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-            Camera.Parameters parameters = mCameraSource.getCamera().getParameters();
+            if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.CAMERA)
+                    != PackageManager.PERMISSION_DENIED) {
+                Camera.Parameters parameters = mCameraSource.getCamera().getParameters();
 
 
-            //parameters.setPreviewSize(mPreviewSize.width, mPreviewSize.height);
-            //parameters.setFlashMode(Parameters.FLASH_MODE_AUTO);
-            //parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
-            parameters.setJpegQuality(100);
-            //parameters.setPreviewSize(mPreviewSize.width, mPreviewSize.height);
+                //parameters.setPreviewSize(mPreviewSize.width, mPreviewSize.height);
+                //parameters.setFlashMode(Parameters.FLASH_MODE_AUTO);
+                //parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
+                parameters.setJpegQuality(100);
+                //parameters.setPreviewSize(mPreviewSize.width, mPreviewSize.height);
 
 
-            List<Camera.Size> sizes = parameters.getSupportedPictureSizes();
-            Camera.Size size = sizes.get(0);
-            for(int i=0;i<sizes.size();i++)
-            {
-                if(sizes.get(i).width > size.width)
-                    size = sizes.get(i);
+                List<Camera.Size> sizes = parameters.getSupportedPictureSizes();
+                Camera.Size size = sizes.get(0);
+                for (int i = 0; i < sizes.size(); i++) {
+                    if (sizes.get(i).width > size.width)
+                        size = sizes.get(i);
+                }
+                parameters.setPictureSize(size.width, size.height);
+
+                mCameraSource.getCamera().setParameters(parameters);
+
+                mCameraSource.getCamera().startPreview();
             }
-            parameters.setPictureSize(size.width, size.height);
-
-            mCameraSource.getCamera().setParameters(parameters);
-
-            mCameraSource.getCamera().startPreview();
         }
     }
 

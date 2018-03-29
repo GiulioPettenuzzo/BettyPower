@@ -14,7 +14,6 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.RemoteException;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -58,12 +57,11 @@ import com.bettypower.entities.deserialized.TeamDeserialized;
 import com.bettypower.listeners.PreLoadingLinearLayoutManager;
 import com.bettypower.threads.LoadLogoThread;
 import com.bettypower.threads.RefreshResultThread;
-import com.bettypower.threads.ShareBetThread;
+import com.bettypower.threads.sharing.ShareBetThread;
 import com.bettypower.util.ImageHelper;
 import com.bettypower.util.touchHelper.ItemTouchHelperCallback;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.googlecode.leptonica.android.Pix;
 import com.renard.ocr.R;
 import com.renard.ocr.TextFairyApplication;
 import com.renard.ocr.documents.viewing.DocumentContentProvider;
@@ -78,7 +76,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.StringTokenizer;
 
 /**
  * this is the activity that show the bet
@@ -91,6 +88,8 @@ public class SingleBetActivity extends AppCompatActivity {
     private SwipeRefreshLayout swipeRefreshLayout;
     private FloatingActionButton refreshButton;
     private boolean editMode = false;
+    private boolean isBetFromSharing = false;
+
 
     private Bet bet;
     private Toolbar toolbar;
@@ -102,8 +101,7 @@ public class SingleBetActivity extends AppCompatActivity {
     private Gson gson = new Gson(); //to use tojson
     private Gson gsonGetter;//to use fromjson
 
-    private static final String APPLICATION_LINK = "http://www.fishtagram.it/bettypower/app_link.php?";
-    public static final String SHARING_LINK = "http://www.fishtagram.it/bettypower/bet_shering/sharing_executor.php";
+    private static final String SHARING_LINK = "http://www.fishtagram.it/bettypower/bet_shering/bet_shared/";
     private static final String MATCH_URL = "http://www.goalserve.com/updaters/soccerupdate.aspx";
     private static final String ALL_MATCH_STATE = "save_all_match";
     private static final String ALL_MATCH_SELECTED_STATE = "all_match_selected_state";
@@ -248,6 +246,9 @@ public class SingleBetActivity extends AppCompatActivity {
         }
         shareMenuItem = menu.findItem(R.id.share_menu_item);
         editMenuItem = menu.findItem(R.id.edit_menu_item);
+        if(isBetFromSharing){
+            editMenuItem.setVisible(false);
+        }
         confirmMenuItem = menu.findItem(R.id.confirm);
         if(editMode)
             enableEditStyle();
@@ -268,7 +269,7 @@ public class SingleBetActivity extends AppCompatActivity {
             case R.id.share_menu_item:
 
                 if(isConnected()){
-                    new ShareBetThread(SingleBetActivity.this,bet,null).execute(SHARING_LINK);
+                    new ShareBetThread(SingleBetActivity.this,bet,uri).execute("");
                 }
                 else{
                     Toast toast = Toast.makeText(getApplicationContext(), R.string.no_connection, Toast.LENGTH_SHORT);
@@ -312,23 +313,6 @@ public class SingleBetActivity extends AppCompatActivity {
                 return super.onOptionsItemSelected(item);
         }
     }
-
-
-
-
-   /* private void shareIt(String fileName) {
-        Uri uri = Uri.fromFile(imagePath);
-        Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
-        sharingIntent.setType("image/*");
-        String shareBody = "http://www.fishtagram.it/bettypower/app_link.php?";
-        //String text = gson.toJson(bet);
-        shareBody = shareBody + fileName;
-        sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "My Tweecher score");
-        sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, shareBody);
-        sharingIntent.putExtra(Intent.EXTRA_STREAM, uri);
-
-        startActivity(Intent.createChooser(sharingIntent, "Share via"));
-    }*/
 
     //*********************************** EDIT MOOD *************************************************
 
@@ -413,15 +397,6 @@ public class SingleBetActivity extends AppCompatActivity {
                     disableEditStyle();
                 }
             });
-           /* rVSingleBet.post(new Runnable() {
-                @Override
-                public void run() {
-                   // singleBetAdapter.setAllMatches(allMatch);
-                   // bet.setArrayMatch(allMatch);
-                    singleBetAdapter.notifyDataSetChanged();
-                    disableEditStyle();
-                }
-            });*/
         }
     }
 
@@ -701,7 +676,7 @@ public class SingleBetActivity extends AppCompatActivity {
     }
 
     private void setRefreshLayoutEnabled(boolean value){
-        if(value && !bet.areMatchesFinished()){
+        if(value && !bet.areMatchesFinished() && bet.areThereMatchToday()){
             swipeRefreshLayout.setEnabled(true);
         }else{
             swipeRefreshLayout.setEnabled(false);
@@ -796,7 +771,6 @@ public class SingleBetActivity extends AppCompatActivity {
             for (PalimpsestMatch currentResultMatch:allPalimpsestMatch
                     ) {
                 if(currentMatch.compareTo(currentResultMatch)){
-                    //if(!currentResultMatch.getAwayResult().equals("-")&&!currentResultMatch.getHomeResult().equals("-")&& currentMatch.getHomeResult().equals("-") && currentMatch.getAwayResult().equals("-") && (currentMatch.getResultTime()==null || (!currentMatch.getResultTime().matches(".*\\d+.*") && !currentMatch.getResultTime().equalsIgnoreCase(getApplicationContext().getResources().getString(R.string.intervallo))))) {
                     if(!currentResultMatch.getAwayResult().equals("-")&&!currentResultMatch.getHomeResult().equals("-")){
                         currentMatch.setHomeResult(currentResultMatch.getHomeResult());
                         currentMatch.setAwayResult(currentResultMatch.getAwayResult());
@@ -846,13 +820,13 @@ public class SingleBetActivity extends AppCompatActivity {
         String appLinkAction = intent.getAction();
         Uri appLinkData = intent.getData();
         if (Intent.ACTION_VIEW.equals(appLinkAction) && appLinkData != null){
-            //String recipeId = appLinkData.getLastPathSegment();
             int index = appLinkData.toString().lastIndexOf("?");
             final String fileName = appLinkData.toString().substring(index+1);
-            String completeUrl = "http://www.fishtagram.it/bettypower/bet_shering/bet_shared/"+fileName;
+            String completeUrl = SHARING_LINK+fileName;
             bet = new SingleBet(new ArrayList<PalimpsestMatch>());
-
             RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
+            isBetFromSharing = true;
+            swipeRefreshLayout.setRefreshing(true);
             StringRequest stringRequest = new StringRequest(Request.Method.GET, completeUrl,
                     new Response.Listener<String>() {
                         @Override
@@ -863,8 +837,8 @@ public class SingleBetActivity extends AppCompatActivity {
                             gsonBuilder.registerTypeAdapter(Team.class,new TeamDeserialized());
                             gsonBuilder.registerTypeAdapter(PalimpsestMatch.class,new PalimpsestMatchDeserialized());
                             gsonGetter = gsonBuilder.create();
-                            Bitmap bitmap = null;
-                            CharSequence id = null;
+                            Bitmap bitmap;
+                            CharSequence date = null;
                             if(response.contains("-->")){
                                 bet = gsonGetter.fromJson(response.substring(0,response.indexOf("-->")-1),SingleBet.class);
                                 byte[] imageAsBytes;
@@ -872,12 +846,11 @@ public class SingleBetActivity extends AppCompatActivity {
                                 bitmap = BitmapFactory.decodeByteArray(imageAsBytes, 0, imageAsBytes.length);
                                 switchMenuItem.setVisible(true);
                                 ImageHelper imageHelper = new ImageHelper(SingleBetActivity.this);
-                                id = DateFormat.format("ssmmhhddMMyy", new Date(System.currentTimeMillis()));
+                                date = DateFormat.format("ssmmhhddMMyy", new Date(System.currentTimeMillis()));
                                 imageHelper.
-                                        setFileName(id.toString()).
+                                        setFileName(date.toString()).
                                         setDirectoryName("bet_image").setExternal(false).
                                         save(bitmap);
-                               // bitmap = gsonGetter.fromJson(response.substring(response.indexOf("-->")+1,response.length()),Bitmap.class);
                             }
                             else {
                                 bet = gsonGetter.fromJson(response, SingleBet.class);
@@ -886,21 +859,27 @@ public class SingleBetActivity extends AppCompatActivity {
                             swipeRefreshLayout.setRefreshing(false);
                             readFromFile(SingleBetActivity.this);
                             if(!betAlreadyExist(fileName)) {
-                                final Bitmap finalBitmap = bitmap;
-                                final CharSequence tempId = id;
+                                loadAllLogos();
+                                final CharSequence tempDate = date;
                                 Thread saveToDb = new Thread(new Runnable() {
                                     @Override
                                     public void run() {
                                         try {
-                                            //TODO non trsformare di nuovo in json, utilizza la string di sopra!
-                                            //TODO loghi squadre di calcio
                                             uri = saveDocumentToDB(gson.toJson(bet));
                                             ContentValues values = new ContentValues();
-                                            if(tempId!=null) {
-                                                values.put(DocumentContentProvider.Columns.PHOTO_PATH, getDir("bet_image", Context.MODE_PRIVATE).getPath() + "/" + tempId.toString());
+                                            if(tempDate!=null) {
+                                                values.put(DocumentContentProvider.Columns.PHOTO_PATH, getDir("bet_image", Context.MODE_PRIVATE).getPath() + "/" + tempDate.toString());
                                                 values.put(DocumentContentProvider.Columns.HOCR_TEXT, "image_shared");
+                                                Cursor c = getContentResolver().query(uri, new String[]{DocumentContentProvider.Columns.ID}, null, null, null);
+                                                String id = null;
+                                                if (c != null) {
+                                                    c.moveToFirst();
+                                                    id = c.getString(c.getPosition());
+                                                    c.close();
+                                                }
+                                                Util.createThumbnail(SingleBetActivity.this,new File(getDir("bet_image", Context.MODE_PRIVATE).getPath() + "/" + tempDate.toString()),Integer.parseInt(id));
+                                                getApplicationContext().getContentResolver().update(uri,values,null,null);
                                             }
-                                            getApplicationContext().getContentResolver().update(uri,values,null,null);
                                         } catch (RemoteException e) {
                                             e.printStackTrace();
                                         }
@@ -910,9 +889,8 @@ public class SingleBetActivity extends AppCompatActivity {
                                 writeToFile(fileName,SingleBetActivity.this);
                             }
                             else{
-                                editMenuItem.setVisible(false);
-                                if(id!=null)
-                                    uri = Uri.parse(getDir("bet_image", Context.MODE_PRIVATE).getPath() + "/" + id.toString());
+                                if(date!=null)
+                                    uri = Uri.parse(getDir("bet_image", Context.MODE_PRIVATE).getPath() + "/" + date.toString());
                             }
                         }
                     }, new Response.ErrorListener() {

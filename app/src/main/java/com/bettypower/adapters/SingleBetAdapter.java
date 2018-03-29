@@ -362,7 +362,7 @@ public class SingleBetAdapter extends RecyclerView.Adapter implements ItemTouchH
             }
             bet.setTextColor(context.getResources().getColor(android.R.color.holo_green_light));
             if(helper.isMatchFinish(match) && match.getBet()!=null){
-                if(!matchChecer.isMatchWin(match.getHomeResult(),match.getAwayResult(),match.getBet(),match.getBetKind(),match.getResultTime())){
+                if(!matchChecer.isMatchWin(match)){
                     bet.setTextColor(context.getResources().getColor(android.R.color.holo_red_dark));
                 }
             }
@@ -589,7 +589,7 @@ public class SingleBetAdapter extends RecyclerView.Adapter implements ItemTouchH
                         errorsEditText.setText(singleBet.getErrors());
                     }
                 }
-                if(!betChecker.isBetWin(singleBet)){
+                if(!betChecker.isBetWin(singleBet,context)){
                     itemView.setBackgroundColor(context.getResources().getColor(android.R.color.holo_red_dark));
                 }
                 numberMatchWinTextView.setText(context.getResources().getString(R.string.event_win)+" "+String.valueOf(betChecker.getWinNumber(singleBet)));
