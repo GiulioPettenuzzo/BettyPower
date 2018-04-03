@@ -13,7 +13,6 @@
     <TextView
             android:drawablePadding="8dp"
             android:layout_marginRight="@dimen/default_element_padding"
-            android:drawableLeft="@drawable/fairy_right_arm"
             android:id="@+id/message"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

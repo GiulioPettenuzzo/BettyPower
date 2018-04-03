@@ -342,7 +342,7 @@ public class TextFairyApplication extends Application {
     private boolean isMustDateUpdate(String lastHourUpdate){
 
         String One = "00:30"; //one is current date
-        String Two = "03:00";
+        String Two = "04:00";
         //String lastHourUpdate = "02:59";
 
         SimpleDateFormat formatter1=new SimpleDateFormat("HH:mm",Locale.getDefault());
@@ -355,8 +355,6 @@ public class TextFairyApplication extends Application {
         String nowminute = String.valueOf(now.getMinutes());
         String thisTime = nowHour+":"+nowminute;
         java.util.Date dateNow = null;
-
-
         try {
             dateOne = formatter1.parse(One); //ora minore
             dateTwo = formatter1.parse(Two); //or maggiore

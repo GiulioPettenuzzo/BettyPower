@@ -63,14 +63,12 @@
             <ImageSwitcher
                     android:layout_weight="1"
                     android:id="@+id/fairy_layout"
-                    android:src="@drawable/fairy_looks_center"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"/>
 
             <ImageView
                     android:id="@+id/page_layout"
                     android:layout_weight="1"
-                    android:src="@drawable/page_layout"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"/>
 

@@ -132,7 +132,6 @@ public class SingleBetActivity extends AppCompatActivity {
             }
             if (savedInstanceState.containsKey(IMAGE_URI)) {
                 uri = savedInstanceState.getParcelable(IMAGE_URI);
-                singleBetAdapter.setUri(uri);
             }
             rVSingleBet.setAdapter(singleBetAdapter);
             singleBetAdapter.setExpandCollapseClickMode(new ExpandCollapseItemClickModeListener());
@@ -174,11 +173,12 @@ public class SingleBetActivity extends AppCompatActivity {
             values.put(DocumentContentProvider.Columns.OCR_TEXT, jsonBet);
             getApplicationContext().getContentResolver().update(uri,values,null,null);
 
-            Cursor c = getContentResolver().query(uri, new String[]{DocumentContentProvider.Columns.ID}, null, null, null);
+            Cursor c = getContentResolver().query(uri, new String[]{DocumentContentProvider.Columns.ID,DocumentContentProvider.Columns.PHOTO_PATH}, null, null, null);
             if (c != null) {
                 c.moveToFirst();
                 Integer id = c.getInt(c.getPosition());
-                if (bet.getArrayMatch().size() == 0) {
+                int photoPath = c.getColumnIndex(DocumentContentProvider.Columns.PHOTO_PATH);
+                if (bet.getArrayMatch().size() == 0 && c.getString(photoPath)==null ) {
                     getContentResolver().delete(uri, DocumentContentProvider.Columns.ID + "=" + id, null);
                 }
                 c.close();
@@ -376,20 +376,22 @@ public class SingleBetActivity extends AppCompatActivity {
         public void run() {
             Cursor c = getContentResolver().query(uri, new String[]{DocumentContentProvider.Columns.OCR_TEXT}, null, null, null);
             String text= "";
-            if (c != null) {
+            if (c != null && c.moveToFirst()) {
                 c.moveToFirst();
                 text = c.getString(c.getPosition());
                 c.close();
-            }
-            bet = gsonGetter.fromJson(text,SingleBet.class);
-            bet.setSistema(false);
-            for (PalimpsestMatch currentMatch:bet.getArrayMatch()
-                    ) {
-                if(currentMatch.isFissa()) {
-                    bet.setSistema(true);
-                    break;
+                bet = gsonGetter.fromJson(text, SingleBet.class);
+                bet.setSistema(false);
+                for (PalimpsestMatch currentMatch : bet.getArrayMatch()
+                        ) {
+                    if (currentMatch.isFissa()) {
+                        bet.setSistema(true);
+                        break;
+                    }
                 }
             }
+            else
+                bet = new SingleBet(new ArrayList<PalimpsestMatch>());
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -494,7 +496,6 @@ public class SingleBetActivity extends AppCompatActivity {
         }
         //allMatchLoadListener.onMatchesLoaded();
         setAddMatchDialog();
-        singleBetAdapter.setUri(uri);
         rVSingleBet.setAdapter(singleBetAdapter);
         setHideScrollListener(true);
         setRefreshLayoutEnabled(true);
@@ -569,7 +570,6 @@ public class SingleBetActivity extends AppCompatActivity {
                     c.close();
                 }
                 singleBetAdapter = new SingleBetAdapter(SingleBetActivity.this, bet);
-                singleBetAdapter.setUri(uri);
                 singleBetAdapter.setExpandCollapseClickMode(new ExpandCollapseItemClickModeListener());
 
                 runOnUiThread(new Runnable() {
@@ -593,7 +593,6 @@ public class SingleBetActivity extends AppCompatActivity {
         TextFairyApplication application = (TextFairyApplication) getApplication();
         checkForResult(application.getAllPalimpsestMatch());
         singleBetAdapter = new SingleBetAdapter(SingleBetActivity.this, bet);
-        singleBetAdapter.setUri(uri);
         rVSingleBet.setAdapter(singleBetAdapter);
         allMatchLoadListener.onMatchesLoaded();
         singleBetAdapter.setExpandCollapseClickMode(new ExpandCollapseItemClickModeListener());
@@ -676,7 +675,7 @@ public class SingleBetActivity extends AppCompatActivity {
     }
 
     private void setRefreshLayoutEnabled(boolean value){
-        if(value && !bet.areMatchesFinished() && bet.areThereMatchToday()){
+        if(value && bet.areThereMatchToday()){
             swipeRefreshLayout.setEnabled(true);
         }else{
             swipeRefreshLayout.setEnabled(false);
@@ -685,7 +684,7 @@ public class SingleBetActivity extends AppCompatActivity {
 
 
     private void makeVolleyForMatchInBet(){
-        if(!bet.areMatchesFinished()) {
+        if(bet.areThereMatchToday()) {
             RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
             StringRequest stringRequest = new StringRequest(Request.Method.GET, MATCH_URL,
                     new Response.Listener<String>() {
@@ -717,9 +716,12 @@ public class SingleBetActivity extends AppCompatActivity {
                 }
             });
             stringRequest.setRetryPolicy(new DefaultRetryPolicy(DefaultRetryPolicy.DEFAULT_TIMEOUT_MS * 48,
-                    2, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+                    0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
             stringRequest.setShouldCache(false);
             queue.add(stringRequest);
+        }
+        else{
+            swipeRefreshLayout.setRefreshing(false);
         }
 
     }
@@ -807,9 +809,9 @@ public class SingleBetActivity extends AppCompatActivity {
 
     private void setHideScrollListener(boolean value){
         if(value && bet.getArrayMatch().size()>3){
-            rVSingleBet.setOnScrollListener(new HidingScrollListener());
+            rVSingleBet.addOnScrollListener(new HidingScrollListener());
         }else{
-            rVSingleBet.setOnScrollListener(null);
+            rVSingleBet.clearOnScrollListeners();
         }
     }
     /* *********************************************************************************************
@@ -910,10 +912,7 @@ public class SingleBetActivity extends AppCompatActivity {
 
     private boolean betAlreadyExist(String name){
         String allBetShared = readFromFile(SingleBetActivity.this);
-        if(allBetShared.contains(name)){
-            return true;
-        }
-        return false;
+        return allBetShared.contains(name);
     }
 
     /*
@@ -930,7 +929,7 @@ public class SingleBetActivity extends AppCompatActivity {
             if ( inputStream != null ) {
                 InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
                 BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-                String receiveString = "";
+                String receiveString;
                 StringBuilder stringBuilder = new StringBuilder();
 
                 while ( (receiveString = bufferedReader.readLine()) != null ) {

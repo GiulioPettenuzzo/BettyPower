@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/normal_result"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -46,8 +47,7 @@
             app:layout_constraintBottom_toBottomOf="@+id/separator"
             app:layout_constraintLeft_toRightOf="@+id/separator"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/separator"
-            app:layout_constraintVertical_bias="0.0" />
+            app:layout_constraintTop_toTopOf="@+id/separator" />
 
         <TextView
             android:id="@+id/separator"
@@ -60,7 +60,8 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toRightOf="@+id/home_scores"
             app:layout_constraintRight_toLeftOf="@+id/away_scores"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="1.0" />
 
         <TextView
             android:id="@+id/home_scores"
@@ -74,15 +75,14 @@
             app:layout_constraintHorizontal_chainStyle="packed"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toLeftOf="@+id/separator"
-            app:layout_constraintTop_toTopOf="@+id/separator"
-            app:layout_constraintVertical_bias="0.0" />
+            app:layout_constraintTop_toTopOf="@+id/separator" />
 
         <TextView
             android:id="@+id/away_team"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="8dp"
-            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
             android:gravity="right"
             android:textAlignment="viewEnd"
             android:textColor="@color/Tekt_dark_lighter"
@@ -91,16 +91,15 @@
             app:layout_constraintHorizontal_bias="1.0"
             app:layout_constraintLeft_toRightOf="@+id/away_scores"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.0" />
 
         <TextView
             android:id="@+id/home_team"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:layout_marginLeft="8dp"
             android:layout_marginRight="8dp"
-            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
             android:textColor="@color/Tekt_dark_lighter"
             android:textSize="16sp"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -108,7 +107,8 @@
             app:layout_constraintHorizontal_chainStyle="spread_inside"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toLeftOf="@+id/home_scores"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.0" />
     </android.support.constraint.ConstraintLayout>
 
     <ImageView
@@ -141,43 +141,36 @@
         android:id="@+id/bet_kind"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:layout_marginRight="8dp"
-        android:maxLines="2"
+        android:layout_marginLeft="8dp"
+        android:layout_marginStart="8dp"
+        android:maxLines="1"
         android:minLines="1"
         android:text="Over 1.5 "
         android:textColor="@android:color/darker_gray"
         android:textSize="14sp"
-        app:layout_constraintBottom_toTopOf="@+id/middle_screen"
-        app:layout_constraintEnd_toStartOf="@+id/bet"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintHorizontal_chainStyle="spread_inside"
-        app:layout_constraintLeft_toRightOf="@+id/home_logo"
-        app:layout_constraintRight_toLeftOf="@+id/bet"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.5" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
         android:id="@+id/away_logo"
         android:layout_width="45dp"
         android:layout_height="45dp"
         android:layout_marginRight="8dp"
-        android:layout_marginTop="2dp"
+        android:layout_marginTop="8dp"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_eagle_shield"
-        android:layout_marginEnd="8dp" />
+        app:layout_constraintTop_toBottomOf="@+id/quote"
+        app:srcCompat="@drawable/ic_eagle_shield" />
 
     <ImageView
         android:id="@+id/home_logo"
         android:layout_width="45dp"
         android:layout_height="45dp"
         android:layout_marginLeft="8dp"
-        android:layout_marginTop="2dp"
+        android:layout_marginTop="8dp"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_shield_with_castle_inside"
-        android:layout_marginStart="8dp" />
+        app:layout_constraintTop_toBottomOf="@+id/bet_kind"
+        app:srcCompat="@drawable/ic_shield_with_castle_inside" />
 
     <LinearLayout
         android:id="@+id/hidden_result"
@@ -197,15 +190,13 @@
         android:id="@+id/quote"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
         android:layout_marginRight="8dp"
-        android:layout_marginTop="8dp"
         android:text="TextView"
         android:textColor="@android:color/darker_gray"
-        app:layout_constraintBottom_toTopOf="@+id/middle_screen"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintRight_toLeftOf="@+id/away_logo"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginEnd="8dp" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/bet"
@@ -214,11 +205,10 @@
         android:layout_marginBottom="8dp"
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
-        android:layout_marginTop="8dp"
         android:text="TextView"
         android:textAlignment="center"
         android:textColor="@android:color/holo_green_light"
-        android:textSize="14sp"
+        android:textSize="16sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toTopOf="@+id/middle_screen"
         app:layout_constraintHorizontal_bias="0.504"
@@ -238,11 +228,11 @@
         android:id="@+id/fissa_text_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
         android:layout_marginStart="8dp"
-        android:text="Fissa"
+        android:text="@string/fissa"
         android:textColor="@android:color/holo_orange_dark"
         android:textStyle="italic"
         app:layout_constraintBottom_toTopOf="@+id/hidden_result"
-        app:layout_constraintStart_toStartOf="@+id/fissa_check_box"
-        android:layout_marginLeft="8dp" />
+        app:layout_constraintStart_toStartOf="@+id/fissa_check_box" />
 </android.support.constraint.ConstraintLayout>

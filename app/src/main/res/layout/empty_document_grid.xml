@@ -1,18 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/empty_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_marginLeft="@dimen/default_padding"
-    android:background="@color/vpi__background_holo_light"
+    android:background="@color/cardview_light_background"
     android:orientation="vertical"
     android:padding="@dimen/default_padding">
 
     <View
         android:id="@+id/gallery_hint_arrow"
         android:layout_width="30dp"
-        android:layout_height="0dp"
+        android:layout_height="90dp"
         android:layout_above="@+id/gallery_hint"
         android:layout_alignParentRight="true"
         android:layout_alignTop="@+id/camera_hint_arrow"
@@ -24,14 +25,13 @@
     <View
         android:id="@+id/camera_hint_arrow"
         android:layout_width="45dp"
-        android:layout_height="0dp"
+        android:layout_height="351dp"
         android:layout_above="@+id/camera_hint"
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
-        android:layout_marginBottom="-36dp"
+        android:layout_marginBottom="-192dp"
         android:layout_marginRight="55dp"
-        android:background="@drawable/hint_arrow"
-        android:visibility="invisible" />
+        android:background="@drawable/hint_arrow" />
 
     <TextView
         android:id="@+id/greeting"
@@ -40,21 +40,23 @@
         android:layout_alignParentTop="true"
         android:layout_marginBottom="@dimen/default_padding"
         android:text="@string/greeting"
+        android:textColor="@color/blu_facebook"
         android:textSize="48dp" />
 
     <TextView
         android:id="@+id/camera_hint"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/greeting"
-        android:layout_marginBottom="@dimen/default_element_padding"
-        android:layout_marginRight="@dimen/default_padding"
-        android:layout_marginTop="@dimen/default_element_padding"
+        android:layout_alignLeft="@+id/greeting"
+        android:layout_alignParentTop="true"
+        android:layout_alignStart="@+id/greeting"
+        android:layout_marginTop="159dp"
         android:layout_toLeftOf="@+id/camera_hint_arrow"
         android:text="@string/empty_grid_camera"
-        android:textColor="@color/grey3"
+        android:textColor="@color/com_facebook_likeboxcountview_border_color"
         android:textSize="20dp"
-        android:visibility="gone" />
+        android:visibility="visible"
+        tools:text="ciao sono giulio" />
 
     <TextView
         android:id="@+id/gallery_hint"
@@ -66,7 +68,7 @@
         android:layout_marginTop="@dimen/default_element_padding"
         android:layout_toLeftOf="@+id/camera_hint_arrow"
         android:text="@string/empty_grid_gallery"
-        android:textColor="@color/grey3"
+        android:textColor="@color/com_facebook_likeboxcountview_text_color"
         android:textSize="20dp" />
 
     <TextView

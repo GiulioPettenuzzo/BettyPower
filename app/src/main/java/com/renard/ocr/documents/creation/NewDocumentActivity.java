@@ -574,7 +574,7 @@ public abstract class NewDocumentActivity extends MonitoredActivity {
                 deleteProgressDialog.setCancelable(false);
                 return deleteProgressDialog;
             case EDIT_TITLE_DIALOG_ID:
-                View layout = getLayoutInflater().inflate(R.layout.dialog_edit_title, null);
+               /* View layout = getLayoutInflater().inflate(R.layout.dialog_edit_title, null);
                 final Uri documentUri = Uri.parse(args.getString(DIALOG_ARG_DOCUMENT_URI));
                 final String oldTitle = args.getString(DIALOG_ARG_TITLE);
                 final EditText edit = (EditText) layout.findViewById(R.id.edit_title);
@@ -600,7 +600,7 @@ public abstract class NewDocumentActivity extends MonitoredActivity {
 
                     }
                 });
-                builder.show();
+                builder.show();*/
         }
         return super.onCreateDialog(id, args);
     }
@@ -611,16 +611,16 @@ public abstract class NewDocumentActivity extends MonitoredActivity {
             case EDIT_TITLE_DIALOG_ID:
                 final Uri documentUri = Uri.parse(args.getString(DIALOG_ARG_DOCUMENT_URI));
                 final String oldTitle = args.getString(DIALOG_ARG_TITLE);
-                final EditText edit = (EditText) dialog.findViewById(R.id.edit_title);
-                edit.setText(oldTitle);
+               // final EditText edit = (EditText) dialog.findViewById(R.id.edit_title);
+              //  edit.setText(oldTitle);
                 AlertDialog alertDialog = (AlertDialog) dialog;
                 Button okButton = alertDialog.getButton(AlertDialog.BUTTON_NEUTRAL);
                 okButton.setOnClickListener(new View.OnClickListener() {
 
                     @Override
                     public void onClick(View v) {
-                        final String title = edit.getText().toString();
-                        saveTitle(title, documentUri);
+                       // final String title = edit.getText().toString();
+                       // saveTitle(title, documentUri);
                     }
                 });
                 break;

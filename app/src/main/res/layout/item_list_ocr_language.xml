@@ -33,7 +33,6 @@
             android:id="@+id/download_language"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:drawableRight="@drawable/ic_download"
             android:gravity="right|center_vertical"
             android:text="@string/download_language"
             android:textAppearance="?android:attr/textAppearanceSmall"

@@ -48,9 +48,9 @@ public class PreferencesUtils {
     public static void initPreferencesWithDefaultsIfEmpty(Context appContext) {
         SharedPreferences prefs = getPreferences(appContext);
         Editor edit = prefs.edit();
-        setIfEmpty(edit, prefs, PREFERENCES_ALIGNMENT_KEY, R.id.align_left);
+        //setIfEmpty(edit, prefs, PREFERENCES_ALIGNMENT_KEY, R.id.align_left);
         // setIfEmpty(edit, prefs, PREFERENCES_DESIGN_KEY, R.id.design_day);
-        setIfEmpty(edit, prefs, PREFERENCES_SPACING_KEY, R.id.spacing_1_5);
+        //setIfEmpty(edit, prefs, PREFERENCES_SPACING_KEY, R.id.spacing_1_5);
         final String defaultLanguage = appContext.getString(R.string.default_ocr_language);
         final String defaultLanguageDisplay = appContext.getString(R.string.default_ocr_display_language);
         setIfEmpty(edit, prefs, PREFERENCES_OCR_LANG, defaultLanguage);
@@ -165,7 +165,7 @@ public class PreferencesUtils {
         if (view == null) {
             return;
         }
-        if (id == R.id.align_block) {
+       /* if (id == R.id.align_block) {
             view.setGravity(Gravity.CENTER_HORIZONTAL);
         } else if (id == R.id.align_left) {
             view.setGravity(Gravity.LEFT);
@@ -175,7 +175,7 @@ public class PreferencesUtils {
             view.setLineSpacing(0, 1.25f);
         } else if (id == R.id.spacing_2) {
             view.setLineSpacing(0, 1.5f);
-        }
+        }*/
     }
 
     public static SharedPreferences getPreferences(Context applicationContext) {

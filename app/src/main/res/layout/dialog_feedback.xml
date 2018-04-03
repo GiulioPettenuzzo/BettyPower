@@ -55,7 +55,6 @@
                 android:textSize="14sp"
                 android:id="@+id/love_it"
                 style="?android:attr/borderlessButtonStyle"
-                android:drawableLeft="@drawable/ic_heart"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:text="@string/love_it"/>

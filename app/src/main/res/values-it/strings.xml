@@ -2,6 +2,41 @@
 <resources>
     <string name="facebook_app_id">1545587202205385</string>
 
+    <string name="sistema_checkbox">Sistema</string>
+    <string name="socal_post">Hey segui qui la mia schedina</string>
+    <string name="share_with">Condividi la schedina con..</string>
+    <string name="match_not_loaded">Sto caricando tutte le partite, attendi un istante!</string>
+    <string name="match_loaded">Partite caricate</string>
+    <string name="event_win">Eventi vinti: </string>
+    <string name="event_lost">Eventi persi: </string>
+    <string name="match_terminated">Terminata</string>
+    <string name="match_posticipated">Posticipata</string>
+    <string name="match_annullato">Annullata</string>
+    <string name="match_break">Intervallo</string>
+    <string name="delate_match_dialog_question">Devo aver sbagliato a leggere questa partita \n Mi dispiace! \n Sei sicuro di volerla eliminare?</string>
+    <string name="autocomplete_textview_hint">"squadra in casa - squadra ospite"</string>
+    <string name="eventi_rimanenti">eventi rimanenti </string>
+    <string name="eventi_in_corso">in corso </string>
+    <string name="scommessa_completata">tutte le partite sono finite</string>
+    <string name="delate_bet_dialog_question_singolar">Eliminare la Scommessa?</string>
+    <string name="delete_bet_dialog_subtitle_singolar">Non potrai più recuperarla</string>
+    <string name="delete_bet_dialog_explaination_singolar">tutti i dati di questa schedina \n andranno perduti</string>
+    <string name="intervallo">Intervallo</string>
+    <string name="delate_bet_dialog_question_plural">Eliminare le Scommesse?</string>
+    <string name="delete_bet_dialog_subtitle_plural">Non potrai più recuperarle</string>
+    <string name="delete_bet_dialog_explaination_plural">tutti i dati di queste schedine \n andranno perduti</string>
+    <string name="no_result_found">Ops! Questo è imbarazzante.. \nNon conosco i risutati di questa partita!</string>
+    <string name="add_new_match_dialog_title">Aggiungi nuova partita</string>
+    <string name="delete_match_dialog_title">Eliminare </string>
+    <string name="confirm">CONFERMA</string>
+    <string name="annulla">ANNULLA</string>
+    <string name="totale_importo_scommesso">Importo scommesso:</string>
+    <string name="field_undefined">no def.</string>
+    <string name="totale_vincita">Totale vincita:</string>
+    <string name="sistema_errori">Errori:</string>
+    <string name="dialog_illustration_set_bet">Seleziona quello che hai scommesso su </string>
+    <string name="current_year">2018</string>
+    <string name="next_year">2019</string>
     <string name="number_avveniments">Numero avvenimenti: </string>
     <string name="drawer_open">Open Main Menu</string>
     <string name="drawer_close">Close ain Menu</string>
@@ -21,28 +56,26 @@
     <string name="please_tap_on_column">Please tap on a text column first</string>
     <string name="send_mail">Drop me a line.</string>
     <string name="hocr2pdf_title">
-        <a href="http://www.exactcode.com/site/open_source/exactimage/hocr2pdf/">hocr2pdf</a>
+        <a href="market://details?id=com.renard.ocr">Text Fairy</a>
         from exactCODE
     </string>
-    <string name="hocr2pdf_summary">hocr2pdf is a command line front-end for the image processing
-        library to create perfectly layouted, searchable PDF files from hOCR, annotated HTML, input
-        obtained from an OCR system.
+    <string name="hocr2pdf_summary">Text Fairy è un applicazione OCR disponibile negli store il cui codice è open source.
+        Questa applicazione implementa tutte le funzionalità di base che un app OCR deve avere ed è stata usata come piattaforma di
+        sviluppo iniziale di Betty Power
     </string>
     <string name="leptonica_title">
         <a href="http://www.leptonica.com/">leptonica</a>
     </string>
-    <string name="leptonica_summary">Leptonica is a pedagogically-oriented open source site
-        containing software that is broadly useful for image processing and image analysis
-        applications.
+    <string name="leptonica_summary">Leptonica è un sito open source orientato alla pedagogia
+        contenente software ampiamente utilizzato per l\'elaborazione e l\'analisi delle immagini
     </string>
     <string name="tesseract_ocr_title">
         <a href="https://github.com/tesseract-ocr/tesseract">tesseract-ocr</a>
     </string>
-    <string name="tesseract_ocr_summary">Tesseract is probably the most accurate open source OCR
-        engine available.
+    <string name="tesseract_ocr_summary">Tesseract è probabilmente il più accurato software OCR open source presente nel mercato
     </string>
-    <string name="contact_welcome_text">Hi, my name is Renard. I have created the Text Fairy in my
-        free time. I hope she is useful for you.
+    <string name="contact_welcome_text">Ciao, mi chiamo Betty. Ho creato questa applicazione nel mio tempo libero.
+        Spero ti torni utile!
     </string>
     <string name="download_failed">Downloading of %1$s failed!</string>
     <string name="app_name">Betty Power</string>
@@ -50,11 +83,10 @@
     <string name="ocr_language_delete">Delete</string>
     <string name="ocr_language_title">Manage Languages</string>
     <string name="pref_summary_rate">Rate the text fairy</string>
-    <string name="pref_summary_license">Learn about the software that was used to create the Text
-        Fairy.
+    <string name="pref_summary_license">Vedi le informazioni rigurdanti i software usati per creare Betty Power
     </string>
-    <string name="pref_summary_contact">Learn about the creator and supply feedback.</string>
-    <string name="pref_title_help">Show tips</string>
+    <string name="pref_summary_contact">Invia un feedback allo sviluppatore.</string>
+    <string name="pref_title_help">Suggerimenti</string>
     <string name="pref_title_contact">Contact information</string>
     <string name="pref_title_license">Licence info</string>
     <string name="error_create_file">I\'m sorry but was not able to store your photo on the SD
@@ -71,7 +103,7 @@
     <string name="progress_ocr">Reading text</string>
     <string name="delete">Delete</string>
     <string name="edit_title">Change title</string>
-    <string name="cancel">Cancel</string>
+    <string name="cancel">CANCELLA</string>
     <string name="edit_dialog_title">Enter a title for your document</string>
     <string name="delete_error">Sorry, I could not delete this document</string>
     <string name="error_could_not_take_photo">Sorry, I could not read the photo</string>
@@ -143,17 +175,19 @@
     <string name="choose_language">Pick a language for text to speech.</string>
     <string name="share_text">Share</string>
     <string name="help_to_improve">Feedback</string>
-    <string name="empty_grid_camera">Tap here to convert text from a new image.</string>
-    <string name="empty_grid_gallery">Con questo pulsante puoi fotografare la tua schedina. \r\nCercherò al posto tuo tutte le partite che hai giocato.
-        \r\nAvrai i risultati delle tue scommesse in tempo reale
+    <string name="empty_grid_camera">Con questo pulsante puoi inserire una scommessa manulmente</string>
+    <string name="empty_grid_gallery">Con questo pulsante la puoi registrare scattandole una foto
     </string>
-    <string name="empty_grid_fairy">P.S. Assicurati che le parole appaiano nitide e che il biglietto non sia piegato</string>
+    <string name="empty_grid_fairy">P.S. sono molto brava a leggere le partite ma se sbaglio qualcosa correggimi!</string>
     <string name="contribute_title">Improve the app</string>
-    <string name="contribute_text">Creating an OCR app is a lot of work. But you can help me to
-        improve the app.
+    <string name="contribute_text">Ciao sono Betty. Ho creato questa applicazione nel mio tempo libero, spero ti torni utile!
+        Per svilupparla ho impiegato molto tempo e molto lavoro. Ma tu mi puoi aiutare a migliorarla.
     </string>
-    <string name="rating_title">Rate the app</string>
-    <string name="rating_text">The app is useful to you? Review it on the Play Store.</string>
+    <string name="privacy_details">L\'applicazione non memorizza nessun tipo informazione riguardante te e il tuo uso,
+    tutte le scommesse che registri sono salvate anonimamente sul tuo dispositivo. Le informazioni sono criptate in modo da impedire ad altre applicazioni
+    di accedervi</string>
+    <string name="rating_title">Dammi un Voto</string>
+    <string name="rating_text">La tua recensione significa molto, votami sul Play Store.</string>
     <string name="feedback_title">Send feedback</string>
     <string name="feedback_text_1">The app is not working as expected?</string>
     <string name="feedback_text_2">You have a feature suggestion?</string>
@@ -162,9 +196,9 @@
     <string name="beta_test_text_1">Try new features as soon as possible?</string>
     <string name="beta_test_text_2">Influence development of new features?</string>
     <string name="enroll_as_beta_tester">Enroll in beta test program.</string>
-    <string name="about">About</string>
+    <string name="about">Informazioni</string>
     <string name="feedback_subject">Text fairy feedback</string>
-    <string name="app_version">Version %s</string>
+    <string name="app_version">Versione 1.0.0</string>
     <string name="image_not_32_bit">Image needs to be 32 bit.</string>
     <string name="image_format_unsupported">Image format not recognized. Only png or jpeg files are
         currently supported.
@@ -178,8 +212,8 @@
     <string name="first_step_detail">If you are not a member the second step won\'t work.</string>
     <string name="second_step_first_detail">You can opt out of the beta program anytime.</string>
     <string name="second_step_second_detail">Please drop me a mail if you find a bug.</string>
-    <string name="explanation_crop_video">(Video) How to fix the viewpoint</string>
-    <string name="ocr_tip_1">Good lightning is most important. Use the flashlight if possible.
+    <string name="explanation_crop_video">(Video) Come usare l\'applicazione</string>
+    <string name="ocr_tip_1">Una buona luce è molto importante, Usa il flash se possibile!
     </string>
     <string name="ocr_tip_2">Blurry text is hard to read for me. Make sure that the camera has
         properly focused the text.
@@ -190,7 +224,7 @@
     <string name="ocr_tip_4">Most of the time 5 to 7 megapixels is enough resolution to get good
         results. Higher values will often only increase the processing time.
     </string>
-    <string name="ocr_tip_heading">How to improve text recognition</string>
+    <string name="ocr_tip_heading">Come migliorare la ricognizione del testo</string>
     <string name="additional_tips">Additional tips</string>
     <string name="ocr_tip_5">You can speed up the text recognition by cropping the taken photo.
     </string>
@@ -249,17 +283,15 @@
     </string>
     <string name="permission_explanation_title">Permission missing</string>
     <string name="no_gallery_found">No gallery app found on this phone.</string>
-    <string name="install_tip_1">Sharp and clear text will get you the best results.
+    <string name="install_tip_1">Fornisco i risultati delle partite in tempo reale
     </string>
-    <string name="install_tip_2">I <b>cannot</b> read handwriting.</string>
+    <string name="install_tip_2">Non sono molto brava a leggere ciò che hai scommesso</string>
     <string name="pref_title_privacy">Privacy Policy</string>
-    <string name="pref_summary_privacy">View the privacy policy</string>
-    <string name="install_tip_3">I extract text from images. But I
-        <b>cannot</b>
-        translate it right away.
+    <string name="pref_summary_privacy">Vedi la nostra politica sulla Privacy</string>
+    <string name="install_tip_3">Estraggo le partite di calcio scattando una foto al biglietto della scommessa.
     </string>
-    <string name="data_tracking_on">"I'm tracking anonymous usage data."</string>
-    <string name="data_tracking_off">No anonymous usage data is tracked.</string>
+    <string name="data_tracking_on">"Betty Power non manipola ne memorizza i dati relativi alle tue scommesse, e non lo farà mai!"</string>
+    <string name="data_tracking_off">"Betty Power non manipola ne memorizza i dati relativi alle tue scommesse, e non lo farà mai!"</string>
     <string name="no_mail_app">No mail app found.</string>
     <string name="memory_low">Memory Low</string>
     <string name="memory_low_description">You have %d of MB memory left. Please close some
@@ -281,5 +313,6 @@
     <string name="time_match_terminated">termin.</string>
     <string name="no_connection">connessione assente, riprova più tardi</string>
     <string name="check_connection">controlla la tua connessione e riprova</string>
+    <string name="fissa">Fissa</string>
 
 </resources>

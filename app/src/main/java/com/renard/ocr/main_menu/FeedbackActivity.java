@@ -26,6 +26,7 @@ import android.view.MenuItem;
 import android.view.View;
 
 public class FeedbackActivity extends MonitoredActivity implements View.OnClickListener {
+    //TODO cambiarlo con il mio
     public static final String MARKET_URL = "market://details?id=com.renard.ocr";
     private boolean slideOutLeft = false;
 
@@ -36,9 +37,9 @@ public class FeedbackActivity extends MonitoredActivity implements View.OnClickL
         initToolbar();
         setToolbarMessage(R.string.contribute_title);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        findViewById(R.id.layout_enroll_beta_test).setOnClickListener(this);
+       // findViewById(R.id.layout_enroll_beta_test).setOnClickListener(this);
         findViewById(R.id.layout_rate_app).setOnClickListener(this);
-        findViewById(R.id.layout_send_feedback).setOnClickListener(this);
+       // findViewById(R.id.layout_send_feedback).setOnClickListener(this);
     }
 
     @Override
@@ -75,18 +76,18 @@ public class FeedbackActivity extends MonitoredActivity implements View.OnClickL
     public void onClick(View v) {
         Intent intent;
         switch (v.getId()) {
-            case R.id.layout_enroll_beta_test:
-            case R.id.button_enroll_beta_test:
+           // case R.id.layout_enroll_beta_test:
+          /*  case R.id.button_enroll_beta_test:
                 slideOutLeft = true;
                 intent = ContactActivity.getBetaTestIntent(this);
                 startActivity(intent);
-                break;
-            case R.id.layout_send_feedback:
-            case R.id.button_send_feedback:
+                break;*/
+           // case R.id.layout_send_feedback:
+           /* case R.id.button_send_feedback:
                 slideOutLeft = true;
                 intent = ContactActivity.getFeedbackIntent(getString(R.string.feedback_subject), null);
                 startActivity(Intent.createChooser(intent, getString(R.string.feedback_title)));
-                break;
+                break;*/
             case R.id.layout_rate_app:
             case R.id.button_rate_app:
                 slideOutLeft = true;

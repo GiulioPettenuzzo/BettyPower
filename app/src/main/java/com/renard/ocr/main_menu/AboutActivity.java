@@ -63,11 +63,11 @@ public class AboutActivity extends MonitoredActivity {
         startActivity(new Intent(this, LicenseActivity.class));
     }
 
-    @OnClick(R.id.show_contact)
+   /* @OnClick(R.id.show_contact)
     public void clickOnContact() {
         slideOutLeft = true;
         startActivity(new Intent(this, ContactActivity.class));
-    }
+    }*/
 
     @OnClick(R.id.privacy_policy)
     public void clickOnPrivacyPolicy() {

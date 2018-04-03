@@ -2,8 +2,6 @@ package com.bettypower.adapters;
 
 import android.app.Activity;
 import android.content.Context;
-import android.icu.text.RelativeDateTimeFormatter;
-import android.icu.text.SimpleDateFormat;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
@@ -17,16 +15,8 @@ import android.widget.TextView;
 import com.bettypower.entities.PalimpsestMatch;
 import com.renard.ocr.R;
 
-
-import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.StringTokenizer;
-import java.util.stream.Stream;
 
 
 /**
@@ -81,7 +71,6 @@ public class DropDownAutoCompleteTextViewAdapter<M extends Parcelable> extends B
         return 0;
     }
 
-    @NonNull
     public View getView(int position, View convertView, @NonNull ViewGroup parent) {
         ViewHolder viewHolder;
         if (convertView == null) {
@@ -90,10 +79,12 @@ public class DropDownAutoCompleteTextViewAdapter<M extends Parcelable> extends B
                 convertView = inflater.inflate(R.layout.item_match_autocomplete,parent, false);
             }
             viewHolder = new ViewHolder();
-            viewHolder.homeTeam = (TextView) convertView.findViewById(R.id.home_team_item_autocomplete);
-            viewHolder.awayTeam = (TextView) convertView.findViewById(R.id.away_team_autocomplete);
-            viewHolder.date = (TextView) convertView.findViewById(R.id.match_date_item_autocomplete);
-            convertView.setTag(viewHolder);
+            if (convertView != null) {
+                viewHolder.homeTeam = (TextView) convertView.findViewById(R.id.home_team_item_autocomplete);
+                viewHolder.awayTeam = (TextView) convertView.findViewById(R.id.away_team_autocomplete);
+                viewHolder.date = (TextView) convertView.findViewById(R.id.match_date_item_autocomplete);
+                convertView.setTag(viewHolder);
+            }
         }
         else{
 
@@ -228,7 +219,7 @@ public class DropDownAutoCompleteTextViewAdapter<M extends Parcelable> extends B
                 notifyDataSetInvalidated();
             }
         }
-    };
+    }
 
     public static class ViewHolder {
         public TextView homeTeam;

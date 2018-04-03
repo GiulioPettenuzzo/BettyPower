@@ -61,7 +61,7 @@ public class SimpleDocumentAdapter extends CursorAdapter {
 			text = (TextView) v.findViewById(R.id.text);
 			date = (TextView) v.findViewById(R.id.date);
 			edit = (EditText) v.findViewById(R.id.editText_document);
-			mPageNumber = (TextView) v.findViewById(R.id.page_number);
+			//mPageNumber = (TextView) v.findViewById(R.id.page_number);
 		}
 
 	}

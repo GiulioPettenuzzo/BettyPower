@@ -14,7 +14,6 @@
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
               android:gravity="center_vertical|left"
-              android:drawableLeft="@drawable/warte3"
               android:drawablePadding="@dimen/default_padding"
               android:textStyle="bold"
               android:textAppearance="@style/FairySpeechbubble">

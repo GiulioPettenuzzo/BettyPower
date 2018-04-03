@@ -46,7 +46,7 @@ public class AddMatchDialog extends Dialog {
     private DropDownAutoCompleteTextViewAdapter dropDownAutoCompleteTextViewAdapter;
     private Activity activity;
 
-    public AddMatchDialog(@NonNull final Context context,Activity activity) {
+    public AddMatchDialog(@NonNull final Context context, final Activity activity) {
         super(context);
         setContentView(R.layout.dialog_add_new_match);
         this.context = context;
@@ -68,13 +68,20 @@ public class AddMatchDialog extends Dialog {
         if(allMatches!=null && allMatches.size()!=0){
             getMatchesAndSetAdapter();
         }else{
-            Toast toast = Toast.makeText(context, R.string.no_connection, Toast.LENGTH_SHORT);
+            Toast toast = Toast.makeText(context, R.string.match_not_loaded, Toast.LENGTH_LONG);
             toast.show();
             application.setAllMatchLoadListener(new TextFairyApplication.AllMatchLoadListener() {
                 @Override
-                public void onMatchLoaded(ArrayList<PalimpsestMatch> allPalimpsestMatch) {
-                    allMatches = allPalimpsestMatch;
-                    getMatchesAndSetAdapter();
+                public void onMatchLoaded(final ArrayList<PalimpsestMatch> allPalimpsestMatch) {
+                    activity.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            allMatches = allPalimpsestMatch;
+                            getMatchesAndSetAdapter();
+                            Toast toast = Toast.makeText(context, R.string.match_loaded, Toast.LENGTH_LONG);
+                            toast.show();
+                        }
+                    });
                 }
             });
         }

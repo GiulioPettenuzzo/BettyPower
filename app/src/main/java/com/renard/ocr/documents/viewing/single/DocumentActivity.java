@@ -16,6 +16,7 @@
 
 package com.renard.ocr.documents.viewing.single;
 
+import com.bettypower.betMatchFinder.labelSet.BetLabelSet;
 import com.renard.ocr.R;
 import com.renard.ocr.documents.creation.NewDocumentActivity;
 import com.renard.ocr.documents.viewing.DocumentContentProvider;
@@ -52,7 +53,9 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 import android.widget.ViewSwitcher;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import butterknife.BindView;
@@ -282,10 +285,10 @@ public class DocumentActivity extends NewDocumentActivity implements LoaderManag
         }
 
         if (itemId == R.id.item_text_options) {
-            Intent i = new Intent(this, TextSettingsActivity.class);
+           /* Intent i = new Intent(this, TextSettingsActivity.class);
             startActivityForResult(i, REQUEST_CODE_OPTIONS);
             mAnalytics.optionTextSettings();
-            return true;
+            return true;*/
         } else if (itemId == R.id.item_content) {
             Intent tocIndent = new Intent(this, TableOfContentsActivity.class);
             //TODO
@@ -472,7 +475,7 @@ public class DocumentActivity extends NewDocumentActivity implements LoaderManag
         DocumentContainerFragment fragment = getDocumentContainer();
         DocumentContainerFragment newFragment = null;
         if (fragment == null) {
-            newFragment = new DocumentPagerFragment();
+           // newFragment = new DocumentPagerFragment();
         }
         if (newFragment != null) {
             if (mCursor != null) {

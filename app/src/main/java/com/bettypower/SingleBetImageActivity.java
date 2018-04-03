@@ -63,7 +63,7 @@ public class SingleBetImageActivity extends AppCompatActivity {
             public void run() {
                 uri = intent.getParcelableExtra(IMAGE_URI);
                 Cursor c = getContentResolver().query(uri, new String[]{DocumentContentProvider.Columns.PHOTO_PATH}, null, null, null);
-                if (c != null) {
+                if (c != null && c.moveToFirst()) {
                     c.moveToFirst();
                     myBitmap = BitmapFactory.decodeFile(c.getString(c.getPosition()));
                     c.close();

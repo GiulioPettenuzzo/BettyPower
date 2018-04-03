@@ -168,7 +168,7 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:buttonTint="@color/vpi__background_holo_light"
-        android:text="Sistema"
+        android:text="@string/sistema_checkbox"
         android:textColor="@color/cardview_light_background"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="@+id/errors_edit_text"

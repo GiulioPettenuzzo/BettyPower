@@ -13,7 +13,7 @@
         android:allowBackup="true"
         android:hardwareAccelerated="true"
         android:hasCode="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@mipmap/app_icon"
         android:installLocation="auto"
         android:label="@string/app_name"
         android:largeHeap="true"
@@ -47,7 +47,7 @@
 
         <activity
             android:name=".documents.creation.visualisation.OCRActivity"
-            android:launchMode="singleTop"></activity>
+            android:launchMode="singleTop" />
         <activity
             android:name=".documents.viewing.single.DocumentActivity"
             android:configChanges="keyboardHidden|keyboard"
@@ -58,7 +58,6 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".documents.viewing.grid.DocumentGridActivity" />
         </activity>
-        <activity android:name=".documents.viewing.single.TextSettingsActivity" />
         <activity android:name=".main_menu.TipsActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -104,11 +103,6 @@
             </intent-filter>
         </receiver>
 
-        <activity android:name=".main_menu.ContactActivity">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.renard.ocr.main_menu.AboutActivity" />
-        </activity>
         <activity android:name=".main_menu.LicenseActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -118,11 +112,6 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".documents.viewing.grid.DocumentGridActivity" />
-        </activity>
-        <activity android:name=".main_menu.BetaTestActivity">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".main_menu.FeedbackActivity" />
         </activity>
         <activity android:name=".main_menu.AboutActivity">
             <meta-data

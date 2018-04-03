@@ -18,7 +18,6 @@ package com.renard.ocr.documents.viewing.single;
 
 import com.renard.ocr.MonitoredActivity;
 import com.renard.ocr.R;
-import com.renard.ocr.documents.viewing.single.DocumentActivity.DocumentContainerFragment;
 import com.renard.ocr.documents.viewing.single.tts.TextSpeaker;
 import com.renard.ocr.util.PreferencesUtils;
 import com.viewpagerindicator.CirclePageIndicator;
@@ -37,7 +36,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 
-public class DocumentPagerFragment extends Fragment implements DocumentContainerFragment {
+public class DocumentPagerFragment extends Fragment  {
 
 
     private ViewPager mPager;
@@ -158,70 +157,6 @@ public class DocumentPagerFragment extends Fragment implements DocumentContainer
         }
     }
 
-
-    @Override
-    public String getTextOfCurrentlyShownDocument() {
-        int currentItem = mPager.getCurrentItem();
-        final String htmlText = mAdapter.getText(currentItem);
-        if (htmlText != null) {
-            return Html.fromHtml(htmlText).toString();
-        } else {
-            return null;
-        }
-    }
-
-    @Override
-    public int getDocumentCount() {
-        if (mCursor != null) {
-            return mCursor.getCount();
-        } else {
-            return 0;
-        }
-    }
-
-    @Override
-    public void setCursor(Cursor cursor) {
-        mIsNewCursor = true;
-        mCursor = cursor;
-        initPager();
-    }
-
-    @Override
-    public String getTextOfAllDocuments() {
-        final DocumentTextFragment fragment = mAdapter.getFragment(mLastPosition);
-
-        DocumentAdapter adapter = (DocumentAdapter) mPager.getAdapter();
-        final int count = adapter.getCount();
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < count; i++) {
-            String text = null;
-            if (i == mLastPosition && fragment != null) {
-                final Spanned documentText = fragment.getDocumentText();
-                if (!TextUtils.isEmpty(documentText)) {
-                    text = Html.toHtml(documentText);
-                }
-            } else {
-                text = adapter.getText(i);
-            }
-            if (text != null) {
-                if (sb.length() > 0) {
-                    sb.append("\n");
-                }
-                sb.append(text);
-            }
-        }
-        return sb.toString();
-    }
-
-    @Override
-    public void setShowText(boolean text) {
-        mAdapter.setShowText(text);
-    }
-
-    @Override
-    public boolean getShowText() {
-        return mAdapter.getShowText();
-    }
 
     public TextSpeaker getTextSpeaker() {
         return mTextSpeaker;

@@ -14,14 +14,14 @@
                     android:layout_height="match_parent">
 
 
-        <ImageView android:layout_width="wrap_content"
-                   android:id="@+id/app_icon"
-                   android:layout_alignParentBottom="true"
-                   android:layout_height="wrap_content"
-                   android:layout_marginBottom="1dp"
-                   android:src="@drawable/textfairy_title"
-                   android:contentDescription="@string/content_description_fairy"
-        />
+        <ImageView
+            android:id="@+id/app_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="1dp"
+            android:contentDescription="@string/content_description_fairy"
+            android:src="@drawable/textfairy_title" />
 
         <TextView
             android:id="@+id/toolbar_text"

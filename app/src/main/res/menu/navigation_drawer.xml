@@ -4,17 +4,17 @@
     <group android:checkableBehavior="none">
 
         <item
-                android:id="@+id/show_tips"
-                android:icon="@drawable/ic_action_tips_light"
-                android:title="@string/pref_title_help"/>
+            android:id="@+id/show_tips"
+            android:icon="@drawable/ic_action_tips_light"
+            android:title="@string/pref_title_help" />
 
         <item
                 android:id="@+id/feedback"
                 android:icon="@drawable/ic_action_feedback"
                 android:title="@string/help_to_improve"/>
         <item
-                android:id="@+id/about"
-                android:icon="@drawable/ic_action_about"
-                android:title="@string/about"/>
+            android:id="@+id/about"
+            android:icon="@drawable/ic_action_about"
+            android:title="@string/about" />
     </group>
 </menu>

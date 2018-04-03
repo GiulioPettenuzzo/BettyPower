@@ -23,6 +23,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.bettypower.SingleBetActivity;
+import com.bettypower.betMatchFinder.labelSet.BetLabelSet;
 import com.bettypower.dialog.DeleteBetDialog;
 import com.bettypower.entities.Bet;
 import com.bettypower.entities.HiddenResult;
@@ -97,6 +98,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import de.greenrobot.event.EventBus;
@@ -208,7 +210,33 @@ public class DocumentGridActivity extends NewDocumentActivity implements Documen
         for(int i = 0;i<20;i++){
             Log.i("PROVA",prova.get(i));
         }*/
+        String x = getMyLabelSet();
     }
+
+    private String getMyLabelSet(){
+        String result = "";
+        BetLabelSet betLabelSet = new BetLabelSet();
+        Map<String,ArrayList<String>> map = betLabelSet.hashBetAndBetKind();
+        ArrayList<String> allBet = new ArrayList<>();
+        for (String currentBetKind:map.keySet()
+                ) {
+            for (String currentBet:map.get(currentBetKind)
+                    ) {
+                if(allBet.lastIndexOf(currentBet)<0) {
+                    allBet.add(currentBet);
+                }
+            }
+        }
+
+        int i = 0;
+        for (String currentBet:allBet
+                ) {
+            String betName = "bet"+String.valueOf(i++);
+            result = result + "ArrayList<String> " + betName + " = new ArrayList<>(); \n" + betName + ".add(\"" + currentBet + "\");\n map.put(\"" + currentBet +  "\" , " + betName + ");\n\n";
+        }
+        return result;
+    }
+
 
     private void sendVolleyForPalimpsestMatch(){
         final TextFairyApplication application = (TextFairyApplication) getApplicationContext();

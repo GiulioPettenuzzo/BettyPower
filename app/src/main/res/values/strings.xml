@@ -1,36 +1,40 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
 <resources>
     <string name="facebook_app_id">1545587202205385</string>
-    <string name="socal_post">Hey segui qui la mia schedina</string>
-    <string name="share_with">Condividi la schedina con..</string>
-    <string name="event_win">Eventi vinti: </string>
-    <string name="event_lost">Eventi persi: </string>
-    <string name="match_terminated">Terminata</string>
-    <string name="match_posticipated">Posticipata</string>
-    <string name="match_annullato">Annullata</string>
-    <string name="match_break">Intervallo</string>
-    <string name="delate_match_dialog_question">Devo aver sbagliato a leggere questa partita \n Mi dispiace! \n Sei sicuro di volerla eliminare?</string>
-    <string name="autocomplete_textview_hint">"squadra in casa - squadra ospite"</string>
-    <string name="eventi_rimanenti">eventi rimanenti </string>
-    <string name="eventi_in_corso">in corso </string>
-    <string name="scommessa_completata">tutte le partite sono finite</string>
-    <string name="delate_bet_dialog_question_singolar">Eliminare la Scommessa?</string>
-    <string name="delete_bet_dialog_subtitle_singolar">Non potrai più recuperarla</string>
-    <string name="delete_bet_dialog_explaination_singolar">tutti i dati di questa schedina \n andranno perduti</string>
-    <string name="intervallo">Intervallo</string>
-    <string name="delate_bet_dialog_question_plural">Eliminare le Scommesse?</string>
-    <string name="delete_bet_dialog_subtitle_plural">Non potrai più recuperarle</string>
-    <string name="delete_bet_dialog_explaination_plural">tutti i dati di queste schedine \n andranno perduti</string>
-    <string name="no_result_found">Ops! Questo è imbarazzante.. \nNon conosco i risutati di questa partita!</string>
-    <string name="add_new_match_dialog_title">Aggiungi nuova partita</string>
-    <string name="delete_match_dialog_title">Eliminare </string>
-    <string name="confirm">CONFERMA</string>
-    <string name="annulla">ANNULLA</string>
-    <string name="totale_importo_scommesso">Importo scommesso:</string>
+    <string name="match_not_loaded">I\'m loading all the matches, please wait a moment!</string>
+    <string name="match_loaded">Match Loaded</string>
+
+    <string name="socal_post">Hey follow here my bet</string>
+    <string name="share_with">Share your bet with..</string>
+    <string name="event_win">Match won: </string>
+    <string name="event_lost">Match lost: </string>
+    <string name="match_terminated">Finished</string>
+    <string name="match_posticipated">Posticipate</string>
+    <string name="match_annullato">Canceled</string>
+    <string name="match_break">Interval</string>
+    <string name="delate_match_dialog_question">I must have been wrong to read this match \n I\'m sorry \n You\'re sure you want to delete it?</string>
+    <string name="autocomplete_textview_hint">"Home team - Away team"</string>
+    <string name="eventi_rimanenti">Remaining events </string>
+    <string name="eventi_in_corso">In progress </string>
+    <string name="scommessa_completata">All match are finished </string>
+    <string name="delate_bet_dialog_question_singolar">Delete this bet?</string>
+    <string name="delete_bet_dialog_subtitle_singolar">You will not able to recover it</string>
+    <string name="delete_bet_dialog_explaination_singolar">All the data of this bet \n will be lost</string>
+    <string name="intervallo">Interval</string>
+    <string name="delate_bet_dialog_question_plural">Delete the bet?</string>
+    <string name="delete_bet_dialog_subtitle_plural">You will not able to recover them</string>
+    <string name="delete_bet_dialog_explaination_plural">All the data of those bet \n will be lost</string>
+    <string name="no_result_found">Ops! This is embarrassing.. \nI don\'t know the result of this match!</string>
+    <string name="add_new_match_dialog_title">Add new match?</string>
+    <string name="delete_match_dialog_title">Delete </string>
+    <string name="confirm">CONFIRM</string>
+    <string name="annulla">CANCEL</string>
+    <string name="totale_importo_scommesso">Bet amount:</string>
     <string name="field_undefined">no def.</string>
-    <string name="totale_vincita">Totale vincita:</string>
-    <string name="sistema_errori">Errori:</string>
-    <string name="dialog_illustration_set_bet">Seleziona quello che hai scommesso su </string>
+    <string name="totale_vincita">Total winnings:</string>
+    <string name="sistema_errori">Errors:</string>
+    <string name="dialog_illustration_set_bet">Select what you bet on </string>
+    <string name="number_avveniments">Number events: </string>
     <string name="current_year">2018</string>
     <string name="next_year">2019</string>
     <string name="drawer_open">Open Main Menu</string>
@@ -51,12 +55,12 @@
     <string name="please_tap_on_column">Please tap on a text column first</string>
     <string name="send_mail">Drop me a line.</string>
     <string name="hocr2pdf_title">
-        <a href="http://www.exactcode.com/site/open_source/exactimage/hocr2pdf/">hocr2pdf</a>
+        <a href="market://details?id=com.renard.ocr">Text Fairy</a>
         from exactCODE
     </string>
-    <string name="hocr2pdf_summary">hocr2pdf is a command line front-end for the image processing
-        library to create perfectly layouted, searchable PDF files from hOCR, annotated HTML, input
-        obtained from an OCR system.
+    <string name="hocr2pdf_summary">Text Fairy is an OCR application available in stores whose code is open source.
+        This application implements all the basic functionality that an OCR app must have and it has been used as an initial platform
+        for develop Betty Power
     </string>
     <string name="leptonica_title">
         <a href="http://www.leptonica.com/">leptonica</a>
@@ -68,6 +72,9 @@
     <string name="tesseract_ocr_title">
         <a href="https://github.com/tesseract-ocr/tesseract">tesseract-ocr</a>
     </string>
+    <string name="privacy_details">The Application does not collect any kind of information about you and your use,
+    all the bet that you register are saved anonymously on your device. The information is encrypted in order to prevent
+    to other applications to access it.</string>
     <string name="tesseract_ocr_summary">Tesseract is probably the most accurate open source OCR
         engine available.
     </string>
@@ -80,8 +87,7 @@
     <string name="ocr_language_delete">Delete</string>
     <string name="ocr_language_title">Manage Languages</string>
     <string name="pref_summary_rate">Rate the text fairy</string>
-    <string name="pref_summary_license">Learn about the software that was used to create the Text
-        Fairy.
+    <string name="pref_summary_license">Learn about the software that was used to create Betty Power.
     </string>
     <string name="pref_summary_contact">Learn about the creator and supply feedback.</string>
     <string name="pref_title_help">Show tips</string>
@@ -173,9 +179,9 @@
     <string name="choose_language">Pick a language for text to speech.</string>
     <string name="share_text">Share</string>
     <string name="help_to_improve">Feedback</string>
-    <string name="empty_grid_camera">Tap here to convert text from a new image.</string>
-    <string name="empty_grid_gallery">Tap here to convert text from an existing image.</string>
-    <string name="empty_grid_fairy">P.S. Tap on the fairy for more info.</string>
+    <string name="empty_grid_camera">Tap here to insert new bet manually.</string>
+    <string name="empty_grid_gallery">Tap here to insert new bet by taking a photo to the ticket.</string>
+    <string name="empty_grid_fairy">P.S. I\'m very good at reading the matches but if I\'m wrong, please correct me!</string>
     <string name="contribute_title">Improve the app</string>
     <string name="contribute_text">Creating an OCR app is a lot of work. But you can help me to
         improve the app.
@@ -192,7 +198,7 @@
     <string name="enroll_as_beta_tester">Enroll in beta test program.</string>
     <string name="about">About</string>
     <string name="feedback_subject">Text fairy feedback</string>
-    <string name="app_version">Version %s</string>
+    <string name="app_version">Version 1.0.0</string>
     <string name="image_not_32_bit">Image needs to be 32 bit.</string>
     <string name="image_format_unsupported">Image format not recognized. Only png or jpeg files are
         currently supported.
@@ -206,7 +212,7 @@
     <string name="first_step_detail">If you are not a member the second step won\'t work.</string>
     <string name="second_step_first_detail">You can opt out of the beta program anytime.</string>
     <string name="second_step_second_detail">Please drop me a mail if you find a bug.</string>
-    <string name="explanation_crop_video">(Video) How to fix the viewpoint</string>
+    <string name="explanation_crop_video">(Video) How to use the application</string>
     <string name="ocr_tip_1">Good lightning is most important. Use the flashlight if possible.
     </string>
     <string name="ocr_tip_2">Blurry text is hard to read for me. Make sure that the camera has
@@ -232,7 +238,7 @@
     <string name="image_source">Pick image source.</string>
     <string name="promo_video_title">Learn more.</string>
     <string name="youtube_promo_link">https://youtu.be/vUmZnwyLH6I</string>
-    <string name="greeting">Hello</string>
+    <string name="greeting">Hello \nI\'m Betty</string>
     <string name="text_is_in">"The text is in: "</string>
     <string name="empty_grid_language">I can read English, Russian and German but you can download more languages.
     </string>
@@ -277,17 +283,15 @@
     </string>
     <string name="permission_explanation_title">Permission missing</string>
     <string name="no_gallery_found">No gallery app found on this phone.</string>
-    <string name="install_tip_1">Sharp and clear text will get you the best results.
+    <string name="install_tip_1">I\'m not very good at reading what you bet
     </string>
     <string name="install_tip_2">I <b>cannot</b> read handwriting.</string>
     <string name="pref_title_privacy">Privacy Policy</string>
     <string name="pref_summary_privacy">View the privacy policy</string>
-    <string name="install_tip_3">I extract text from images. But I
-        <b>cannot</b>
-        translate it right away.
+    <string name="install_tip_3">Iextract soccer match by taking a photo to the bet ticket
     </string>
-    <string name="data_tracking_on">"I'm tracking anonymous usage data."</string>
-    <string name="data_tracking_off">No anonymous usage data is tracked.</string>
+    <string name="data_tracking_on">"Betty Power does not manipulate or store your bets, and it never will!"</string>
+    <string name="data_tracking_off">Betty Power does not manipulate or store your bets, and it never will!</string>
     <string name="no_mail_app">No mail app found.</string>
     <string name="memory_low">Memory Low</string>
     <string name="memory_low_description">You have %d of MB memory left. Please close some
@@ -307,10 +311,12 @@
     <string name="volume_is_off">Volume is off</string>
     <string name="install_tts_prompt">You need to install text to speech first.</string>
     <string name="time_match_terminated">termin.</string>
-    <string name="no_connection">connessione assente, riprova più tardi</string>
-    <string name="check_connection">controlla la tua connessione e riprova</string>
+    <string name="no_connection">absent connection, please try again late</string>
+    <string name="check_connection">Check your connection</string>
     <string name="the_photo_of_the_bet">the photo of the bet</string>
     <string name="home_team_image_logo">home team image logo</string>
     <string name="away_team_image_logo">away team image logo</string>
     <string name="asset_statements" translatable="false">[{\n  \"relation\": [\"delegate_permission/common.handle_all_urls\"],\n  \"target\": {\n    \"namespace\": \"web\",\n    \"site\": \"https://www.fishtagram.it\",\n  }\n}]</string>
+    <string name="sistema_checkbox">System</string>
+    <string name="fissa">Fixed</string>
 </resources>

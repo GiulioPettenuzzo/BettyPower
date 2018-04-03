@@ -54,7 +54,7 @@ public class InstallActivity extends MonitoredActivity implements TaskFragment.T
     protected View mContentView;
     @BindView(R.id.fairy_container)
     protected View mFairyContainer;
-    @BindView(R.id.imageView_fairy)
+    //@BindView(R.id.imageView_fairy)
     protected ImageView mImageViewFairy;
     @BindView(R.id.fairy_text_bubble)
     protected View mFairySpeechBubble;

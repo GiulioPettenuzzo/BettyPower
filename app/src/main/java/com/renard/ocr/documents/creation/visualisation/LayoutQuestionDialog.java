@@ -118,7 +118,7 @@ public class LayoutQuestionDialog extends DialogFragment {
                 return new ImageView(context);
             }
         });
-        fairy.setImageResource(R.drawable.fairy_looks_center);
+        //fairy.setImageResource(R.drawable.fairy_looks_center);
         fairy.setInAnimation(context, android.R.anim.fade_in);
         fairy.setOutAnimation(context, android.R.anim.fade_out);
 
@@ -131,7 +131,7 @@ public class LayoutQuestionDialog extends DialogFragment {
             @Override
             public void onClick(View v) {
                 if (mLayout != LayoutKind.COMPLEX) {
-                    fairy.setImageResource(R.drawable.fairy_looks_left);
+                    //fairy.setImageResource(R.drawable.fairy_looks_left);
                     titleViewFlipper.setDisplayedChild(2);
                     columnLayout.setColorFilter(colorFilter);
                     pageLayout.clearColorFilter();
@@ -146,7 +146,7 @@ public class LayoutQuestionDialog extends DialogFragment {
                 if (mLayout != LayoutKind.SIMPLE) {
                     mLayout = LayoutKind.SIMPLE;
                     titleViewFlipper.setDisplayedChild(1);
-                    fairy.setImageResource(R.drawable.fairy_looks_right);
+                    //fairy.setImageResource(R.drawable.fairy_looks_right);
                     pageLayout.setColorFilter(colorFilter);
                     columnLayout.clearColorFilter();
                 }
@@ -158,9 +158,9 @@ public class LayoutQuestionDialog extends DialogFragment {
         List<OcrLanguage> installedLanguages = OcrLanguageDataStore.getInstalledOCRLanguages(context);
 
         // actual values uses by tesseract
-        final ArrayAdapter<OcrLanguage> adapter = new ArrayAdapter<>(context, R.layout.item_spinner_language, installedLanguages);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        langButton.setAdapter(adapter);
+        //final ArrayAdapter<OcrLanguage> adapter = new ArrayAdapter<>(context, R.layout.item_spinner_language, installedLanguages);
+        //adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        //langButton.setAdapter(adapter);
         for (int i = 0; i < installedLanguages.size(); i++) {
             OcrLanguage lang = installedLanguages.get(i);
             if (lang.getValue().equals(language.first)) {
@@ -171,10 +171,10 @@ public class LayoutQuestionDialog extends DialogFragment {
         langButton.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                final OcrLanguage item = adapter.getItem(position);
-                mLanguage = item.getValue();
-                PreferencesUtils.saveOCRLanguage(context, item);
-                getAnalytics().sendOcrLanguageChanged(item);
+                //final OcrLanguage item = adapter.getItem(position);
+                //mLanguage = item.getValue();
+                ////PreferencesUtils.saveOCRLanguage(context, item);
+                //getAnalytics().sendOcrLanguageChanged(item);
             }
 
             @Override

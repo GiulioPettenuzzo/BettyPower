@@ -2,7 +2,6 @@ package com.renard.ocr.documents.viewing.single;
 
 import com.googlecode.tesseract.android.OCR;
 import com.renard.ocr.R;
-import com.renard.ocr.main_menu.ContactActivity;
 import com.renard.ocr.main_menu.TipsActivity;
 
 import android.app.AlertDialog;
@@ -57,7 +56,7 @@ public class OCRResultDialog extends TopDialogFragment implements View.OnClickLi
         } else if (accuracy < MEDIUM_ACCURACY) {
             speech.setText(R.string.ocr_result_is_ok);
         } else {
-            speech.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_fairy_happy, 0, 0, 0);
+            //speech.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_fairy_happy, 0, 0, 0);
             speech.setText(R.string.ocr_result_is_good);
             hideTipsAndFeedback(view);
         }
@@ -104,12 +103,12 @@ public class OCRResultDialog extends TopDialogFragment implements View.OnClickLi
                 File lastOriginalImage = OCR.getLastOriginalImageFromCache(getActivity());
                 final String language = getArguments().getString(EXTRA_LANGUAGE);
                 String body = activity.getString(R.string.document_scanned_as, language);
-                Intent intent = ContactActivity.getFeedbackIntent(getActivity(), getString(R.string.feedback_subject), lastOriginalImage, body);
+               /* Intent intent = ContactActivity.getFeedbackIntent(getActivity(), getString(R.string.feedback_subject), lastOriginalImage, body);
                 try {
                     startActivity(intent);
                 } catch (ActivityNotFoundException notFound) {
                     Toast.makeText(getContext(), R.string.no_mail_app, Toast.LENGTH_LONG).show();
-                }
+                }*/
                 break;
             case R.id.button_show_tips:
                 getAnalytics().ocrResultShowTips();

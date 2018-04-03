@@ -112,7 +112,7 @@ public class DocumentGridAdapter extends CursorAdapter implements OnCheckedChang
 		DocumentViewHolder(View v) {
 			gridElement = (CheckableGridElement) v;
 			date = (TextView) v.findViewById(R.id.date);
-			mPageNumber = (TextView) v.findViewById(R.id.page_number);
+			//mPageNumber = (TextView) v.findViewById(R.id.page_number);
 			eventNumberTextView = (TextView) v.findViewById(R.id.event_number);
 			totaleImportoScommesso = (TextView) v.findViewById(R.id.importo_scommesso);
 			totaleImportoPagamento = (TextView) v.findViewById(R.id.importo_pagamento);

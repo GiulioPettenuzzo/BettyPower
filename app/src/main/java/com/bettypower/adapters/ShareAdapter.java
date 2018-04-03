@@ -1,5 +1,6 @@
 package com.bettypower.adapters;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.pm.ResolveInfo;
 import android.view.LayoutInflater;
@@ -8,8 +9,6 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
-
-import com.bettypower.SingleBetActivity;
 import com.renard.ocr.R;
 
 import java.util.List;
@@ -29,6 +28,7 @@ public class ShareAdapter extends BaseAdapter {
         this.context = context;
     }
 
+    @SuppressLint("InflateParams")
     public View getView(int position, View convertView, ViewGroup parent) {
 
         ViewHendler hendler;

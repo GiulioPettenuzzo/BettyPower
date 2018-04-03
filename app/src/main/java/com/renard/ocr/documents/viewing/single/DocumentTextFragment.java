@@ -20,7 +20,6 @@ import com.renard.ocr.R;
 import com.renard.ocr.documents.creation.NewDocumentActivity;
 import com.renard.ocr.documents.viewing.DocumentContentProvider;
 import com.renard.ocr.documents.viewing.single.tts.TextSpeaker;
-import com.renard.ocr.documents.viewing.single.tts.TextToSpeechControls;
 import com.renard.ocr.util.PreferencesUtils;
 
 import android.net.Uri;
@@ -48,8 +47,8 @@ public class DocumentTextFragment extends Fragment implements TextWatcher {
     public static final String EXTRA_LANG = "lang";
     private static final String EXTRA_POSITION = "position";
 
-    @BindView(R.id.text_to_speech_controls)
-    protected TextToSpeechControls mTextToSpeechControls;
+    //@BindView(R.id.text_to_speech_controls)
+    //protected TextToSpeechControls mTextToSpeechControls;
     @BindView(R.id.editText_document)
     protected EditText mEditText;
     @BindView(R.id.viewSwitcher)
@@ -88,10 +87,10 @@ public class DocumentTextFragment extends Fragment implements TextWatcher {
             mHtmlTask.cancel(true);
         }
 
-        DocumentActivity documentActivity = (DocumentActivity) getActivity();
+        //DocumentActivity documentActivity = (DocumentActivity) getActivity();
         DocumentPagerFragment pagerFragment = (DocumentPagerFragment) getParentFragment();
         TextSpeaker textSpeaker = pagerFragment.getTextSpeaker();
-        mTextToSpeechControls.onCreateView(getChildFragmentManager(), documentActivity.getAnaLytics(), textSpeaker);
+        //mTextToSpeechControls.onCreateView(getChildFragmentManager(), documentActivity.getAnaLytics(), textSpeaker);
         PreferencesUtils.applyTextPreferences(mEditText, getActivity());
 
         return view;
@@ -105,7 +104,7 @@ public class DocumentTextFragment extends Fragment implements TextWatcher {
             mHtmlTask.cancel(true);
         }
         mEditText.removeTextChangedListener(this);
-        mTextToSpeechControls.onDestroyView();
+       // mTextToSpeechControls.onDestroyView();
     }
 
     @Override
@@ -124,7 +123,7 @@ public class DocumentTextFragment extends Fragment implements TextWatcher {
         } else {
             mViewSwitcher.setDisplayedChild(1);
             mEditText.addTextChangedListener(this);
-            mTextToSpeechControls.setCurrentText(mEditText.getText(), getLangOfCurrentlyShownDocument(), getIndexOfCurrentlyShownDocument());
+            //mTextToSpeechControls.setCurrentText(mEditText.getText(), getLangOfCurrentlyShownDocument(), getIndexOfCurrentlyShownDocument());
         }
     }
 
@@ -175,7 +174,7 @@ public class DocumentTextFragment extends Fragment implements TextWatcher {
         } else {
             mHasTextChanged = true;
         }
-        mTextToSpeechControls.setCurrentText(s, getLangOfCurrentlyShownDocument(), getIndexOfCurrentlyShownDocument());
+       // mTextToSpeechControls.setCurrentText(s, getLangOfCurrentlyShownDocument(), getIndexOfCurrentlyShownDocument());
     }
 
     @Override

@@ -5,7 +5,6 @@
     android:layout_height="wrap_content"
     android:layout_alignParentTop="true"
     android:layout_margin="@dimen/default_padding"
-    android:drawableLeft="@drawable/warte3"
     android:drawablePadding="@dimen/default_padding"
     android:gravity="center_vertical|left"
     android:textAppearance="@style/FairySpeechbubble"

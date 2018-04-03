@@ -2,7 +2,6 @@ package com.renard.ocr.documents.viewing.single;
 
 import com.googlecode.tesseract.android.OCR;
 import com.renard.ocr.R;
-import com.renard.ocr.main_menu.ContactActivity;
 import com.renard.ocr.main_menu.FeedbackActivity;
 
 import android.app.AlertDialog;
@@ -103,7 +102,7 @@ public class GetOpinionDialog extends TopDialogFragment implements DialogInterfa
         mLoveIt.setVisibility(View.GONE);
         mButtonDivider.setVisibility(View.GONE);
         mCouldBeBetter.setText(R.string.feedback_title);
-        mCouldBeBetter.setOnClickListener(new OnClickListener() {
+       /* mCouldBeBetter.setOnClickListener(new OnClickListener() {
 
             @Override
             public void onClick(View v) {
@@ -113,7 +112,7 @@ public class GetOpinionDialog extends TopDialogFragment implements DialogInterfa
                 dismiss();
                 notifyListener();
             }
-        });
+        });*/
         final Drawable drawable = getResources().getDrawable(R.drawable.ic_action_feedback);
         mCouldBeBetter.setCompoundDrawablesWithIntrinsicBounds(drawable, null, null, null);
     }

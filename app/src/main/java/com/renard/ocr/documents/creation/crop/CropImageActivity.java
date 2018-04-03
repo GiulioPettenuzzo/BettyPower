@@ -61,7 +61,7 @@ import de.greenrobot.event.EventBus;
 /**
  * The activity can crop specific region of interest from an image.
  */
-public class CropImageActivity extends MonitoredActivity implements BlurWarningDialog.BlurDialogClickListener {
+public class CropImageActivity extends MonitoredActivity {
     public static final int RESULT_NEW_IMAGE = RESULT_FIRST_USER + 1;
     private static final int HINT_DIALOG_ID = 2;
     public static final String SCREEN_NAME = "Crop Image";
@@ -194,7 +194,7 @@ public class CropImageActivity extends MonitoredActivity implements BlurWarningD
             //should not happen. Scaling of the original document failed some how. Maybe out of memory?
             mAnalytics.sendCropError();
             Toast.makeText(this, R.string.could_not_load_image, Toast.LENGTH_LONG).show();
-            onNewImageClicked();
+           // onNewImageClicked();
             return;
         }
         mAnalytics.sendBlurResult(cropData.getBlurriness());
@@ -231,11 +231,11 @@ public class CropImageActivity extends MonitoredActivity implements BlurWarningD
                 break;
             case MEDIUM_BLUR:
             case STRONG_BLUR:
-                setTitle(R.string.image_is_blurred);
+                /*setTitle(R.string.image_is_blurred);
                 BlurWarningDialog dialog = BlurWarningDialog.newInstance((float) cropData.getBlurriness().getBlurValue());
                 final FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
                 fragmentTransaction.add(dialog, BlurWarningDialog.TAG).commitAllowingStateLoss();
-                break;
+                break;*/
         }
     }
 
@@ -402,21 +402,6 @@ public class CropImageActivity extends MonitoredActivity implements BlurWarningD
         mImageView.invalidate();
     }
 
-    @Override
-    public void onContinueClicked() {
-        if (mCropData.isPresent()) {
-            mAnalytics.sendScreenView(SCREEN_NAME);
-            showDefaultCroppingRectangle(mCropData.get().getBitmap());
-            setToolbarMessage(R.string.crop_title);
-            mImageView.zoomTo(1, 500);
-        }
-    }
 
-    @Override
-    public void onNewImageClicked() {
-        setResult(RESULT_NEW_IMAGE);
-        mPix.recycle();
-        finish();
-    }
 }
 
