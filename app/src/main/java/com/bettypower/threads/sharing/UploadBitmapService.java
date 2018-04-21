@@ -29,7 +29,7 @@ public class UploadBitmapService extends IntentService {
     public static final String EXTRA_BET = "bet";
     public static final String BITMAP_URI = "bitmap";
 
-    private static final String URL_STRING = "https://www.fishtagram.it/bettypower/bet_shering/sharing_uploader.php";
+    private static final String URL_STRING = "https://www.bettypower.it/bet_sharing/sharing_uploader.php";
     private static final int CONNECTION_TIMEOUT = 15 * 1000;
     private static final int QUALITY = 100;
 

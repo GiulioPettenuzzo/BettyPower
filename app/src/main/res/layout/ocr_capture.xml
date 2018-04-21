@@ -38,7 +38,6 @@
         style="@style/Base.Animation.AppCompat.Dialog"
         android:layout_width="75dp"
         android:layout_height="75dp"
-        android:layout_marginBottom="0dp"
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
         android:background="@color/common_google_signin_btn_text_dark_default"
@@ -54,8 +53,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:srcCompat="@drawable/capture_image_icon"
-        tools:layout_editor_absoluteY="456dp" />
+        app:srcCompat="@mipmap/photo_ball_button" />
 
     <ImageButton
         android:id="@+id/flash_button"

@@ -15,6 +15,7 @@
  */
 package com.renard.ocr.documents.creation.visualisation;
 
+import com.bettypower.PalimpsestWaiting;
 import com.bettypower.SingleBetActivity;
 import com.bettypower.betMatchFinder.listeners.CompleteElaborationListener;
 import com.bettypower.betMatchFinder.listeners.PalimpsestLoadListener;
@@ -29,12 +30,14 @@ import com.renard.ocr.MonitoredActivity;
 import com.renard.ocr.PermissionGrantedEvent;
 import com.renard.ocr.R;
 import com.renard.ocr.TextFairyApplication;
+import com.renard.ocr.documents.creation.crop.CropImageActivity;
 import com.renard.ocr.documents.creation.visualisation.LayoutQuestionDialog.LayoutChoseListener;
 import com.renard.ocr.documents.creation.visualisation.LayoutQuestionDialog.LayoutKind;
 import com.renard.ocr.documents.viewing.DocumentContentProvider;
 import com.renard.ocr.documents.viewing.DocumentContentProvider.Columns;
 import com.renard.ocr.documents.viewing.grid.DocumentGridActivity;
 import com.renard.ocr.documents.viewing.single.DocumentActivity;
+import com.renard.ocr.install.InstallActivity;
 import com.renard.ocr.util.ResourceUtils;
 import com.renard.ocr.util.Screen;
 import com.renard.ocr.util.Util;
@@ -326,6 +329,10 @@ public class OCRActivity extends MonitoredActivity implements LayoutChoseListene
                         TextFairyApplication application = (TextFairyApplication) getApplicationContext();
                         String correctResult = Html.fromHtml(utf8String).toString();
                         application.resolver.setNormalResponse(correctResult);
+                        if(application.getAllPalimpsestMatch()==null) {
+                            Intent intent = new Intent(OCRActivity.this, PalimpsestWaiting.class);
+                            startActivity(intent);
+                        }
                         application.resolver.setCompleteElaborationListener(new CompleteElaborationListener() {
                             @Override
                             public void onElaborationComplete(Bet bet) {

@@ -43,7 +43,7 @@ import java.util.List;
 
 public class ShareBetThread extends AsyncTask<String, Void, String> {
 
-    private static final String APPLICATION_LINK = "http://www.fishtagram.it/bettypower/app_link.php?";
+    private static final String APPLICATION_LINK = "https://www.bettypower.it/app_link.php?";
     public static final String SHARE_CODES_FILE_NAMES = "share_code_file_name";
 
 
@@ -212,6 +212,12 @@ public class ShareBetThread extends AsyncTask<String, Void, String> {
                                     "Description")
                             .setContentUrl(Uri.parse(appLink)).build();
                     shareDialog.show(linkContent);*/
+                    sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "La mia schedina");
+                    sharingIntent.putExtra(Intent.EXTRA_STREAM, uri);
+                    sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT,activity.getApplicationContext().getResources().getString(R.string.socal_post)+" "+ appLink);
+                    sharingIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                    sharingIntent.setPackage(info.activityInfo.packageName);
+                    activity.startActivity(sharingIntent);
                 } else {
                     sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "La mia schedina");
                     sharingIntent.putExtra(Intent.EXTRA_STREAM, uri);

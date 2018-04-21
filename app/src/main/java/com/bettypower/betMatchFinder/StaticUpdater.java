@@ -1,7 +1,11 @@
 package com.bettypower.betMatchFinder;
 
+import android.util.Log;
+
+import com.bettypower.betMatchFinder.betFinderManagment.StaticBetUpdater;
 import com.bettypower.betMatchFinder.entities.ConcreteMatchToFind;
 import com.bettypower.betMatchFinder.entities.MatchToFind;
+import com.bettypower.betMatchFinder.entities.OddsToFind;
 import com.bettypower.entities.PalimpsestMatch;
 import com.bettypower.util.Helper;
 
@@ -16,26 +20,29 @@ public class StaticUpdater {
 
     private ArrayList<PalimpsestMatch> allPalimpsestMatch;
     private ArrayList<MatchToFind> allMatchFoundByRealTimeOCR;
-    private ArrayList<String> allQuoteFoundByRealTimeOCR;
+    private ArrayList<OddsToFind> allQuoteFoundByRealTimeOCR;
+    private Map<String,String> bookmakerAndMoney;
     private Validator validator;
     private Helper helper;
+    private StaticBetUpdater staticBetUpdater;
 
     private ArrayList<MatchToFind> mainListOfMatches;
 
 
-    public StaticUpdater(ArrayList<PalimpsestMatch> allPalimpsestMatch,ArrayList<MatchToFind> allMatchFoundByRealTimeOCR,ArrayList<String> allQuoteFoundByRealTimeOCR){
+    public StaticUpdater(ArrayList<PalimpsestMatch> allPalimpsestMatch,ArrayList<MatchToFind> allMatchFoundByRealTimeOCR,ArrayList<OddsToFind> allQuoteFoundByRealTimeOCR,Map<String,String> bookMakerAndMoney){
         this.allPalimpsestMatch = allPalimpsestMatch;
         this.allMatchFoundByRealTimeOCR = allMatchFoundByRealTimeOCR;
         this.allQuoteFoundByRealTimeOCR = allQuoteFoundByRealTimeOCR;
+        this.bookmakerAndMoney = bookMakerAndMoney;
         mainListOfMatches = new ArrayList<>();
         validator = new Validator();
+        staticBetUpdater = new StaticBetUpdater(allQuoteFoundByRealTimeOCR);
         helper = new Helper(allPalimpsestMatch);
     }
 
     public void updateNewElement(Map<String,Object> map) {
         for (String currentKey : map.keySet()) {
             if (currentKey.equals(Finder.PALIMPSEST)) {
-                //solo per l'inizio
                 if(mainListOfMatches.size()!=0 && getCurrentMatch().getPalimpsest()!=null && getCurrentMatch().getPalimpsest().equals(map.get(currentKey).toString())){
                     return;
                 }
@@ -100,6 +107,7 @@ public class StaticUpdater {
                 resolveNameMethod(map.get(currentKey).toString());
             }
             if (currentKey.equals(Finder.QUOTE)&& mainListOfMatches.size()!=0) {
+                staticBetUpdater.updateNewQuote(map.get(currentKey).toString(),mainListOfMatches);
                 /*
                 if(mainListOfMatches.get(pointer).getHour() != null && !mainListOfMatches.get(pointer).getHour().equals(map.get(currentKey).toString()) ||
                         (map.containsKey(Finder.QUOTE) && !map.get(Finder.QUOTE).toString().equals(map.get(currentKey).toString())) ){
@@ -110,23 +118,41 @@ public class StaticUpdater {
 
 
          //   }
-            if (currentKey.equals(Finder.BET)&& mainListOfMatches.size()!=0) {
-                if(validator.isBetValidate(map.get(currentKey).toString(),getCurrentMatch().getBetKind(),
+            if (currentKey.equals(Finder.BET)&& mainListOfMatches.size()!=0 && getCurrentMatch().getBet()==null) {
+                mainListOfMatches = staticBetUpdater.updateNewBet(map.get(currentKey).toString(),mainListOfMatches);
+               /* if(validator.isBetValidate(map.get(currentKey).toString(),getCurrentMatch().getBetKind(),
                         getCurrentMatch().getOdds(),getCurrentMatch().getPalimpsestMatch())){
                     getCurrentMatch().setBet(map.get(currentKey).toString());
                 }
                 else{
                     getCurrentMatch().setBet(null);
-                    getCurrentMatch().setBetKind(null);
-                }
+                }*/
             }
-            if (currentKey.equals(Finder.BET_KIND)&& mainListOfMatches.size()!=0) {
-                if(validator.isBetKindValidate(getCurrentMatch().getBet(),map.get(currentKey).toString())){
+            if (currentKey.equals(Finder.BET_KIND)&& mainListOfMatches.size()!=0 && getCurrentMatch().getBetKind()==null) {
+                mainListOfMatches = staticBetUpdater.updateNewBetKind(map.get(currentKey).toString(),mainListOfMatches);
+               /* if(validator.isBetKindValidate(getCurrentMatch().getBet(),map.get(currentKey).toString())){
                     getCurrentMatch().setBetKind(map.get(currentKey).toString());
                 }
                 else {
-                    getCurrentMatch().setBet(null);
                     getCurrentMatch().setBetKind(null);
+                }*/
+            }
+
+            if(currentKey.equals(Finder.VINCITA)){
+                String currentVincita = bookmakerAndMoney.get(currentKey);
+                if(currentVincita==null || isBigger(map.get(currentKey).toString(),currentVincita)){
+                    bookmakerAndMoney.put(currentKey,map.get(currentKey).toString());
+                }
+            }
+
+            if(currentKey.equals(Finder.PUNTATA)){
+                bookmakerAndMoney.put(currentKey,map.get(currentKey).toString());
+            }
+
+            if(currentKey.equals(Finder.EURO)){
+                String currentVincita = bookmakerAndMoney.get(Finder.VINCITA);
+                if(currentVincita==null || isBigger(map.get(currentKey).toString(),currentVincita)){
+                    bookmakerAndMoney.put(Finder.VINCITA,map.get(currentKey).toString());
                 }
             }
         }
@@ -233,11 +259,27 @@ public class StaticUpdater {
         }
     }
 
+    private boolean isBigger(String one,String two){
+        one = one.replace(",","");
+        two = two.replace(",","");
+        int numberOne = Integer.parseInt(one);
+        int numberTwo = Integer.parseInt(two);
+        return numberOne > numberTwo;
+    }
+
     public ArrayList<MatchToFind> getAllMatchFound(){
         return mainListOfMatches;
     }
 
     public ArrayList<MatchToFind> getAllMatchRemainedFromRealTimeOCR(){
         return allMatchFoundByRealTimeOCR;
+    }
+
+    public Map<String,String> getBookmakerAndMoney(){
+        return bookmakerAndMoney;
+    }
+
+    public ArrayList<String> getAllQuote(){
+        return staticBetUpdater.getAllQuoteFoundByStaticOCR();
     }
 }

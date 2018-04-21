@@ -46,6 +46,10 @@ public class RefreshResultThread extends Thread{
         this.isTimeUnderThree = isTimeUnderThree();
     }
 
+    public RefreshResultThread(){
+
+    }
+
     @Override
     public void run() {
         long normalInit = System.currentTimeMillis();
@@ -72,7 +76,7 @@ public class RefreshResultThread extends Thread{
                 if(isTheSameMatch(savedMatch,goalServeMatch)){
                     String homeResult = goalServeMatch.getHomeResult().replace("?","-");
                     String awayResult = goalServeMatch.getAwayResult().replace("?","-");
-                    if(!homeResult.equals("-") && !awayResult.equals("-")) {
+                    if(!homeResult.equals("-") && !awayResult.equals("-") || goalServeMatch.getResultTime().equalsIgnoreCase("posticipata")) {
                         savedMatch.setHomeResult(homeResult);
                         savedMatch.setAwayResult(awayResult);
                         savedMatch.setResultTime(goalServeMatch.getResultTime());
@@ -98,6 +102,7 @@ public class RefreshResultThread extends Thread{
      */
     private boolean isTheSameMatch(PalimpsestMatch betPalimpsest,PalimpsestMatch goalServePalimpsest){
 
+        //TODO da testare ma secondo me funziona lo stesso se confronti sia con oggi che con ieri
         if(isTimeUnderThree){
             if(betPalimpsest.getDate().equalsIgnoreCase(dateFromGive) || betPalimpsest.getDate().equalsIgnoreCase(yesterdayDate)){
                 return areMatchCompatible(betPalimpsest,goalServePalimpsest);
@@ -151,9 +156,9 @@ public class RefreshResultThread extends Thread{
         return i;
     }
 
-    private boolean isTimeUnderThree(){
-        String One = "01:00"; //one is current date
-        String Two = "03:00";
+    public boolean isTimeUnderThree(){
+        String One = "00:00"; //one is current date
+        String Two = "04:00";
         java.util.Date now = Calendar.getInstance().getTime();
         String thisHour = String.valueOf(now.getHours());
         String thisminute = String.valueOf(now.getMinutes());
@@ -177,14 +182,14 @@ public class RefreshResultThread extends Thread{
         return resultdate;
     }
 
-    private String giveDate() {
-        Calendar c = Calendar.getInstance();
+    public String giveDate() {
+       /* Calendar c = Calendar.getInstance();
         SimpleDateFormat sdfh = new SimpleDateFormat("HH:mm",Locale.getDefault());
         String getCurrentTime = sdfh.format(c.getTime());
 
         String midnight = "00:00"; //TODO se la partita comincia a mezzanotte non funziona nulla fino all'una
         //questo è dovuto al fatto che molte volte a mezzanotte segnano che le partite sono il giorno prima stronzi dimmmerda
-        String oneOclock = "01:00";
+        String oneOclock = "02:00";
 
         String date = "";
         if (getCurrentTime.compareTo(midnight) >= 0 && getCurrentTime.compareTo(oneOclock) <= 0)
@@ -195,11 +200,11 @@ public class RefreshResultThread extends Thread{
             date = sdf.format(cal.getTime());
         }
         else
-        {
+        {*/
             Calendar cal = Calendar.getInstance();
             SimpleDateFormat sdf = new SimpleDateFormat("dd/MM", Locale.getDefault());
-            date = sdf.format(cal.getTime());
-        }
+            String date = sdf.format(cal.getTime());
+      //  }
         return date;
     }
 

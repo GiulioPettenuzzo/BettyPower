@@ -4,6 +4,7 @@
 
     <string name="sistema_checkbox">Sistema</string>
     <string name="socal_post">Hey segui qui la mia schedina</string>
+    <string name="server_error">Scusa</string>
     <string name="share_with">Condividi la schedina con..</string>
     <string name="match_not_loaded">Sto caricando tutte le partite, attendi un istante!</string>
     <string name="match_loaded">Partite caricate</string>
@@ -138,6 +139,11 @@
     <string name="progress_choose_columns">Please choose the text and images you want in the final
         document
     </string>
+    <string name="match_charged_first_part">CARICATE</string>
+    <string name="match_charged_second_part">PARTITE</string>
+    <string name="palimpsest_waiting_connection">P.S. Assicurati che il telefono sia connesso ad internet</string>
+    <string name="palimpsest_waiting">MI SERVE UN ISTANTE</string>
+    <string name="palimpsest_waiting_explanation">La prima volta che usi l\'applicazione è necessario caricare tutti i campionati e le partite di calcio,      l\'operazione può richiedere una decina di secondi!\n Ti ringrazio per l\'attesa.</string>
     <string name="no_sd_card">No SD card mounted. Is the phone connected to your pc? If so please
         remove it and try again.
     </string>
@@ -156,6 +162,8 @@
     <string name="install_error_disk_space">Not enough disk space. You need to free %1$d MB on your
         SD card
     </string>
+    <string name="device_connected">DISPOSITIVO CONNESSO! ATTENDERE CARICAMENTO</string>
+    <string name="connection_down">HO BISOGNO DI UNA CONNESSIONE AD INTERNET</string>
     <string name="install_error">Could not install configuration files.</string>
     <string name="toc_title">Table of contents</string>
     <string name="document_list_help_title">Manage your scanned documents here.</string>
@@ -283,9 +291,9 @@
     </string>
     <string name="permission_explanation_title">Permission missing</string>
     <string name="no_gallery_found">No gallery app found on this phone.</string>
-    <string name="install_tip_1">Fornisco i risultati delle partite in tempo reale
+    <string name="install_tip_1">puoi seguire i risultati delle partite di calcio di tutto il mondo in tempo reale
     </string>
-    <string name="install_tip_2">Non sono molto brava a leggere ciò che hai scommesso</string>
+    <string name="install_tip_2">Non sono molto brava a leggere ciò che hai scommesso, correggimi se sbaglio</string>
     <string name="pref_title_privacy">Privacy Policy</string>
     <string name="pref_summary_privacy">Vedi la nostra politica sulla Privacy</string>
     <string name="install_tip_3">Estraggo le partite di calcio scattando una foto al biglietto della scommessa.

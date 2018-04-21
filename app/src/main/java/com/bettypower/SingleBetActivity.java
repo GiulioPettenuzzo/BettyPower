@@ -101,7 +101,7 @@ public class SingleBetActivity extends AppCompatActivity {
     private Gson gson = new Gson(); //to use tojson
     private Gson gsonGetter;//to use fromjson
 
-    private static final String SHARING_LINK = "http://www.fishtagram.it/bettypower/bet_shering/bet_shared/";
+    private static final String SHARING_LINK = "https://www.bettypower.it/bet_sharing/bet_shared/";
     private static final String MATCH_URL = "http://www.goalserve.com/updaters/soccerupdate.aspx";
     private static final String ALL_MATCH_STATE = "save_all_match";
     private static final String ALL_MATCH_SELECTED_STATE = "all_match_selected_state";
@@ -375,7 +375,7 @@ public class SingleBetActivity extends AppCompatActivity {
         @Override
         public void run() {
             Cursor c = getContentResolver().query(uri, new String[]{DocumentContentProvider.Columns.OCR_TEXT}, null, null, null);
-            String text= "";
+            String text;
             if (c != null && c.moveToFirst()) {
                 c.moveToFirst();
                 text = c.getString(c.getPosition());
@@ -424,6 +424,7 @@ public class SingleBetActivity extends AppCompatActivity {
         refreshButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //TODO perchè first time match loader?
                 firstTimeMatchLoader();
                 refreshButton.setVisibility(View.GONE);
             }
@@ -578,7 +579,11 @@ public class SingleBetActivity extends AppCompatActivity {
                         rVSingleBet.setAdapter(singleBetAdapter);
                         allMatchLoadListener.onMatchesLoaded();
                         swipeRefreshLayout.setRefreshing(true);
-                        setRefreshLayoutEnabled(true);
+                        Uri appLinkData = getIntent().getData();
+                        String appLinkAction = getIntent().getAction();
+                        if (!(Intent.ACTION_VIEW.equals(appLinkAction) && appLinkData != null)) {
+                            setRefreshLayoutEnabled(true);
+                        }
                         setHideScrollListener(true);
                     }
                 });
@@ -642,6 +647,7 @@ public class SingleBetActivity extends AppCompatActivity {
                 @Override
                 public void onLoadLogoFinish(Bitmap bitmap) {
                     singleBetAdapter.notifyItemChanged(bet.getArrayMatch().lastIndexOf(currentMatch));
+                    //singleBetAdapter.notifyDataSetChanged();
                 }
             }, SingleBetActivity.this);
             homeThread.start();
@@ -653,6 +659,7 @@ public class SingleBetActivity extends AppCompatActivity {
                 @Override
                 public void onLoadLogoFinish(Bitmap bitmap) {
                     singleBetAdapter.notifyItemChanged(bet.getArrayMatch().lastIndexOf(currentMatch));
+                    //singleBetAdapter.notifyDataSetChanged();
                 }
             }, SingleBetActivity.this);
             awayThread.start();
@@ -675,7 +682,7 @@ public class SingleBetActivity extends AppCompatActivity {
     }
 
     private void setRefreshLayoutEnabled(boolean value){
-        if(value && bet.areThereMatchToday()){
+        if(value && bet.areThereMatchToday() && !editMode){
             swipeRefreshLayout.setEnabled(true);
         }else{
             swipeRefreshLayout.setEnabled(false);
@@ -768,7 +775,6 @@ public class SingleBetActivity extends AppCompatActivity {
                 ) {
             if (currentMatch.isFissa()) {
                 bet.setSistema(true);
-                //break;
             }
             for (PalimpsestMatch currentResultMatch:allPalimpsestMatch
                     ) {
@@ -819,6 +825,7 @@ public class SingleBetActivity extends AppCompatActivity {
      **********************************************************************************************/
 
     private void handleIntent(Intent intent) {
+        swipeRefreshLayout.setEnabled(true);
         String appLinkAction = intent.getAction();
         Uri appLinkData = intent.getData();
         if (Intent.ACTION_VIEW.equals(appLinkAction) && appLinkData != null){
@@ -841,58 +848,64 @@ public class SingleBetActivity extends AppCompatActivity {
                             gsonGetter = gsonBuilder.create();
                             Bitmap bitmap;
                             CharSequence date = null;
-                            if(response.contains("-->")){
-                                bet = gsonGetter.fromJson(response.substring(0,response.indexOf("-->")-1),SingleBet.class);
-                                byte[] imageAsBytes;
-                                imageAsBytes = Base64.decode(response.substring(response.indexOf("-->")+1,response.length()).getBytes(),Base64.DEFAULT);
-                                bitmap = BitmapFactory.decodeByteArray(imageAsBytes, 0, imageAsBytes.length);
-                                switchMenuItem.setVisible(true);
-                                ImageHelper imageHelper = new ImageHelper(SingleBetActivity.this);
-                                date = DateFormat.format("ssmmhhddMMyy", new Date(System.currentTimeMillis()));
-                                imageHelper.
-                                        setFileName(date.toString()).
-                                        setDirectoryName("bet_image").setExternal(false).
-                                        save(bitmap);
-                            }
-                            else {
-                                bet = gsonGetter.fromJson(response, SingleBet.class);
-                            }
-                            singleBetAdapter.setBet(bet);
-                            swipeRefreshLayout.setRefreshing(false);
-                            readFromFile(SingleBetActivity.this);
-                            if(!betAlreadyExist(fileName)) {
-                                loadAllLogos();
-                                final CharSequence tempDate = date;
-                                Thread saveToDb = new Thread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        try {
-                                            uri = saveDocumentToDB(gson.toJson(bet));
-                                            ContentValues values = new ContentValues();
-                                            if(tempDate!=null) {
-                                                values.put(DocumentContentProvider.Columns.PHOTO_PATH, getDir("bet_image", Context.MODE_PRIVATE).getPath() + "/" + tempDate.toString());
-                                                values.put(DocumentContentProvider.Columns.HOCR_TEXT, "image_shared");
-                                                Cursor c = getContentResolver().query(uri, new String[]{DocumentContentProvider.Columns.ID}, null, null, null);
-                                                String id = null;
-                                                if (c != null) {
-                                                    c.moveToFirst();
-                                                    id = c.getString(c.getPosition());
-                                                    c.close();
+                            try {
+                                if (response.contains("-->")) {
+                                    bet = gsonGetter.fromJson(response.substring(0, response.indexOf("-->") - 1), SingleBet.class);
+                                    byte[] imageAsBytes;
+                                    imageAsBytes = Base64.decode(response.substring(response.indexOf("-->") + 1, response.length()).getBytes(), Base64.DEFAULT);
+                                    bitmap = BitmapFactory.decodeByteArray(imageAsBytes, 0, imageAsBytes.length);
+                                    switchMenuItem.setVisible(true);
+                                    ImageHelper imageHelper = new ImageHelper(SingleBetActivity.this);
+                                    date = DateFormat.format("ssmmhhddMMyy", new Date(System.currentTimeMillis()));
+                                    imageHelper.
+                                            setFileName(date.toString()).
+                                            setDirectoryName("bet_image").setExternal(false).
+                                            save(bitmap);
+                                } else {
+                                    bet = gsonGetter.fromJson(response, SingleBet.class);
+                                }
+                                singleBetAdapter.setBet(bet);
+                                swipeRefreshLayout.setRefreshing(false);
+                                readFromFile(SingleBetActivity.this);
+                                if (!betAlreadyExist(fileName)) {
+                                    loadAllLogos();
+                                    final CharSequence tempDate = date;
+                                    Thread saveToDb = new Thread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            try {
+                                                uri = saveDocumentToDB(gson.toJson(bet));
+                                                ContentValues values = new ContentValues();
+                                                if (tempDate != null) {
+                                                    values.put(DocumentContentProvider.Columns.PHOTO_PATH, getDir("bet_image", Context.MODE_PRIVATE).getPath() + "/" + tempDate.toString());
+                                                    values.put(DocumentContentProvider.Columns.HOCR_TEXT, "image_shared");
+                                                    Cursor c = getContentResolver().query(uri, new String[]{DocumentContentProvider.Columns.ID}, null, null, null);
+                                                    String id = null;
+                                                    if (c != null) {
+                                                        c.moveToFirst();
+                                                        id = c.getString(c.getPosition());
+                                                        c.close();
+                                                    }
+                                                    Util.createThumbnail(SingleBetActivity.this, new File(getDir("bet_image", Context.MODE_PRIVATE).getPath() + "/" + tempDate.toString()), Integer.parseInt(id));
+                                                    getApplicationContext().getContentResolver().update(uri, values, null, null);
                                                 }
-                                                Util.createThumbnail(SingleBetActivity.this,new File(getDir("bet_image", Context.MODE_PRIVATE).getPath() + "/" + tempDate.toString()),Integer.parseInt(id));
-                                                getApplicationContext().getContentResolver().update(uri,values,null,null);
+                                            } catch (RemoteException e) {
+                                                e.printStackTrace();
                                             }
-                                        } catch (RemoteException e) {
-                                            e.printStackTrace();
                                         }
-                                    }
-                                });
-                                saveToDb.start();
-                                writeToFile(fileName,SingleBetActivity.this);
+                                    });
+                                    saveToDb.start();
+                                    writeToFile(fileName, SingleBetActivity.this);
+                                } else {
+                                    if (date != null)
+                                        uri = Uri.parse(getDir("bet_image", Context.MODE_PRIVATE).getPath() + "/" + date.toString());
+                                }
                             }
-                            else{
-                                if(date!=null)
-                                    uri = Uri.parse(getDir("bet_image", Context.MODE_PRIVATE).getPath() + "/" + date.toString());
+                            catch(Exception e){
+                                //TODO devo trovare il modo di capire quando entra qui
+                                swipeRefreshLayout.setRefreshing(false);
+                                Toast toast = Toast.makeText(getApplicationContext(), R.string.server_error, Toast.LENGTH_LONG);
+                                toast.show();
                             }
                         }
                     }, new Response.ErrorListener() {

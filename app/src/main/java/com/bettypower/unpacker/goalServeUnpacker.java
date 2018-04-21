@@ -27,8 +27,6 @@ public class goalServeUnpacker implements Unpacker {
     private ArrayList<Team> allHomeTeams = new ArrayList<>();
     private ArrayList<Team> allAwayTeams = new ArrayList<>();
 
-    private ArrayList<String> allHiddenResultOnHtml = new ArrayList<>();
-
     private String response;
 
     public goalServeUnpacker(String response){
@@ -107,9 +105,6 @@ public class goalServeUnpacker implements Unpacker {
     }
 
 
-    /**
-     * serve un metodo per estrarre tutti i match in html e uno per estrarre tutte le informazioni da quello specifico match in html
-     */
     /**
      * this method give back all the matche in html format
      * ritorna in una matrice tutte le informazioni di tutti i match la prima riga rappresenta la squadra

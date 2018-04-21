@@ -3,12 +3,16 @@ package com.bettypower.betMatchFinder;
 import android.util.Log;
 
 import com.bettypower.betMatchFinder.entities.MatchToFind;
+import com.bettypower.betMatchFinder.entities.OddsToFind;
+import com.bettypower.betMatchFinder.labelSet.BetLabelSet;
 import com.bettypower.entities.PalimpsestMatch;
+import com.bettypower.entities.ParcelablePalimpsestMatch;
 import com.bettypower.entities.Team;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.StringTokenizer;
 
 /**
@@ -17,24 +21,28 @@ import java.util.StringTokenizer;
 
 public class StaticPredictor {
 
-    private ArrayList<PalimpsestMatch> allPalimpsestMatch;
     private String response;
     private StaticUpdater staticUpdater;
     private ArrayList<String> lastWordsNames;
+    private Finder finder;
 
     private ArrayList<MatchToFind> allMatchesFound;
+    private BetLabelSet betLabelSet = new BetLabelSet();
+    private ArrayList<String> allQuoteFound = new ArrayList<>();
+    private Map<String,String> bookmakerAndMoney;
 
-    public StaticPredictor(ArrayList<PalimpsestMatch> allPalimpsestMatch,String response,ArrayList<MatchToFind> allMatchFoundByRealTimeOCR,ArrayList<String> allQuoteFoundByRealTimeOCR){
-        this.allPalimpsestMatch = allPalimpsestMatch;
+    public StaticPredictor(ArrayList<PalimpsestMatch> allPalimpsestMatch, String response, ArrayList<MatchToFind> allMatchFoundByRealTimeOCR, ArrayList<OddsToFind> allQuoteFoundByRealTimeOCR, Finder finder,Map<String,String> bookMakerAndMoney){
         this.response = response;
-        staticUpdater = new StaticUpdater(allPalimpsestMatch,allMatchFoundByRealTimeOCR,allQuoteFoundByRealTimeOCR);
+        this.finder = finder;
+        staticUpdater = new StaticUpdater(allPalimpsestMatch,allMatchFoundByRealTimeOCR,allQuoteFoundByRealTimeOCR,bookMakerAndMoney);
         lastWordsNames = new ArrayList<>();
+
     }
 
     public void getAllElementFound(){
         StringTokenizer token = new StringTokenizer(response);
-        Finder finder = new Finder(allPalimpsestMatch);
         Map<String,Object> allElementFound;
+        long init = System.currentTimeMillis();
         while(token.hasMoreTokens()){
             String word = token.nextToken();
             finder.setWord(word);
@@ -49,15 +57,15 @@ public class StaticPredictor {
             }
         }
 
+        Log.i("TEMPO FINDER",String.valueOf(System.currentTimeMillis()-init));
 
         allMatchesFound = staticUpdater.getAllMatchFound();
         ArrayList<MatchToFind> remained = staticUpdater.getAllMatchRemainedFromRealTimeOCR();
-        for (MatchToFind matchCurrent:remained
-                ) {
-            allMatchesFound.add(matchCurrent);
-        }
+        bookmakerAndMoney = staticUpdater.getBookmakerAndMoney();
+        allMatchesFound.addAll(remained);
         Assembler assembler = new Assembler(allMatchesFound);
         allMatchesFound = assembler.getAllMatchReassembled();
+        allQuoteFound = staticUpdater.getAllQuote();
         int i = 0;
         for (MatchToFind currentMatch:allMatchesFound
                 ) {
@@ -80,9 +88,29 @@ public class StaticPredictor {
                 Log.i("DATE",""+currentMatch.getDate());
             if(currentMatch.getHour()!=null)
                 Log.i("HOUR",""+currentMatch.getHour());
-            if(currentMatch.getBet()!=null)
-                Log.i("BET",""+currentMatch.getBet());
+            if(currentMatch.getBet()!=null) {
+                //TODO quando hai finito ci aggiungi sta roba ma prima deve funzionare bene senza
+
+              /*  BetLabelSet betLabelSet = new BetLabelSet();
+                if(currentMatch.getBetKind()==null) {
+                    Map<String, ArrayList<String>> allBetKind = betLabelSet.hashBetAndBetKind();
+                    for (String currentBetKind : allBetKind.keySet()
+                            ) {
+                        for (String currentbet : allBetKind.get(currentBetKind)
+                                ) {
+                            if (currentMatch.getBet().equalsIgnoreCase(currentbet)) {
+                                currentMatch.setBetKind(currentBetKind);
+                            }
+                        }
+                    }
+                }*/
+                Log.i("BET", "" + currentMatch.getBet());
+            }
             if(currentMatch.getBetKind()!=null)
+                //TODO  quando hai finito ci aggiungi sta roba ma prima deve funzionare bene senza
+              /*  if(currentMatch.getBet()==null){
+                    currentMatch.setBet(betLabelSet.hashBetAndBetKind().get(currentMatch.getBetKind()).get(0));
+                }*/
                 Log.i("BET KIND",""+currentMatch.getBetKind());
             if(currentMatch.getOdds()!=null)
                 Log.i("QUOTE",""+currentMatch.getOdds());
@@ -143,7 +171,16 @@ public class StaticPredictor {
         return map;
     }
 
+
     public ArrayList<MatchToFind> getAllMatchesFound(){
         return allMatchesFound;
+    }
+
+    public Map<String, String> getBookmakerAndMoney() {
+        return bookmakerAndMoney;
+    }
+
+    public ArrayList<String> getAllQuoteFound() {
+        return allQuoteFound;
     }
 }

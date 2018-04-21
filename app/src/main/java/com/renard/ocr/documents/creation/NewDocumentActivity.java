@@ -470,10 +470,11 @@ public abstract class NewDocumentActivity extends MonitoredActivity {
                 startOcrActivity(nativePix, true);
             } else {
                 startOcrActivity(nativePix, true);
-                /**
-                Intent actionIntent = new Intent(this, CropImageActivity.class);
+
+                //TODO QUI SE VOGLIO AGGIUNGERE IL CROP IMAGE
+            /*    Intent actionIntent = new Intent(this, CropImageActivity.class);
                 actionIntent.putExtra(NewDocumentActivity.EXTRA_NATIVE_PIX, nativePix);
-                startActivityForResult(actionIntent, NewDocumentActivity.REQUEST_CODE_CROP_PHOTO);*/
+                startActivity(actionIntent);*/
             }
         } else {
             showFileError(pixLoadStatus);

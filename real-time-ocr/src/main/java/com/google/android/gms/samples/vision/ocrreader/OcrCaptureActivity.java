@@ -67,6 +67,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.security.Policy;
+import java.util.List;
 
 /**
  * Activity for the multi-tracker app.  This app detects text and displays the value with the
@@ -143,11 +144,13 @@ public final class OcrCaptureActivity extends AppCompatActivity {
         gestureDetector = new GestureDetector(this, new CaptureGestureListener());
         scaleGestureDetector = new ScaleGestureDetector(this, new ScaleListener());
 
+
         mCaptureImageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 //mCameraSource.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
-                    mCameraSource.autoFocus(new CameraSource.AutoFocusCallback() {
+              //  mCaptureImageButton.setImageDrawable(getResources().getDrawable(R.drawable.photo_ball_button_pressed));
+                mCameraSource.autoFocus(new CameraSource.AutoFocusCallback() {
                     @Override
                     public void onAutoFocus(boolean success) {
                         mCameraSource.takePicture(new CameraSource.ShutterCallback() {
@@ -186,6 +189,23 @@ public final class OcrCaptureActivity extends AppCompatActivity {
             }
         });
 
+
+        mCaptureImageButton.setOnTouchListener(new View.OnTouchListener() {
+
+            public boolean onTouch(View v, MotionEvent event) {
+                if (event.getAction() == MotionEvent.ACTION_UP) {
+                    // reset the background color here
+                    mCaptureImageButton.setImageDrawable(getResources().getDrawable(R.mipmap.photo_ball_button));
+
+                }else{
+                    // Change the background color here
+                    mCaptureImageButton.setImageDrawable(getResources().getDrawable(R.mipmap.photo_ball_button_pressed));
+
+                }
+                return false;
+            }
+        });
+
         mFlashButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -205,7 +225,9 @@ public final class OcrCaptureActivity extends AppCompatActivity {
                 //mCameraSource.setFlashMode(useFlash ? Camera.Parameters.FLASH_MODE_TORCH : null);
             }
         });
+
     }
+
 
 
     /**
@@ -365,9 +387,21 @@ public final class OcrCaptureActivity extends AppCompatActivity {
         if (grantResults.length != 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             Log.d(TAG, "Camera permission granted - initialize the camera source");
             // We have permission, so create the camerasource
-            boolean autoFocus = getIntent().getBooleanExtra(AutoFocus,false);
-            boolean useFlash = getIntent().getBooleanExtra(UseFlash, false);
+            boolean autoFocus = getIntent().getBooleanExtra(AutoFocus,true);
+            boolean useFlash = getIntent().getBooleanExtra(UseFlash, true);
             createCameraSource(autoFocus, useFlash);
+            startCameraSource();
+            Camera.Parameters parameters = mCameraSource.getCamera().getParameters();
+            parameters.setJpegQuality(100);
+            List<Camera.Size> sizes = parameters.getSupportedPictureSizes();
+            Camera.Size size = sizes.get(0);
+            for (int i = 0; i < sizes.size(); i++) {
+                if (sizes.get(i).width > size.width)
+                    size = sizes.get(i);
+            }
+            parameters.setPictureSize(size.width, size.height);
+
+            mCameraSource.getCamera().setParameters(parameters);
             return;
         }
 

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.StringTokenizer;
+import java.util.TreeMap;
 
 /**
  * Created by giuliopettenuzzo on 25/10/17.
@@ -208,6 +209,7 @@ public class BetLabelSet {
 
         ArrayList<String> bet48 = new ArrayList<>();
         bet48.add("No Goal");
+        bet48.add("NoGoal");
         map.put("No Goal" , bet48);
 
         ArrayList<String> bet49 = new ArrayList<>();
@@ -300,11 +302,15 @@ public class BetLabelSet {
 
         ArrayList<String> bet71 = new ArrayList<>();
         bet71.add("Gol");
-        map.put("Gol" , bet71);
+        bet71.add("goal");
+        map.put("Goal" , bet71);
 
         ArrayList<String> bet72 = new ArrayList<>();
         bet72.add("NoGol");
-        map.put("NoGol" , bet72);
+        bet72.add("nogoal");
+        bet72.add("NOGOAL");
+        bet72.add("no goal");
+        map.put("No Goal" , bet72);
 
         ArrayList<String> bet73 = new ArrayList<>();
         bet73.add("Gol & Over 2,5");
@@ -360,22 +366,32 @@ public class BetLabelSet {
 
         ArrayList<String> bet86 = new ArrayList<>();
         bet86.add("1 & Under 1.5");
+        bet86.add("1 + U 1.5");
+        bet86.add("1 + U");
         map.put("1 & Under 1.5" , bet86);
 
         ArrayList<String> bet87 = new ArrayList<>();
         bet87.add("1 & Over 1.5");
+        bet86.add("1 + O 1.5");
+        bet86.add("1 + O");
         map.put("1 & Over 1.5" , bet87);
 
         ArrayList<String> bet88 = new ArrayList<>();
         bet88.add("X & Under 1.5");
+        bet86.add("X + U 1.5");
+        bet86.add("X + U");
         map.put("X & Under 1.5" , bet88);
 
         ArrayList<String> bet89 = new ArrayList<>();
         bet89.add("X & Over 1.5");
+        bet86.add("X + O 1.5");
+        bet86.add("X + O");
         map.put("X & Over 1.5" , bet89);
 
         ArrayList<String> bet90 = new ArrayList<>();
         bet90.add("2 & Under 1.5");
+        bet86.add("2 + U 1.5");
+        bet86.add("2 + U");
         map.put("2 & Under 1.5" , bet90);
 
         ArrayList<String> bet91 = new ArrayList<>();
@@ -784,7 +800,7 @@ public class BetLabelSet {
 
         ArrayList<String> two = new ArrayList<>();
         two.add("goal/no goal");
-        map.put("goal/nogoal",two);
+        map.put("Goal/NoGoal",two);
 
         ArrayList<String> underOver = new ArrayList<>();
         underOver.add("under / over");
@@ -921,8 +937,8 @@ public class BetLabelSet {
         return map;
     }
 
-    public Map<String,ArrayList<String>> hashBetAndBetKind(){
-        Map<String,ArrayList<String>> map = new HashMap<>();
+    public TreeMap<String,ArrayList<String>> hashBetAndBetKind(){
+        TreeMap<String,ArrayList<String>> map = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
 
         ArrayList<String> arrayListOne = new ArrayList<>();
         arrayListOne.add("1");
@@ -939,7 +955,7 @@ public class BetLabelSet {
         ArrayList<String> arrayListThree = new ArrayList<>();
         arrayListThree.add("Goal");
         arrayListThree.add("No Goal");
-        map.put("Goal / NoGoal",arrayListThree);
+        map.put("Goal/NoGoal",arrayListThree);
 
         ArrayList<String> arrayListFour = new ArrayList<>();
         arrayListFour.add("Under 0,5");

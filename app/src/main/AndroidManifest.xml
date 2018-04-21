@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.renard.ocr"
     android:installLocation="auto"
     android:versionName="3.0.10">
@@ -19,13 +20,22 @@
         android:largeHeap="true"
         android:theme="@style/AppTheme">
 
-        <meta-data android:name="com.facebook.sdk.ApplicationId" android:value="@string/facebook_app_id"/>
+        <receiver android:name="com.bettypower.NetworkBroadcastReciver" >
+            <intent-filter>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+            </intent-filter>
+        </receiver>
+
+        <meta-data
+            android:name="com.facebook.sdk.ApplicationId"
+            android:value="@string/facebook_app_id" />
+
         <service android:name="com.bettypower.threads.sharing.UploadBitmapService" />
 
-
-        <provider android:authorities="com.facebook.app.FacebookContentProviderYOURFBAPPID"
+        <provider
             android:name="com.facebook.FacebookContentProvider"
-            android:exported="true"/>
+            android:authorities="com.facebook.app.FacebookContentProviderYOURFBAPPID"
+            android:exported="true" />
 
         <meta-data
             android:name="asset_statements"
@@ -82,18 +92,18 @@
         <activity
             android:name=".documents.viewing.grid.DocumentGridActivity"
             android:hardwareAccelerated="false"
-            android:launchMode="singleTop">
-        </activity>
-        <activity android:name="com.google.android.gms.samples.vision.ocrreader.OcrCaptureActivity">
+            android:launchMode="singleTop" />
+        <activity
+            android:name="com.google.android.gms.samples.vision.ocrreader.OcrCaptureActivity"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="com.google.android.gms.samples.vision.ocrreader.OcrCaptureActivity" />
 
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity android:name="com.bettypower.SingleBetActivity">
-
-        </activity>
+        <activity android:name="com.bettypower.SingleBetActivity"></activity>
 
         <service android:name=".main_menu.language.OCRLanguageInstallService" />
 
@@ -133,28 +143,30 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.bettypower.SingleBetActivity" />
         </activity>
-
         <activity
             android:name="com.bettypower.SplashActivity"
             android:theme="@style/SplashTheme">
+            <tools:validation testUrl="https://www.bettypower.it/app_link.php" />
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-            <intent-filter>
+            <intent-filter android:autoVerify="true">
                 <action android:name="android.intent.action.VIEW" />
 
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data
-                    android:scheme="http"
-                    android:host="www.fishtagram.it"
-                    android:pathPattern="/bettypower/app_link.php" />
+                    android:host="www.bettypower.it"
+                    android:pathPattern="/app_link.php"
+                    android:scheme="https" />
             </intent-filter>
-
         </activity>
+        <activity android:name="com.bettypower.PalimpsestWaiting"></activity>
+
     </application>
 
 </manifest>

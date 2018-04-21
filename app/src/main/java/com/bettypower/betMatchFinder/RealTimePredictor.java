@@ -4,12 +4,14 @@ import android.util.Log;
 
 import com.bettypower.betMatchFinder.entities.MatchToFind;
 import com.bettypower.betMatchFinder.entities.OddsToFind;
+import com.bettypower.betMatchFinder.labelSet.BetLabelSet;
 import com.bettypower.entities.PalimpsestMatch;
 import com.bettypower.entities.Team;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.StringTokenizer;
 
 /**
@@ -25,7 +27,8 @@ public class RealTimePredictor {
 
     //result
     private ArrayList<MatchToFind> elementsFound;
-    private ArrayList<String> oddsElementFound;
+    private ArrayList<OddsToFind> oddsElementFound;
+    private Map<String,String> bookmakerAndMoney;
 
 
     public RealTimePredictor(ArrayList<PalimpsestMatch> allPalimpsestMatch, String response){
@@ -55,35 +58,11 @@ public class RealTimePredictor {
         }
 
         elementsFound = realTimeUpdater.getMainListOfMatches();
-        Assembler assembler = new Assembler(elementsFound);
-        elementsFound = assembler.getAllMatchReassembled();
-        int i = 0;
-        for (MatchToFind currentMatch:elementsFound
-             ) {
-            Log.i("","");
-            Log.i("NEW ","MATCH " + i);
-            i++;
-            Log.i("number match",String.valueOf(currentMatch.getPalimpsestMatch().size()));
-            if(currentMatch.getPalimpsest()!=null)
-                Log.i("PLIMPSEST",""+currentMatch.getPalimpsest());
-            if(currentMatch.getHomeName()!=null)
-                Log.i("HOME NAME",""+currentMatch.getHomeName());
-            if(currentMatch.getAwayName()!=null)
-                Log.i("AWAY NAME",""+currentMatch.getAwayName());
-            if(currentMatch.getUnknownTeamName()!=null)
-                Log.i("UNKNOWN NAME",""+currentMatch.getUnknownTeamName());
-            if(currentMatch.getDate()!=null)
-                Log.i("DATE",""+currentMatch.getDate());
-            if(currentMatch.getHour()!=null)
-                Log.i("HOUR",""+currentMatch.getHour());
-            if(currentMatch.getBet()!=null)
-                Log.i("BET",""+currentMatch.getBet());
-            if(currentMatch.getBetKind()!=null)
-                Log.i("BET KIND",""+currentMatch.getBetKind());
-            if(currentMatch.getOdds()!=null)
-                Log.i("QUOTE",""+currentMatch.getOdds());
-        }
+       // Assembler assembler = new Assembler(elementsFound);
+       // elementsFound = assembler.getAllMatchReassembled();
+
         oddsElementFound = realTimeUpdater.getMainListOfOdds();
+        bookmakerAndMoney = realTimeUpdater.getBookMakerMoney();
     }
 
     /*
@@ -144,7 +123,11 @@ public class RealTimePredictor {
         return elementsFound;
     }
 
-    public ArrayList<String> getAllQuoteTofind(){
+    public ArrayList<OddsToFind> getAllQuoteTofind(){
         return oddsElementFound;
+    }
+
+    public Map<String, String> getBookmakerAndMoney() {
+        return bookmakerAndMoney;
     }
 }

@@ -3,7 +3,7 @@
     <string name="facebook_app_id">1545587202205385</string>
     <string name="match_not_loaded">I\'m loading all the matches, please wait a moment!</string>
     <string name="match_loaded">Match Loaded</string>
-
+    <string name="server_error">We are sorry! We have some server bug, try later we are fixing them</string>
     <string name="socal_post">Hey follow here my bet</string>
     <string name="share_with">Share your bet with..</string>
     <string name="event_win">Match won: </string>
@@ -283,9 +283,9 @@
     </string>
     <string name="permission_explanation_title">Permission missing</string>
     <string name="no_gallery_found">No gallery app found on this phone.</string>
-    <string name="install_tip_1">I\'m not very good at reading what you bet
+    <string name="install_tip_1">I can follow all soccer result in the word
     </string>
-    <string name="install_tip_2">I <b>cannot</b> read handwriting.</string>
+    <string name="install_tip_2">I\'m not very good at reading what you bet, correct me! </string>
     <string name="pref_title_privacy">Privacy Policy</string>
     <string name="pref_summary_privacy">View the privacy policy</string>
     <string name="install_tip_3">Iextract soccer match by taking a photo to the bet ticket
@@ -297,6 +297,15 @@
     <string name="memory_low_description">You have %d of MB memory left. Please close some
         background apps or restart your device.
     </string>
+    <string name="device_connected">DEVICE CONNECTED!</string>
+    <string name="connection_down">I NEED AN INTERNET CONNECTION NOW</string>
+    <string name="match_charged_first_part">CHARGED</string>
+    <string name="match_charged_second_part">MATCHES</string>
+    <string name="palimpsest_waiting">WE NEED A FEW SECONDS</string>
+    <string name="palimpsest_waiting_explanation">The first time you are using the application we need to charge the whole soccer matches in the world, the operation require a few seconds! Thank you for waiting</string>
+    <string name="palimpsest_waiting_connection">Check your internet Connection!</string>
+
+
     <string name="memory_low_warning">The app might crash if you continue.</string>
     <string name="crop_onboarding_title">A Tip for your first scan</string>
     <string name="crop_onboarding_message">Please make sure the text is upright. You can rotate the

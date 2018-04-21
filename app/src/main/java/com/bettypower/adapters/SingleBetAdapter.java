@@ -13,6 +13,8 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.CheckBox;
@@ -320,12 +322,11 @@ public class SingleBetAdapter extends RecyclerView.Adapter implements ItemTouchH
             this.match = mmatch;
             homeTeam.setText(match.getHomeTeam().getName());
             awayTeam.setText(match.getAwayTeam().getName());
-            if(isTimeOut(match.getDate(),match.getHour()) && match.getHomeResult().equalsIgnoreCase("-") && match.getAwayResult().equalsIgnoreCase("-")){ //FUNZIONA ORA DEVO INSERIRE L'HIDDEN RESULT
+            if(isTimeOut(match.getDate(),match.getHour()) && match.getHomeResult().equalsIgnoreCase("-") && match.getAwayResult().equalsIgnoreCase("-") && (match.getResultTime()==null || !match.getResultTime().equalsIgnoreCase("posticipata"))){
                 HiddenResult hiddenResult = new ParcelableHiddenResult("","",ParcelableHiddenResult.NO_MATCH_FOUND,ParcelableHiddenResult.ERROR_TEAM);
                 ArrayList<HiddenResult> allHiddenResult = new ArrayList<>();
                 allHiddenResult.add(hiddenResult);
                 match.setAllHiddenResult(allHiddenResult);
-                Log.i("TIME OUT ", homeTeam.getText().toString());
             }
             homeScores.setText(match.getHomeResult());
             awayScores.setText(match.getAwayResult());
@@ -439,6 +440,17 @@ public class SingleBetAdapter extends RecyclerView.Adapter implements ItemTouchH
             }
             if(editMode) {
                 SetBetDialog selectBetDialog = new SetBetDialog(context, match);
+                selectBetDialog.show();
+
+                WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
+                Window window = selectBetDialog.getWindow();
+                if (window != null) {
+                    lp.copyFrom(window.getAttributes());
+                }
+                lp.width = WindowManager.LayoutParams.MATCH_PARENT;
+                if (window != null) {
+                    window.setAttributes(lp);
+                }
                 selectBetDialog.setFinishEdittingDialogListener(new SetBetDialog.FinishEdittingDialogListener() {
                     @Override
                     public void onEdittingDialogFinish(PalimpsestMatch editMatch) {
@@ -448,7 +460,6 @@ public class SingleBetAdapter extends RecyclerView.Adapter implements ItemTouchH
                         notifyItemChanged(singleBet.getArrayMatch().lastIndexOf(match));
                     }
                 });
-                selectBetDialog.show();
             }
         }
     }
@@ -495,6 +506,10 @@ public class SingleBetAdapter extends RecyclerView.Adapter implements ItemTouchH
         private void setItemView(){
             String numberAvveniments = context.getResources().getString(R.string.number_avveniments) +" "+ String.valueOf(singleBet.getArrayMatch().size());
             matchNumberTextView.setText(numberAvveniments);
+            if(singleBet.getBookMaker()!=null)
+                bookMakerTextView.setText(singleBet.getBookMaker());
+            else
+                bookMakerTextView.setVisibility(View.INVISIBLE);
             if(editMode){
                 itemView.setBackgroundColor(context.getResources().getColor(R.color.toolbar_background_light));
                 vincitaTextView.setVisibility(View.VISIBLE);
@@ -579,10 +594,16 @@ public class SingleBetAdapter extends RecyclerView.Adapter implements ItemTouchH
                 errorsEditText.setVisibility(View.GONE);
                 if(singleBet.getErrors()==null || Integer.parseInt(singleBet.getErrors())==0 || singleBet.getErrors().equals(""))
                     errorsTextView.setVisibility(View.GONE);
+                else
+                    errorsTextView.setVisibility(View.VISIBLE);
                 if(singleBet.getVincita()==null || singleBet.getVincita().isEmpty())
                     vincitaTextView.setVisibility(View.GONE);
+                else
+                    vincitaTextView.setVisibility(View.VISIBLE);
                 if(singleBet.getPuntata()==null || singleBet.getPuntata().isEmpty())
                     puntataTextView.setVisibility(View.GONE);
+                else
+                    puntataTextView.setVisibility(View.VISIBLE);
                 sistemaCheckBox.setVisibility(View.GONE);
             }
             int matchRemained = helper.getNumberMatchNotFinished(singleBet.getArrayMatch());
@@ -771,7 +792,7 @@ public class SingleBetAdapter extends RecyclerView.Adapter implements ItemTouchH
         final long ONE_MINUTE_IN_MILLIS = 60000;//millisecs
 
         long curTimeInMs = beforeTime.getTime();
-        return new Date(curTimeInMs + (10 * ONE_MINUTE_IN_MILLIS));
+        return new Date(curTimeInMs + (100 * ONE_MINUTE_IN_MILLIS));
     }
 
     public void setEditMode(boolean editMode){

@@ -116,7 +116,7 @@ public class MatchChecker {
         }
 
         //goal/nogoal
-        if(betKind.equalsIgnoreCase("Goal / NoGoal")) {
+        if(betKind.equalsIgnoreCase("Goal/NoGoal")) {
             if (bet.equalsIgnoreCase("Goal")) {
                 return concreteChecker.goal();
             }

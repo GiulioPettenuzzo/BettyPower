@@ -66,9 +66,11 @@ public class TipsActivity extends MonitoredActivity implements YouTubePlayer.OnI
         return super.onOptionsItemSelected(item);
     }
 
+    private static final String INAL_YOUTUBE_URL = "_2tjel-gDmk";
+
     @Override
     public void onInitializationSuccess(YouTubePlayer.Provider provider, YouTubePlayer youTubePlayer, boolean b) {
-        youTubePlayer.cueVideo(getString(R.string.crop_image_tutorial));
+        youTubePlayer.cueVideo(INAL_YOUTUBE_URL);
     }
 
     @Override

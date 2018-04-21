@@ -15,13 +15,15 @@
  */
 package com.renard.ocr;
 
-import com.android.volley.DefaultRetryPolicy;
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
+import android.app.Application;
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.net.Uri;
+import android.os.StrictMode;
+import android.util.Log;
+import android.view.ViewConfiguration;
+
 import com.bettypower.betMatchFinder.Resolver;
 import com.bettypower.entities.Bet;
 import com.bettypower.entities.HiddenResult;
@@ -31,7 +33,7 @@ import com.bettypower.entities.Team;
 import com.bettypower.entities.deserialized.HiddenResultDeserialized;
 import com.bettypower.entities.deserialized.PalimpsestMatchDeserialized;
 import com.bettypower.entities.deserialized.TeamDeserialized;
-import com.bettypower.unpacker.AllMatchesUnpacker;
+import com.bettypower.unpacker.AllPalimpsestDBJsonParser;
 import com.crashlytics.android.Crashlytics;
 import com.crashlytics.android.ndk.CrashlyticsNdk;
 import com.google.gson.Gson;
@@ -39,29 +41,14 @@ import com.google.gson.GsonBuilder;
 import com.googlecode.tesseract.android.TessBaseAPI;
 import com.renard.ocr.analytics.Analytics;
 import com.renard.ocr.analytics.AnalyticsFactory;
-import com.renard.ocr.documents.viewing.grid.DocumentGridActivity;
 import com.renard.ocr.main_menu.language.OcrLanguage;
 import com.renard.ocr.main_menu.language.OcrLanguageDataStore;
 import com.renard.ocr.util.PreferencesUtils;
 import com.renard.ocr.util.ResourceUtils;
 import com.squareup.leakcanary.LeakCanary;
 
-import android.app.Application;
-import android.content.ContentProviderClient;
-import android.content.ContentValues;
-import android.content.Context;
-import android.database.Cursor;
-import android.net.Uri;
-import android.os.RemoteException;
-import android.os.StrictMode;
-import android.util.Log;
-import android.view.ViewConfiguration;
-import android.widget.Toast;
-
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -78,6 +65,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.StringTokenizer;
+import java.util.concurrent.ExecutionException;
 
 import io.fabric.sdk.android.Fabric;
 
@@ -230,6 +218,29 @@ public class TextFairyApplication extends Application {
         return allPalimpsestMatch;
     }
 
+    public boolean isLessThanMounthAgo(String date){
+        SimpleDateFormat formatter=new SimpleDateFormat("yyyy-MM-dd",Locale.getDefault());
+        Date dateOne = null;
+        try {
+            dateOne = formatter.parse(date);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.MONTH, -1);
+        Date now = cal.getTime();
+
+        String si = "";
+        if(dateOne!=null) {
+            return !now.after(dateOne);
+        }
+        else{
+            return false;
+        }
+    }
+
+
     public void setPalimpsest(){
         String lastPalimpsestUpdate = readFromFile(getApplicationContext(),"palimpsest_date.txt");
         Date c = Calendar.getInstance().getTime();
@@ -242,49 +253,46 @@ public class TextFairyApplication extends Application {
             lastUpdate = token.nextToken();
             lastHour = token.nextToken();
         }
-
-        Thread loadPalimpsestFromMemory = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                ArrayList<PalimpsestMatch> allPali = getAllMatchFromMemory();
-                if(allMatchLoadListener!=null)
-                    allMatchLoadListener.onMatchLoaded(allPali);
-            }
-        });
-        loadPalimpsestFromMemory.start();
-        if(!(today.equalsIgnoreCase(lastUpdate) && !isMustDateUpdate(lastHour))){
-            //TODO l'ocr e l'aggiunta di partite deve poter funzionare anche se questo non va
-            RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
-            final StringRequest stringRequest = new StringRequest(Request.Method.GET, "http://www.fishtagram.it/bettypower/all_result.txt",
-                    new Response.Listener<String>() {
-                        @Override
-                        public void onResponse(final String response) {
-                            Log.i("primo volley", "uno");
-                            Thread loader = new Thread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    AllMatchesUnpacker allMatchesUnpacker = new AllMatchesUnpacker(response);
-                                    ArrayList<PalimpsestMatch> allPalimpsestMatches = allMatchesUnpacker.getAllMatches();
-                                    setAllPalimpsestMatch(allPalimpsestMatches);
-                                    if(allMatchLoadListener!=null)
-                                        allMatchLoadListener.onMatchLoaded(allPalimpsestMatches);
-                                }
-                            });
-                            loader.start();
-                        }
-                    }, new Response.ErrorListener() {
+        if(isLessThanMounthAgo(lastUpdate)) {
+            Thread loadPalimpsestFromMemory = new Thread(new Runnable() {
                 @Override
-                public void onErrorResponse(VolleyError error) {
-                    Log.i("errore", error.toString());
-                    Toast toast = Toast.makeText(getApplicationContext(), "ERRORE VOLLEY", Toast.LENGTH_SHORT);
-                    toast.show();
+                public void run() {
+                    ArrayList<PalimpsestMatch> allPali = getAllMatchFromMemory();
+                    if (allMatchLoadListener != null)
+                        allMatchLoadListener.onMatchLoaded(allPali);
                 }
             });
-            //stringRequest.setShouldCache(false);
-            stringRequest.setRetryPolicy(new DefaultRetryPolicy(DefaultRetryPolicy.DEFAULT_TIMEOUT_MS * 48,
-                    2, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-            queue.add(stringRequest);
+            loadPalimpsestFromMemory.start();
         }
+        if(!(today.equalsIgnoreCase(lastUpdate) && !isMustDateUpdate(lastHour))){
+           if(isInternetConnected(this)) {
+               Thread loadPalimpsest = new Thread(new Runnable() {
+                   @Override
+                   public void run() {
+                       AllPalimpsestDBJsonParser allPalimpsestDBJsonParser = new AllPalimpsestDBJsonParser();
+                       allPalimpsestDBJsonParser.execute();
+                       try {
+                           ArrayList<PalimpsestMatch> allPalimpsestMatches = allPalimpsestDBJsonParser.get();
+                           setAllPalimpsestMatch(allPalimpsestMatches);
+                           if (allMatchLoadListener != null)
+                               allMatchLoadListener.onMatchLoaded(allPalimpsestMatches);
+                       } catch (InterruptedException e) {
+                           e.printStackTrace();
+                       } catch (ExecutionException e) {
+                           e.printStackTrace();
+                       }
+                   }
+               });
+               loadPalimpsest.start();
+           }
+        }
+    }
+
+    public boolean isInternetConnected(Context context) {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 
     public void setAllPalimpsestMatch(ArrayList<PalimpsestMatch> allPalimpsestMatch){
@@ -379,5 +387,4 @@ public class TextFairyApplication extends Application {
         }
         return resultdate;
     }
-
 }

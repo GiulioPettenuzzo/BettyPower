@@ -1,11 +1,15 @@
 package com.bettypower.betMatchFinder;
 
+import com.bettypower.betMatchFinder.betFinderManagment.RealTimeBetUpdater;
 import com.bettypower.betMatchFinder.entities.ConcreteMatchToFind;
+import com.bettypower.betMatchFinder.entities.ConcreteOddsToFind;
 import com.bettypower.betMatchFinder.entities.MatchToFind;
+import com.bettypower.betMatchFinder.entities.OddsToFind;
 import com.bettypower.entities.PalimpsestMatch;
 import com.bettypower.util.Helper;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -16,10 +20,12 @@ public class RealTimeUpdater {
 
     private int pointer;
     private ArrayList<MatchToFind> mainListOfMatches;
-    private ArrayList<String> mainListOfOdds;
+    private ArrayList<OddsToFind> mainListOfOdds;
     private ArrayList<PalimpsestMatch> allPalimpsestMatch;
+    private Map<String,String> bookMakerAndMoney;
     private Validator validator;
     private Helper helper;
+    private RealTimeBetUpdater realTimeBetUpdater;
 
 
     public RealTimeUpdater(ArrayList<PalimpsestMatch> allPalimpsestMatches){
@@ -30,6 +36,8 @@ public class RealTimeUpdater {
         mainListOfMatches.add(new ConcreteMatchToFind());
         mainListOfMatches.get(pointer).setPalimpsestMatch(allPalimpsestMatch);
         mainListOfOdds = new ArrayList<>();
+        realTimeBetUpdater = new RealTimeBetUpdater();
+        bookMakerAndMoney = new HashMap<>();
         this.helper = new Helper();
     }
 
@@ -86,44 +94,74 @@ public class RealTimeUpdater {
             }
 
             if(currentKey.equals(Finder.QUOTE)){
-             //   if(!validator.isOddsValidate(map.get(currentKey).toString(),mainListOfMatches.get(pointer).getPalimpsestMatch()).isEmpty()){
+                mainListOfMatches = realTimeBetUpdater.updateNewQuote(map.get(currentKey).toString(),mainListOfMatches);
+                //   if(!validator.isOddsValidate(map.get(currentKey).toString(),mainListOfMatches.get(pointer).getPalimpsestMatch()).isEmpty()){
              //       mainListOfMatches.get(pointer).setOdds(map.get(currentKey).toString());
               //  }
-                if(mainListOfMatches.get(pointer).getHour() != null && !mainListOfMatches.get(pointer).getHour().equals(map.get(currentKey).toString()) ||
+             /*   if(mainListOfMatches.get(pointer).getHour() != null && !mainListOfMatches.get(pointer).getHour().equals(map.get(currentKey).toString()) ||
                         (map.containsKey(Finder.QUOTE) && !map.get(Finder.QUOTE).toString().equals(map.get(currentKey).toString())) ){
-                    mainListOfOdds.add(map.get(currentKey).toString());
-                }
+                    mainListOfOdds.add(new ConcreteOddsToFind());
+                    //mainListOfOdds.add(map.get(currentKey).toString());
+                }*/
             }
 
-            if(currentKey.equals(Finder.BOOKMAKER + "NON ANCORA TESTATAO")){
-                ArrayList<PalimpsestMatch> result = new ArrayList<>();
+            if(currentKey.equals(Finder.BOOKMAKER)){
+                bookMakerAndMoney.put(Finder.BOOKMAKER,map.get(Finder.BOOKMAKER).toString());
+                /*ArrayList<PalimpsestMatch> result = new ArrayList<>();
                 for (PalimpsestMatch currentPalimpsestMatch:allPalimpsestMatch
                      ) {
                 /*    if(currentPalimpsestMatch.getBookMaker().equals(map.get(Finder.BOOKMAKER).toString())){
                         result.add(currentPalimpsestMatch);
                     }*/
-                }
-                allPalimpsestMatch = result;
+               // }
+               // allPalimpsestMatch = result;
+
             }
 
             if(currentKey.equals(Finder.BET)){
-                if(validator.isBetValidate(map.get(currentKey).toString(),mainListOfMatches.get(pointer).getBetKind(),
+
+                mainListOfMatches = realTimeBetUpdater.updateNewBet(map.get(currentKey).toString(),mainListOfMatches);
+               /* if(validator.isBetValidate(map.get(currentKey).toString(),mainListOfMatches.get(pointer).getBetKind(),
                         mainListOfMatches.get(pointer).getOdds(),mainListOfMatches.get(pointer).getPalimpsestMatch())){
                     mainListOfMatches.get(pointer).setBet(map.get(currentKey).toString());
+
+                    //quando trovo due cose uguali aggiorno il bet to find
+                    //TODO se il validator ritorna false aggiorno l'oods to find, se ritorna true carico l'odds to find nel match to find
                 }
                 else{
                     mainListOfMatches.get(pointer).setBet(null);
                     mainListOfMatches.get(pointer).setBetKind(null);
-                }
+                }*/
             }
 
             if(currentKey.equals(Finder.BET_KIND)){
+                mainListOfMatches = realTimeBetUpdater.updateNewBetKind(map.get(currentKey).toString(),mainListOfMatches);
+                /*
                 if(validator.isBetKindValidate(mainListOfMatches.get(pointer).getBet(),map.get(currentKey).toString())){
                     mainListOfMatches.get(pointer).setBetKind(map.get(currentKey).toString());
                 }
                 else {
                     mainListOfMatches.get(pointer).setBet(null);
                     mainListOfMatches.get(pointer).setBetKind(null);
+                }
+                */
+            }
+
+            if(currentKey.equals(Finder.VINCITA)){
+                String currentVincita = bookMakerAndMoney.get(currentKey);
+                if(currentVincita==null || isBigger(map.get(currentKey).toString(),currentVincita)){
+                    bookMakerAndMoney.put(currentKey,map.get(currentKey).toString());
+                }
+            }
+
+            if(currentKey.equals(Finder.PUNTATA)){
+                bookMakerAndMoney.put(currentKey,map.get(currentKey).toString());
+            }
+
+            if(currentKey.equals(Finder.EURO)){
+                String currentVincita = bookMakerAndMoney.get(Finder.VINCITA);
+                if(currentVincita==null || isBigger(map.get(currentKey).toString(),currentVincita)){
+                    bookMakerAndMoney.put(Finder.VINCITA,map.get(currentKey).toString());
                 }
             }
         }
@@ -133,6 +171,29 @@ public class RealTimeUpdater {
         pointer++;
         mainListOfMatches.add(new ConcreteMatchToFind());
         mainListOfMatches.get(pointer).setPalimpsestMatch(allPalimpsestMatch);
+    }
+
+
+    private int getPointerForBet(){
+        int index = 0;
+        for (OddsToFind currentOddsToFind:mainListOfOdds
+             ) {
+            if(currentOddsToFind.getBet()!=null || currentOddsToFind.getBetKind()!=null){
+                index++;
+            }
+        }
+        return index;
+    }
+
+    private int getPointerForQuote(){
+        int index = 0;
+        for (OddsToFind currentOddsToFind:mainListOfOdds
+                ) {
+            if(currentOddsToFind!=null){
+                index++;
+            }
+        }
+        return index;
     }
 
     private void resolveNameMethod(String name){
@@ -187,13 +248,24 @@ public class RealTimeUpdater {
         }
     }
 
+    private boolean isBigger(String one,String two){
+        one = one.replace(",","");
+        two = two.replace(",","");
+        int numberOne = Integer.parseInt(one);
+        int numberTwo = Integer.parseInt(two);
+        return numberOne > numberTwo;
+    }
+
+    public Map<String,String> getBookMakerMoney(){
+        return bookMakerAndMoney;
+    }
 
     public ArrayList<MatchToFind> getMainListOfMatches(){
         return mainListOfMatches;
     }
 
-    public ArrayList<String> getMainListOfOdds(){
-        return mainListOfOdds;
+    public ArrayList<OddsToFind> getMainListOfOdds(){
+        return realTimeBetUpdater.getMainListOfOdds();
     }
 
 }

@@ -30,7 +30,7 @@ public class LoadLogoThread extends Thread {
     private LoadLogoListener loadLogoListener;
     private Context context;
 
-    private static final String IMAGE_URL = "http://www.fishtagram.it/loghi.html";
+    private static final String IMAGE_URL = "https://www.bettypower.it/team_logos/all_logos.html";
     private static final String INITIAL_YAHOO_URL = "https://it.images.search.yahoo.com/search/images;_ylt=A2KLn0VkFotaOFIAZgQdDQx.?p=";
     private static final String FINAL_YAHOO_URL = "soccer+logo&fr=yfp-t-909&fr2=sb-top-it.images.search.yahoo.com&ei=UTF-8&n=60&x=wrt&imgty=clipart";
     private String url;

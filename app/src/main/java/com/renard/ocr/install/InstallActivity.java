@@ -55,7 +55,7 @@ public class InstallActivity extends MonitoredActivity implements TaskFragment.T
     @BindView(R.id.fairy_container)
     protected View mFairyContainer;
     //@BindView(R.id.imageView_fairy)
-    protected ImageView mImageViewFairy;
+    //protected ImageView mImageViewFairy;
     @BindView(R.id.fairy_text_bubble)
     protected View mFairySpeechBubble;
     @BindView(R.id.fairy_text)
@@ -85,7 +85,7 @@ public class InstallActivity extends MonitoredActivity implements TaskFragment.T
         setContentView(R.layout.activity_install);
         ButterKnife.bind(this);
 
-        mFairyAnimation = (AnimationDrawable) mImageViewFairy.getDrawable();
+//        mFairyAnimation = (AnimationDrawable) mImageViewFairy.getDrawable();
         android.support.v4.app.FragmentManager fm = getSupportFragmentManager();
         mTaskFragment = (TaskFragment) fm.findFragmentByTag(TAG_TASK_FRAGMENT);
 
@@ -144,7 +144,7 @@ public class InstallActivity extends MonitoredActivity implements TaskFragment.T
         set.setDuration(600);
         set.playTogether(anim1, anim2, anim3, anim4);
         set.start();
-        mFairyAnimation.start();
+      //  mFairyAnimation.start();
 
     }
 
@@ -156,7 +156,7 @@ public class InstallActivity extends MonitoredActivity implements TaskFragment.T
 
     private void markAsDone(InstallResult result) {
         fadeInStartButton();
-        mFairyAnimation.stop();
+      //  mFairyAnimation.stop();
         switch (result.getResult()) {
             case OK:
                 final View.OnClickListener onClickListener = new View.OnClickListener() {
@@ -225,7 +225,7 @@ public class InstallActivity extends MonitoredActivity implements TaskFragment.T
 
     private float getTranslateX(float progress) {
         final int fairyEndX = mContentView.getWidth() / 2;
-        final int fairyStartX = mImageViewFairy.getWidth() / 2;
+        final int fairyStartX = 100;
         final int maxTravelDistance = Math.min(fairyEndX - fairyStartX, mContentView.getWidth() - mFairyContainer.getWidth());
         return maxTravelDistance * (progress / 100);
     }

@@ -15,46 +15,6 @@
  */
 package com.renard.ocr.documents.viewing.grid;
 
-import com.android.volley.DefaultRetryPolicy;
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
-import com.bettypower.SingleBetActivity;
-import com.bettypower.betMatchFinder.labelSet.BetLabelSet;
-import com.bettypower.dialog.DeleteBetDialog;
-import com.bettypower.entities.Bet;
-import com.bettypower.entities.HiddenResult;
-import com.bettypower.entities.ParcelableHiddenResult;
-import com.bettypower.entities.SingleBet;
-import com.bettypower.entities.deserialized.HiddenResultDeserialized;
-import com.bettypower.entities.PalimpsestMatch;
-import com.bettypower.entities.ParcelablePalimpsestMatch;
-import com.bettypower.entities.ParcelableTeam;
-import com.bettypower.entities.Team;
-import com.bettypower.entities.deserialized.PalimpsestMatchDeserialized;
-import com.bettypower.entities.deserialized.TeamDeserialized;
-import com.bettypower.unpacker.AllMatchesUnpacker;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.renard.ocr.PermissionGrantedEvent;
-import com.renard.ocr.R;
-import com.renard.ocr.TextFairyApplication;
-import com.renard.ocr.documents.creation.ImageSource;
-import com.renard.ocr.documents.creation.NewDocumentActivity;
-import com.renard.ocr.documents.creation.PixLoadStatus;
-import com.renard.ocr.documents.viewing.DocumentContentProvider;
-import com.renard.ocr.main_menu.AboutActivity;
-import com.renard.ocr.main_menu.FeedbackActivity;
-import com.renard.ocr.main_menu.TipsActivity;
-import com.renard.ocr.main_menu.language.OCRLanguageActivity;
-import com.renard.ocr.main_menu.language.OcrLanguage;
-import com.renard.ocr.main_menu.language.OcrLanguageDataStore;
-import com.renard.ocr.util.PreferencesUtils;
-import com.renard.ocr.util.Util;
-
 import android.Manifest;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -93,12 +53,29 @@ import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.GridView;
 import android.widget.Toast;
 
+import com.bettypower.SingleBetActivity;
+import com.bettypower.dialog.DeleteBetDialog;
+import com.renard.ocr.PermissionGrantedEvent;
+import com.renard.ocr.R;
+import com.renard.ocr.TextFairyApplication;
+import com.renard.ocr.documents.creation.ImageSource;
+import com.renard.ocr.documents.creation.NewDocumentActivity;
+import com.renard.ocr.documents.creation.PixLoadStatus;
+import com.renard.ocr.documents.viewing.DocumentContentProvider;
+import com.renard.ocr.main_menu.AboutActivity;
+import com.renard.ocr.main_menu.FeedbackActivity;
+import com.renard.ocr.main_menu.TipsActivity;
+import com.renard.ocr.main_menu.language.OCRLanguageActivity;
+import com.renard.ocr.main_menu.language.OcrLanguage;
+import com.renard.ocr.main_menu.language.OcrLanguageDataStore;
+import com.renard.ocr.util.PreferencesUtils;
+import com.renard.ocr.util.Util;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import de.greenrobot.event.EventBus;
@@ -127,7 +104,6 @@ public class DocumentGridActivity extends NewDocumentActivity implements Documen
     private final Handler mScrollHandler = new ScrollHandler();
     private boolean mPendingThumbnailUpdate = false;
     private boolean mBusIsRegistered = false;
-    Gson gson;
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //sendVolleyForPalimpsestMatch();
@@ -141,137 +117,6 @@ public class DocumentGridActivity extends NewDocumentActivity implements Documen
         if (savedInstanceState == null) {
             checkForImageIntent(getIntent());
         }
-
-        //BET
-       /* gson = new Gson();
-        ArrayList<PalimpsestMatch> allMatch = new ArrayList<>();
-        for(int i = 0; i<20;i++){
-            PalimpsestMatch pali = new ParcelablePalimpsestMatch(new ParcelableTeam(String.valueOf(i)),new ParcelableTeam(String.valueOf(i)));
-            ArrayList<HiddenResult> allHiddenResult = new ArrayList<>();
-            for(int j = 0;j<20;j++){
-                HiddenResult hiddenResult = new ParcelableHiddenResult(String.valueOf(i),"11/03 11:48","Goal",0);
-                hiddenResult.setResult("1:0");
-                allHiddenResult.add(hiddenResult);
-            }
-            pali.setAllHiddenResult(allHiddenResult);
-            allMatch.add(pali);
-        }
-        Bet bet = new SingleBet(allMatch);
-        bet.setErrors("0");
-        bet.setPuntata("2.00");
-        bet.setVincita("150,00");
-        bet.setSistema(true);
-        bet.setDate("17/04 21:00");
-        bet.setAreMatchFinished(false);
-        String provaString = gson.toJson(bet);
-        Log.i("PALIMPSEST MATCH",provaString);
-
-        GsonBuilder gsonBuilder = new GsonBuilder();
-        gsonBuilder.registerTypeAdapter(HiddenResult.class,new HiddenResultDeserialized());
-        gsonBuilder.registerTypeAdapter(Team.class,new TeamDeserialized());
-        gsonBuilder.registerTypeAdapter(PalimpsestMatch.class,new PalimpsestMatchDeserialized());
-        gson = gsonBuilder.create();
-        Bet betTwo = gson.fromJson(provaString,SingleBet.class);
-        String x = "";*/
-
-        //PALIMPSEST MATCH
-        /*
-        PalimpsestMatch pali = new ParcelablePalimpsestMatch(new ParcelableTeam("GIULIO"),new ParcelableTeam("PETTENUZZO"));
-        String provaString = gson.toJson(pali);
-
-        GsonBuilder gsonBuilder = new GsonBuilder();
-        gsonBuilder.registerTypeAdapter(HiddenResult.class,new HiddenResultDeserialized());
-        gsonBuilder.registerTypeAdapter(Team.class,new TeamDeserialized());
-        gson = gsonBuilder.create();
-        PalimpsestMatch paliTwo = gson.fromJson(provaString,ParcelablePalimpsestMatch.class);
-        Log.i("PALIMPSEST MATCH",paliTwo.getHomeTeam().getName()+" "+paliTwo.getAwayTeam().getName());
-        */
-/*
-
-        HiddenResult hiddenResult = new ParcelableHiddenResult("Giulio","11/03 11:48","Goal",0);
-        hiddenResult.setResult("1:0");
-        String provaString = gson.toJson(hiddenResult);
-        HiddenResult hiddenResultTwo = gson.fromJson(provaString,ParcelableHiddenResult.class);
-        Log.i("HIDDEN RESULT",provaString);
-*/
-        //TEAM
-
-       /* Team team = new ParcelableTeam("GIULIO");
-        String provaString = gson.toJson(team);
-        team = gson.fromJson(provaString,ParcelableTeam.class);
-        Log.i("TEAM",provaString);*/
-        //ARRAY LIST
-        /*ArrayList<String> prova = new ArrayList<>();
-        for(int i = 0;i<20;i++){
-            prova.add(String.valueOf(i));
-        }
-        String provaString = gson.toJson(prova);
-        prova = (ArrayList<String>)gson.fromJson(provaString,new TypeToken<ArrayList<String>>(){}.getType());
-        for(int i = 0;i<20;i++){
-            Log.i("PROVA",prova.get(i));
-        }*/
-        String x = getMyLabelSet();
-    }
-
-    private String getMyLabelSet(){
-        String result = "";
-        BetLabelSet betLabelSet = new BetLabelSet();
-        Map<String,ArrayList<String>> map = betLabelSet.hashBetAndBetKind();
-        ArrayList<String> allBet = new ArrayList<>();
-        for (String currentBetKind:map.keySet()
-                ) {
-            for (String currentBet:map.get(currentBetKind)
-                    ) {
-                if(allBet.lastIndexOf(currentBet)<0) {
-                    allBet.add(currentBet);
-                }
-            }
-        }
-
-        int i = 0;
-        for (String currentBet:allBet
-                ) {
-            String betName = "bet"+String.valueOf(i++);
-            result = result + "ArrayList<String> " + betName + " = new ArrayList<>(); \n" + betName + ".add(\"" + currentBet + "\");\n map.put(\"" + currentBet +  "\" , " + betName + ");\n\n";
-        }
-        return result;
-    }
-
-
-    private void sendVolleyForPalimpsestMatch(){
-        final TextFairyApplication application = (TextFairyApplication) getApplicationContext();
-
-        RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
-        final StringRequest stringRequest = new StringRequest(Request.Method.GET, "http://www.fishtagram.it/bettypower/all_result.txt",
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(final String response) {
-                        Log.i("primo volley", "uno");
-                        Thread loader = new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            AllMatchesUnpacker allMatchesUnpacker = new AllMatchesUnpacker(response);
-                            ArrayList<PalimpsestMatch> allPalimpsestMatches = allMatchesUnpacker.getAllMatches();
-                            application.setAllPalimpsestMatch(allPalimpsestMatches);
-                          //  application.isPalimpsestMatchLoaded = true;
-                            if(application.allMatchLoadListener!=null)
-                                 application.allMatchLoadListener.onMatchLoaded(allPalimpsestMatches);
-                        }
-                    });
-                    loader.start();
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.i("errore", error.toString());
-                Toast toast = Toast.makeText(DocumentGridActivity.this, "ERRORE VOLLEY", Toast.LENGTH_SHORT);
-                toast.show();
-            }
-        });
-        //stringRequest.setShouldCache(false);
-        stringRequest.setRetryPolicy(new DefaultRetryPolicy(DefaultRetryPolicy.DEFAULT_TIMEOUT_MS * 48,
-                0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-        queue.add(stringRequest);
     }
 
     @Override

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.util.Log;
 
 import com.bettypower.betMatchFinder.entities.MatchToFind;
+import com.bettypower.betMatchFinder.entities.OddsToFind;
 import com.bettypower.betMatchFinder.listeners.CompleteElaborationListener;
 import com.bettypower.betMatchFinder.listeners.RealTimeElaborationListener;
 import com.bettypower.betMatchFinder.listeners.StaticElaborationListener;
@@ -15,6 +16,7 @@ import com.bettypower.entities.SingleBet;
 import com.renard.ocr.TextFairyApplication;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 /**
  * Created by giuliopettenuzzo on 21/10/17.
@@ -27,34 +29,34 @@ public class Resolver {
 
     private ArrayList<PalimpsestMatch> allPalimpsestMatch;  //all the palimpsest from bookmaker
     private ArrayList<MatchToFind> allMatchFoundByRealTimeOCR;
-    private ArrayList<String> allQuoteFoundByRealTimeOCR;
-    private ArrayList<MatchToFind> allMatchFoundByStaticOCR;
+    private ArrayList<OddsToFind> allQuoteFoundByRealTimeOCR;
+    private ArrayList<PalimpsestMatch> allMatchFoundByStaticOCR;
+    private Map<String,String> bookmakerAndMoney;
 
     private String realTimeResponse;
-    private ArrayList<String> allStringInRealTimeResponse;
     private String staticResponse;
     private RealTimeThread realTimeThread;
     private StaticThread staticThread;
     private boolean realTimeExecutionFinish = false;
     private boolean staticExecutionFinish = false;
+    private Finder finderForStatic;
 
+    private long init;
 
     /**
      * this constructor also sort the palimpsest match array list in order by the palimpsest number
-     * @param allPalimpsestMatch
-     * @param context
+     * @param allPalimpsestMatch all palimpsest match from server
+     * @param context in order to get application context fields
      */
     public Resolver(ArrayList<PalimpsestMatch> allPalimpsestMatch,Context context){
         this.allPalimpsestMatch = allPalimpsestMatch;
         application = (TextFairyApplication) context;
+        if(allPalimpsestMatch!=null)
+            finderForStatic = new Finder(allPalimpsestMatch);
     }
 
-    public Resolver(Context context){
-        application = (TextFairyApplication) context;
-    }
 
-
-    /***********************************************************************************************
+    /* **********************************************************************************************
      *********************************   PUBLIC METHODS   ******************************************
      **********************************************************************************************/
 
@@ -67,29 +69,24 @@ public class Resolver {
         checkExeguible();
     }
 
-    public void setRealTimeResponse(ArrayList<String> realTimeResponse){
-        //TODO FATTO QUESTO DEVE FUNZIONARE CAZZO
-        allStringInRealTimeResponse = realTimeResponse;
-        checkExeguible();
-    }
-
     /**
      * set response from renard ocr
      * @param staticResponse response from renard ocr
      */
     public void setNormalResponse(String staticResponse){
+        init = System.currentTimeMillis();
         this.staticResponse = staticResponse;
         checkExeguible();
     }
     /**
      * set the listener created in order to know when all the elaboration are done
-     * @param completeElaborationListener
+     * @param completeElaborationListener listener in order to understand when the bet is load
      */
     public void setCompleteElaborationListener(CompleteElaborationListener completeElaborationListener){
         this.completeElaborationListener = completeElaborationListener;
     }
 
-    /***********************************************************************************************
+    /* **********************************************************************************************
      *********************************   PRIVATE METHODS   ******************************************
      **********************************************************************************************/
 
@@ -115,26 +112,21 @@ public class Resolver {
     }
 
     private void notifyThreadsFinish(){
-        ArrayList<PalimpsestMatch> allMatchFound = new ArrayList<>();
-        for (MatchToFind currentMatch:allMatchFoundByStaticOCR
-             ) {
-            if(currentMatch.getPalimpsestMatch().size()==1) {
-                PalimpsestMatch palimpsestMatch = currentMatch.getPalimpsestMatch().get(0);
-                //Match currentMatch = new ParcelableMatch(palimpsestMatch.getHomeTeam(),palimpsestMatch.getAwayTeam());
-                //currentMatch.setTime(currentMatch.getDate() + " " + currentMatch.getHour());
-                palimpsestMatch.setHomeResult("-");
-                palimpsestMatch.setAwayResult("-");
-                if(palimpsestMatch.getBet()!=null) {
-                    palimpsestMatch.setBet(currentMatch.getBet());
-                }
-                if(palimpsestMatch.getBetKind()!=null){
-                    palimpsestMatch.setBetKind(currentMatch.getBetKind());
-                }
-                //TODO quote
-                allMatchFound.add(palimpsestMatch);
-            }
+        Bet bet = new SingleBet(allMatchFoundByStaticOCR);
+        if(bookmakerAndMoney.get("bookmaker")!=null){
+            bet.setBookMaker(bookmakerAndMoney.get("bookmaker"));
         }
-        Bet bet = new SingleBet(allMatchFound);
+        if(bookmakerAndMoney.get("vincita")!=null){
+            String vincita = bookmakerAndMoney.get("vincita");
+            vincita = vincita.replace(",",".");
+            bet.setVincita(vincita);
+        }
+        if(bookmakerAndMoney.get("puntata")!=null){
+            String puntata = bookmakerAndMoney.get("puntata");
+            puntata = puntata.replace(",",".");
+            bet.setPuntata(puntata);
+        }
+        Log.i("TEMPO DI ESECUZIONE",String.valueOf(System.currentTimeMillis()-init));
         completeElaborationListener.onElaborationComplete(bet);
     }
 
@@ -147,6 +139,7 @@ public class Resolver {
                 @Override
                 public void onMatchLoaded(ArrayList<PalimpsestMatch> allMatch) {
                     allPalimpsestMatch = allMatch;
+                    finderForStatic = new Finder(allPalimpsestMatch);
                     notifyThreads();
                 }
             });
@@ -165,10 +158,11 @@ public class Resolver {
         realTimeThread.start();
         realTimeThread.setRealTimeElaborationListener(new RealTimeElaborationListener() {
             @Override
-            public void onElaborationCompleted(ArrayList<MatchToFind> allMatchFound,ArrayList<String> quote) {
+            public void onElaborationCompleted(ArrayList<MatchToFind> allMatchFound, ArrayList<OddsToFind> quote, Map<String,String> bookAndMoney) {
                 realTimeExecutionFinish = true;
                 allMatchFoundByRealTimeOCR = allMatchFound;
                 allQuoteFoundByRealTimeOCR = quote;
+                bookmakerAndMoney = bookAndMoney;
                 notifyThreads();
             }
         });
@@ -178,13 +172,14 @@ public class Resolver {
      * start thread from renard ocr and wait the response in a listener
      */
     private void executeStaticResponse(){
-        staticThread = new StaticThread(allPalimpsestMatch,staticResponse,allMatchFoundByRealTimeOCR,allQuoteFoundByRealTimeOCR);
+        staticThread = new StaticThread(allPalimpsestMatch,staticResponse,allMatchFoundByRealTimeOCR,allQuoteFoundByRealTimeOCR,finderForStatic,bookmakerAndMoney);
         Log.i("STATIC RESPONSE",staticResponse);
         staticThread.start();
         staticThread.setStaticElaborationListener(new StaticElaborationListener() {
             @Override
-            public void onElaborationCompleted(ArrayList<MatchToFind> allMatchFound) {
+            public void onElaborationCompleted(ArrayList<PalimpsestMatch> allMatchFound,Map<String,String> bookMakerAndMoney) {
                 allMatchFoundByStaticOCR = allMatchFound;
+                bookmakerAndMoney = bookMakerAndMoney;
                 staticExecutionFinish = true;
                 notifyThreads();
             }

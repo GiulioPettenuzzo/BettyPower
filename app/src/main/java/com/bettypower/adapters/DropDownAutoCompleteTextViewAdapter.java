@@ -108,6 +108,10 @@ public class DropDownAutoCompleteTextViewAdapter<M extends Parcelable> extends B
         ArrayList<PalimpsestMatch> matchSuggestedWithStartWith = new ArrayList<>();
         ArrayList<PalimpsestMatch> matchSuggestedWithEquals = new ArrayList<>();
         ArrayList<PalimpsestMatch> matchSuggestedWithContains = new ArrayList<>();
+        ArrayList<PalimpsestMatch> matchSuggestedAwayEquals = new ArrayList<>();
+        ArrayList<PalimpsestMatch> matchSuggestedAwayStartWith = new ArrayList<>();
+        ArrayList<PalimpsestMatch> matchSuggestedAwayContains = new ArrayList<>();
+
 
         ArrayList<PalimpsestMatch> matchSuggestedEqualsEquals = new ArrayList<>();
         ArrayList<PalimpsestMatch> matchSuggestedEqualsStartWith = new ArrayList<>();
@@ -143,6 +147,12 @@ public class DropDownAutoCompleteTextViewAdapter<M extends Parcelable> extends B
                     matchSuggestedWithStartWith.add(customer);
                 } else if (customer.getHomeTeam().getName().toLowerCase().contains(constraint.toString().toLowerCase())) {
                     matchSuggestedWithContains.add(customer);
+                } else if(customer.getAwayTeam().getName().toLowerCase().equals(constraint.toString().toLowerCase())){
+                    matchSuggestedAwayEquals.add(customer);
+                } else if(customer.getAwayTeam().getName().toLowerCase().startsWith(constraint.toString().toLowerCase())){
+                    matchSuggestedAwayStartWith.add(customer);
+                } else if(customer.getAwayTeam().getName().toLowerCase().contains(constraint.toString().toLowerCase())){
+                    matchSuggestedAwayContains.add((customer));
                 }
             }
         }
@@ -154,6 +164,9 @@ public class DropDownAutoCompleteTextViewAdapter<M extends Parcelable> extends B
             matchSuggested.addAll(matchSuggestedWithEquals);
             matchSuggested.addAll(matchSuggestedWithStartWith);
             matchSuggested.addAll(matchSuggestedWithContains);
+            matchSuggested.addAll(matchSuggestedAwayEquals);
+            matchSuggested.addAll(matchSuggestedAwayStartWith);
+            matchSuggested.addAll(matchSuggestedAwayContains);
         }
 
         else{

@@ -140,7 +140,7 @@ public class CameraSourcePreview extends ViewGroup {
 
                 //parameters.setPreviewSize(mPreviewSize.width, mPreviewSize.height);
                 //parameters.setFlashMode(Parameters.FLASH_MODE_AUTO);
-                //parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
+               // parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
                 parameters.setJpegQuality(100);
                 //parameters.setPreviewSize(mPreviewSize.width, mPreviewSize.height);
 

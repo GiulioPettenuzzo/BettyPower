@@ -47,7 +47,7 @@
                 style="@style/DocumentDateText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/grid_title_dark"
+                android:background="#d6323641"
                 android:gravity="center_vertical"
                 android:maxLines="1"
                 android:padding="4dp"

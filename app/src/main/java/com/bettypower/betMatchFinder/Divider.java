@@ -14,6 +14,11 @@ public class Divider {
 
     private String word = "";
 
+    private ArrayList<String> dateSeparatorLabelSet = new SeparatorLabelSet().getAllDateSeparator();
+    private ArrayList<String> hourSeparatorLabelSet = new SeparatorLabelSet().getAllHourSeparator();
+    private ArrayList<String> nameSeparatorLabelSet = new SeparatorLabelSet().getAllNameSeparator();
+    private ArrayList<String> quoteSeparatorLabelSet = new SeparatorLabelSet().getAllQuoteSeparator();
+
     public static final String IS_POSSIBLE_NAME = "is_possible_name";
     public static final String IS_POSSIBLE_PALIMPSEST = "is_possible-palimpsest";
     public static final String IS_POSSIBLE_BET = "is_possible_bet";
@@ -93,20 +98,19 @@ public class Divider {
 
     private ArrayList<String> allFieldsBySeparator(){
         ArrayList<String> result = new ArrayList<>();
-        SeparatorLabelSet separatorLabelSet = new SeparatorLabelSet();
-        for (String currentLabelSet:separatorLabelSet.getAllHourSeparator()
+        for (String currentLabelSet:hourSeparatorLabelSet
                 ) {
             if(word.contains(currentLabelSet)){
                 result.add(IS_POSSIBLE_HOUR);
             }
         }
-        for (String currentLabelSet:separatorLabelSet.getAllQuoteSeparator()
+        for (String currentLabelSet:quoteSeparatorLabelSet
                 ) {
             if(word.contains(currentLabelSet)){
                 result.add(IS_POSSIBLE_QUOTE);
             }
         }
-        for (String currentLabelSet:separatorLabelSet.getAllDateSeparator()
+        for (String currentLabelSet:dateSeparatorLabelSet
                 ) {
             if(word.contains(currentLabelSet)){
                 result.add(IS_POSSIBLE_DATE);
@@ -116,7 +120,7 @@ public class Divider {
             result.add(IS_POSSIBLE_BOOKMAKER); //-1 non va qui
             result.add(IS_POSSIBLE_NAME);
         }
-        for (String currentLabelSet:separatorLabelSet.getAllNameSeparator()
+        for (String currentLabelSet:nameSeparatorLabelSet
                 ) {
             if(word.contains(currentLabelSet)){
                 result.add(IS_POSSIBLE_NAME);

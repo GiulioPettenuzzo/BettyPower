@@ -20,6 +20,9 @@ import com.bettypower.betMatchFinder.labelSet.BetLabelSet;
 import com.bettypower.entities.PalimpsestMatch;
 import com.renard.ocr.R;
 
+import java.util.ArrayList;
+import java.util.Map;
+
 /**
  * Dialog that allaws user to insert bet kind, bet and quote, just in case the ocr made a mistake
  * Created by giulio pettenuzzo on 23/11/17.
@@ -38,6 +41,7 @@ public class SetBetDialog extends Dialog {
     private com.shawnlin.numberpicker.NumberPicker selectQuotePicker;
 
     private BetLabelSet betLabelSet = new BetLabelSet();
+    private Map<String,ArrayList<String>> hashBetAndBetKind = new BetLabelSet().hashBetAndBetKind();
     private Object[] betKindArray;
     private Object[] allBet;
     private PalimpsestMatch match;
@@ -102,7 +106,7 @@ public class SetBetDialog extends Dialog {
         TextView teamsNamesTextView = (TextView) findViewById(R.id.teams_names);
         TextView illustrationTextView = (TextView) findViewById(R.id.illustration);
 
-        betKindArray =  betLabelSet.hashBetAndBetKind().keySet().toArray();
+        betKindArray =  hashBetAndBetKind.keySet().toArray();
         illustrationTextView.setText(context.getResources().getString(R.string.dialog_illustration_set_bet));
         String teamsName = match.getHomeTeam().getName() + " - " + match.getAwayTeam().getName();
         teamsNamesTextView.setText(teamsName);
@@ -113,7 +117,7 @@ public class SetBetDialog extends Dialog {
      * for example when user scroll selectBetKindPicker
      */
     private void preSetBetPicker(){
-        allBet = betLabelSet.hashBetAndBetKind().get(getStringFromBetKindArray(selectBetKindPicker.getValue())).toArray();
+        allBet = hashBetAndBetKind.get(getStringFromBetKindArray(selectBetKindPicker.getValue())).toArray();
 
         selectBetPicker.setWheelItemCount(8);
         selectBetPicker.setMinValue(0);
@@ -223,7 +227,7 @@ public class SetBetDialog extends Dialog {
             @Override
             public void onValueChange(com.shawnlin.numberpicker.NumberPicker picker, int oldVal, int newVal) {
                 showBetKindTextView.setText(getStringFromBetKindArray(newVal));
-                allBet = betLabelSet.hashBetAndBetKind().get(getStringFromBetKindArray(newVal)).toArray();
+                allBet = hashBetAndBetKind.get(getStringFromBetKindArray(newVal)).toArray();
                 selectBetPicker.setMaxValue(allBet.length-1);
                 selectBetPicker.setWrapSelectorWheel(false);
                 setBetPicker();
@@ -330,7 +334,7 @@ public class SetBetDialog extends Dialog {
      */
     private int get(Object[] array, String value){
         for(int i = 0; i<array.length;i++){
-            if(array[i].toString().equals(value)){
+            if(array[i].toString().equalsIgnoreCase(value)){
                 return i;
             }
         }
@@ -356,13 +360,12 @@ public class SetBetDialog extends Dialog {
      * @return the corrisponding string
      */
     private String getStringFromBetKindArray(int newVal){
-        String betKind;
-        if(newVal!=0) {
+        /*if(newVal!=0) {
             betKind = betKindArray[newVal].toString();
         }else{
             betKind = betKindArray[betKindArray.length-1].toString();
-        }
-        return betKind;
+        }*/
+        return betKindArray[newVal].toString();
     }
     /***********************************************************************************************
      *********************************   INTERFACE   ****************************************

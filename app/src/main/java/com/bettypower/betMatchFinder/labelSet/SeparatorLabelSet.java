@@ -55,7 +55,14 @@ public class SeparatorLabelSet {
         ArrayList<String> result = new ArrayList<>();
         result.add("-");
         result.add("~");
+        result.add(".");
         return result;
+    }
 
+    public  ArrayList<String> getMoneySeparator(){
+        ArrayList<String> result = new ArrayList<>();
+        result.add(".");
+        result.add(",");
+        return result;
     }
 }

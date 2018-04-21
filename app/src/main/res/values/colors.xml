@@ -3,7 +3,7 @@
     <color name="action_bar_edit_mode">#006249</color>
     <color name="dark_grey">#9d34861b</color>
     <color name="document_grid_background">#dedede</color>
-    <color name="primary">#FF004428</color>
+    <color name="primary">#004428</color>
     <color name="accent">#006249</color>
     <color name="toolbar_bottom_bar">#ffffff</color>
     <color name="status_bar_behind_menu">#5b02001c</color>
@@ -30,7 +30,7 @@
     <color name="toolbar_background_dark">#004428</color>
     <color name="Tekt_dark_lighter">#f14e5365</color>
     <color name="Text_dark">#323641</color>
-    <color name="green_for_dialog">#c563c417</color>
+    <color name="green_for_dialog">#63c417</color>
     <color name="blu_facebook">#4266b2</color>
     <color name="title_colour_transparent">#9f40af08</color>
     <color name="title_opacity">#8f006249</color>
@@ -45,5 +45,7 @@
     <color name="toolbar_lighter">#259a24</color>
     <color name="action_bar_lighter">#0b7e07</color>
     <color name="grid_title_dark">#4553687d</color>
+    <color name="primmary_for_document_grid">#c8004428</color>
+    <color name="grid_bar">#c5323641</color>
 
 </resources>

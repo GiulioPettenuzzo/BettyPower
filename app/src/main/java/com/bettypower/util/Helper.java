@@ -97,47 +97,6 @@ public class Helper {
     }
 
     /**
-     * this method compare two string given in param without the character that are more likely to be read
-     * wrong from ocr. usually those character are 'i' and 'l'
-     * @return true if wordOne is equals Ignoring Case with wordTwo, false otherwise
-     */
-    public boolean compareNamesWithoutOCRError(String wordOne, String wordTwo){
-        wordOne = wordOne.toUpperCase();
-        wordTwo = wordTwo.toUpperCase();
-        if(wordOne.length() == wordTwo.length()){
-            for(int i = 0;i<wordOne.length();i++){
-                if((wordOne.charAt(i) != wordTwo.charAt(i)) && (
-                        (wordOne.charAt(i) != 'L' && wordOne.charAt(i) != 'I') ||
-                        (wordTwo.charAt(i) != 'L' && wordTwo.charAt(i) != 'I'))){
-                    return false;
-                }
-            }
-        }
-        else{
-            return false;
-        }
-        return true;
-    }
-
-    /**
-     * this metod do the same work of word1.contains(word2) but using the method that comapre the two word
-     * without take care about the difference between 'i' and 'l'
-     * @param teamName has more than one word
-     * @param word has only one word
-     * @return true if teamName contains word, false otherwise
-     */
-    public boolean isWordContainedInTeamNameWithoutOcrError(String teamName, String word){
-        StringTokenizer token = new StringTokenizer(teamName);
-        while(token.hasMoreTokens()){
-            String singleTeamName = token.nextToken();
-            if(compareNamesWithoutOCRError(singleTeamName,word)){
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
      * this method make the join of the two list given in param,
      * to use this method you have to be sure that the two list haven't any element in common
      */

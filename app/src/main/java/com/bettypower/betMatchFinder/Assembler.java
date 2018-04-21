@@ -162,7 +162,7 @@ public class Assembler {
             }
         }
 
-        if(match.getBet()!=null && matchToCompare.getBet()!=null){
+      /*  if(match.getBet()!=null && matchToCompare.getBet()!=null){
             return null;
         }
         else if(match.getBet()==null && matchToCompare.getBet()!=null){
@@ -184,7 +184,7 @@ public class Assembler {
             else{
                 return null;
             }
-        }
+        }*/
 
         return result;
     }
