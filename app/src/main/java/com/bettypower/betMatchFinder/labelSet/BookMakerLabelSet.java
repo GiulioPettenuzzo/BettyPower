@@ -11,6 +11,15 @@ public class BookMakerLabelSet{
         ArrayList<String> allBookMaker = new ArrayList<>();
         allBookMaker.add("matchpoint");
         allBookMaker.add("sisal");
+        allBookMaker.add("snai");
+        allBookMaker.add("totosi");
+        allBookMaker.add("bwin");
+        allBookMaker.add("eurobet");
+        allBookMaker.add("intertops");
+        allBookMaker.add("tipico");
+        allBookMaker.add("betflag");
+        allBookMaker.add("1xbet");
+        allBookMaker.add("interwetten");
         allBookMaker.add("william hill");
         return allBookMaker;
     }

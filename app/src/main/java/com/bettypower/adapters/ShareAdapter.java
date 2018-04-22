@@ -9,7 +9,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
-import com.renard.ocr.R;
+import com.renard.betty.R;
 
 import java.util.List;
 

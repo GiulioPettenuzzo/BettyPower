@@ -1,6 +1,5 @@
 package com.bettypower.betMatchFinder.listeners;
 
-import com.bettypower.betMatchFinder.entities.MatchToFind;
 import com.bettypower.entities.PalimpsestMatch;
 
 import java.util.ArrayList;

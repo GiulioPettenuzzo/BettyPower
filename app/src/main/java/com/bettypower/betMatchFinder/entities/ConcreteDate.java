@@ -14,7 +14,7 @@ public class ConcreteDate implements Date {
 
     //this is the format that define the order in witch the date must be read
     private String format;
-    public static final String FORMAT_NOT_ALREADY_KNOWN = "not_already_know";
+    private static final String FORMAT_NOT_ALREADY_KNOWN = "not_already_know";
     public static final String FORMAT_DAY_MONTH_YEAR = "day_month_year";
     public static final String FORMAT_MONTH_DAY_YEAR = "month_day_year";
     public static final String FORMAT_DAY_MONTH = "day_month";

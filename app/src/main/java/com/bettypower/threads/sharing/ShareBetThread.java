@@ -17,8 +17,8 @@ import android.view.View;
 
 import com.bettypower.adapters.ShareAdapter;
 import com.bettypower.entities.Bet;
-import com.renard.ocr.R;
-import com.renard.ocr.documents.viewing.DocumentContentProvider;
+import com.renard.betty.R;
+import com.renard.betty.documents.viewing.DocumentContentProvider;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -119,10 +119,8 @@ public class ShareBetThread extends AsyncTask<String, Void, String> {
             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
             fos.flush();
             fos.close();
-        } catch (FileNotFoundException e) {
-            Log.e("GREC", e.getMessage(), e);
-        } catch (IOException e) {
-            Log.e("GREC", e.getMessage(), e);
+        } catch (FileNotFoundException ignored) {
+        } catch (IOException ignored) {
         }
     }
 
@@ -200,7 +198,6 @@ public class ShareBetThread extends AsyncTask<String, Void, String> {
                 Uri uri = Uri.fromFile(imagePath);
 
                 if (info.activityInfo.packageName.equals("com.facebook.katana")) {
-                    //TODO condividere con facebook quando avrai l'id pubblico
                     // Facebook was chosen
                    /* ShareDialog shareDialog;
                     FacebookSdk.sdkInitialize(activity);
@@ -238,8 +235,7 @@ public class ShareBetThread extends AsyncTask<String, Void, String> {
             outputStreamWriter.write(text);
             outputStreamWriter.close();
         }
-        catch (IOException e) {
-            Log.e("Exception", "File write failed: " + e.toString());
+        catch (IOException ignored) {
         }
     }
 
@@ -253,7 +249,7 @@ public class ShareBetThread extends AsyncTask<String, Void, String> {
             if ( inputStream != null ) {
                 InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
                 BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-                String receiveString = "";
+                String receiveString;
                 StringBuilder stringBuilder = new StringBuilder();
 
                 while ( (receiveString = bufferedReader.readLine()) != null ) {

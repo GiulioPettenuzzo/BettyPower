@@ -10,7 +10,7 @@
              android:id="@+id/toolbar"/>
 
 
-    <com.renard.ocr.documents.creation.visualisation.OCRImageView
+    <com.renard.betty.documents.creation.visualisation.OCRImageView
         android:id="@+id/progress_image"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

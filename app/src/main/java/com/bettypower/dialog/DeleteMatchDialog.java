@@ -7,7 +7,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import com.bettypower.entities.PalimpsestMatch;
-import com.renard.ocr.R;
+import com.renard.betty.R;
 
 import java.util.StringTokenizer;
 

@@ -1,7 +1,7 @@
 package com.googlecode.tesseract.android;
 
 import com.googlecode.leptonica.android.Pix;
-import com.renard.ocr.R;
+import com.renard.betty.R;
 
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;

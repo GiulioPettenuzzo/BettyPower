@@ -55,7 +55,7 @@
     <string name="please_tap_on_column">Please tap on a text column first</string>
     <string name="send_mail">Drop me a line.</string>
     <string name="hocr2pdf_title">
-        <a href="market://details?id=com.renard.ocr">Text Fairy</a>
+        <a href="market://details?id=com.renard.betty">Text Fairy</a>
         from exactCODE
     </string>
     <string name="hocr2pdf_summary">Text Fairy is an OCR application available in stores whose code is open source.

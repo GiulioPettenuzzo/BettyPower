@@ -1,6 +1,5 @@
 package com.bettypower.entities;
 
-import android.graphics.Bitmap;
 import android.os.Parcel;
 
 /**
@@ -9,7 +8,7 @@ import android.os.Parcel;
 
 public class ParcelableTeam implements Team {
 
-    String name;
+    private String name;
 
     public ParcelableTeam(String name){
         this.name = name;
@@ -32,7 +31,7 @@ public class ParcelableTeam implements Team {
         }
     };
 
-    public ParcelableTeam(Parcel source){
+    private ParcelableTeam(Parcel source){
         this(source.readString());
     }
 

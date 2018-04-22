@@ -44,7 +44,7 @@ public class PalimpsestFixer implements Fixer {
      * @param word to examinate
      * @return true if word is a number, false otherwise
      */
-    public boolean isNumber(String word){
+    private boolean isNumber(String word){
         try{
             long wordToLong = Long.parseLong(word);
             return true;

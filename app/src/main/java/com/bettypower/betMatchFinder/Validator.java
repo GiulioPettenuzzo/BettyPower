@@ -1,6 +1,5 @@
 package com.bettypower.betMatchFinder;
 
-import com.bettypower.betMatchFinder.labelSet.BetLabelSet;
 import com.bettypower.entities.PalimpsestMatch;
 
 import java.util.ArrayList;
@@ -18,8 +17,6 @@ public class Validator {
 
     public static final String HOME_TEAM = "home_team";
     public static final String AWAY_TEAM = "away_team";
-    Map<String, ArrayList<String>> hashBetAndBetKind = new BetLabelSet().hashBetAndBetKind();
-
 
     public ArrayList<PalimpsestMatch> isPalimpsestValidate(String palimpsest, ArrayList<PalimpsestMatch> allPossibleMatches){
         ArrayList<PalimpsestMatch> result = new ArrayList<>();
@@ -114,83 +111,4 @@ public class Validator {
         }
         return result;
     }
-
-    //TODO DA QUI IN POI POSSO TOGLIERE
-    public Map<String,ArrayList<PalimpsestMatch>> isOddsValidate(String odds,ArrayList<PalimpsestMatch> allPalimpsestMatch){
-        Map<String,ArrayList<PalimpsestMatch>> result = new HashMap<>();
-
-        for (PalimpsestMatch currentMatch:allPalimpsestMatch
-             ) {
-            for (String currentKey:currentMatch.getAllOdds().keySet()) {
-                if(odds.equals(currentMatch.getAllOdds().get(currentKey))){
-                    //la chiave esiste gia?
-                    for (String currentExistingKey:result.keySet()
-                         ) {
-                        if(currentExistingKey.equals(currentKey)){
-                            ArrayList<PalimpsestMatch> currentResult = result.get(currentKey);
-                            currentResult.add(currentMatch);
-                            result.put(currentKey,currentResult);
-                        }
-                        else{
-                            ArrayList<PalimpsestMatch> currentResult = new ArrayList<>();
-                            currentResult.add(currentMatch);
-                            result.put(currentKey,currentResult);
-                        }
-                    }
-                }
-            }
-        }
-        
-        return result;
-    }
-
-    //TODO forse se qui gli passo l'odds to find quando
-    public boolean isBetValidate(String bet,String betKind,String quote,ArrayList<PalimpsestMatch> allPalimpsestMatch){
-        if(betKind!=null){
-            ArrayList<String> allPossibleBet = hashBetAndBetKind.get(betKind);
-            if(allPossibleBet!=null) {
-                for (String currentBet:allPossibleBet
-                    ) {
-                    if (currentBet.equals(bet)) {
-                        return true;
-                    }
-                }
-            }
-        }
-        else{
-            return true;
-        }
-       /* if(quote != null){
-            //TODO le quote non sono precise quindi le posso controllare ma aggingendo +-delta
-            for (PalimpsestMatch currentMatch:allPalimpsestMatch
-                    ) {
-                for (String currentKey:currentMatch.getAllOdds().keySet()) {
-                    if(quote.equals(currentMatch.getAllOdds().get(currentKey))){
-                        //la chiave esiste gia?
-                        return true;
-                    }
-                }
-            }
-        }*/
-        return false;
-    }
-
-   /* public boolean isBetKindValidate(String bet, String betKind){
-        //TODO se il betkind c'è già dovrebbe confrontare i valori e nel caso in cui i valori combaciano sono sicuro del risultato
-        //TODO se i valori non combaciano forse andrebbero scartati tutti e due per poi arrivarci guardando la bet
-        if(bet!=null){
-            ArrayList<String> allPossibleBet = hashBetAndBetKind.get(betKind);
-            if(allPossibleBet!=null) {
-                for (String currentBet : allPossibleBet
-                        ) {
-                    if (currentBet.equals(bet)) {
-                        return true;
-                    }
-                }
-            }
-        }
-        else
-            return true;
-        return false;
-    }*/
 }

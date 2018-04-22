@@ -1,7 +1,5 @@
 package com.bettypower.betMatchFinder.threads;
 
-import android.util.Log;
-
 import com.bettypower.betMatchFinder.Finder;
 import com.bettypower.betMatchFinder.StaticPredictor;
 import com.bettypower.betMatchFinder.entities.MatchToFind;
@@ -38,50 +36,24 @@ public class StaticThread extends Thread {
     @Override
     public void run() {
         super.run();
-        long init = System.currentTimeMillis();
         StaticPredictor predictor = new StaticPredictor(allPalimpsestMatch,staticResponse,allMatchFoundByRealTimeOCR,allQuoteFoundByRealTimeOCR,finder,bookmakerAndMoney);
         predictor.getAllElementFound(); //elaboration
-        Log.i("STATIC PREDICTOR",String.valueOf(System.currentTimeMillis()-init));
-        for (MatchToFind current:predictor.getAllMatchesFound()
-             ) {
-            if(current.getBet()!=null){
-                Log.i("bet====",current.getBet());
-            }
-        }
         ArrayList<PalimpsestMatch> allPalimpsestFound = new ArrayList<>();
         for (MatchToFind currentMatchToFind:predictor.getAllMatchesFound()
              ) {
             if(currentMatchToFind.getPalimpsestMatch().size()==1){
                 if(!isPalimpsestPresent(currentMatchToFind.getPalimpsestMatch().get(0).getPalimpsest(),allPalimpsestFound)){
                     PalimpsestMatch palimpsestMatch = currentMatchToFind.getPalimpsestMatch().get(0);
-                    /*if(currentMatchToFind.getBet()!=null){
-                        palimpsestMatch.setBet(currentMatchToFind.getBet());
-                    }
-                    if(currentMatchToFind.getBetKind()!=null){
-                        palimpsestMatch.setBetKind(currentMatchToFind.getBetKind());
-                    }*/
                     allPalimpsestFound.add(palimpsestMatch);
                 }
             }
         }
         ArrayList<String> allQuoteFound = predictor.getAllQuoteFound();
-
-       /* bookmakerAndMoney = predictor.getBookmakerAndMoney();
-        for(int i = 0;i<allQuoteFound.size();i++){
-            try {
-                allPalimpsestFound.get(i).setQuote(allQuoteFound.get(i));
-                Log.i("SIZE OF ALLMATCH = ",String.valueOf(allPalimpsestFound.size()));
-            }catch (IndexOutOfBoundsException e){
-                if(bookmakerAndMoney.get("puntata")==null){
-                    bookmakerAndMoney.put("puntata",allQuoteFound.get(i));
-                }
-            }
-        }*/
         try{
             if(bookmakerAndMoney.get("puntata")==null){
                 bookmakerAndMoney.put("puntata",allQuoteFound.get(allPalimpsestFound.size()));
             }
-        }catch(IndexOutOfBoundsException e){
+        }catch(IndexOutOfBoundsException ignored){
 
         }
         staticElaborationListener.onElaborationCompleted(allPalimpsestFound,bookmakerAndMoney);

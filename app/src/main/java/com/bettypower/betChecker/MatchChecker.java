@@ -14,8 +14,6 @@ import java.util.StringTokenizer;
 
 public class MatchChecker {
 
-    private int homeResult;
-    private int awayResult;
     private String betKind;
     private String bet;
     private ConcreteChecker concreteChecker;
@@ -30,12 +28,12 @@ public class MatchChecker {
         if(palimpsestMatch.getHomeResult().equals("-") || palimpsestMatch.getAwayResult().equals("-")){
             return true;
         }
-        this.homeResult = Integer.parseInt(palimpsestMatch.getHomeResult());
-        this.awayResult = Integer.parseInt(palimpsestMatch.getAwayResult());
+        int homeResult = Integer.parseInt(palimpsestMatch.getHomeResult());
+        int awayResult = Integer.parseInt(palimpsestMatch.getAwayResult());
         this.bet = palimpsestMatch.getBet();
         this.betKind = palimpsestMatch.getBetKind();
         getResultsPerTime(palimpsestMatch.getAllHiddenResult());
-        this.concreteChecker = new ConcreteChecker(this.homeResult,this.awayResult,this.firstTimeHomeResult,this.firstTimeAwayResult,this.secondTimeHomeResult,this.secondTimeAwayResult);
+        this.concreteChecker = new ConcreteChecker(homeResult, awayResult,this.firstTimeHomeResult,this.firstTimeAwayResult,this.secondTimeHomeResult,this.secondTimeAwayResult);
         return checkMatch();
     }
 
@@ -85,7 +83,7 @@ public class MatchChecker {
     }
 
     private boolean noHiddenResult(){
-        return firstTimeHomeResult < 0 && firstTimeAwayResult < 0 && secondTimeHomeResult < 0 && secondTimeAwayResult < 0;
+        return firstTimeHomeResult >= 0 || firstTimeAwayResult >= 0 || secondTimeHomeResult >= 0 || secondTimeAwayResult >= 0;
     }
 
     private boolean checkMatch(){
@@ -225,15 +223,15 @@ public class MatchChecker {
             if (bet.equalsIgnoreCase("Pari")) {
                 return concreteChecker.pari();
             }
-            if (bet.equalsIgnoreCase("Dispari 1T") && !noHiddenResult()){
+            if (bet.equalsIgnoreCase("Dispari 1T") && noHiddenResult()){
                 return concreteChecker.dispari1time();
             }
-            if (bet.equalsIgnoreCase("Pari 1T") && !noHiddenResult()){
+            if (bet.equalsIgnoreCase("Pari 1T") && noHiddenResult()){
                 return concreteChecker.pari1time();
             }
         }
 
-        if(betKind.equalsIgnoreCase("Primo Tempo")&&!noHiddenResult()){
+        if(betKind.equalsIgnoreCase("Primo Tempo")&& noHiddenResult()){
             if(bet.equalsIgnoreCase("1")){
                 return concreteChecker.uno1tempo();
             }
@@ -245,7 +243,7 @@ public class MatchChecker {
             }
         }
 
-        if(betKind.equalsIgnoreCase("Primo Tempo / Secondo Tempo")&&!noHiddenResult()){
+        if(betKind.equalsIgnoreCase("Primo Tempo / Secondo Tempo")&& noHiddenResult()){
             if(bet.equalsIgnoreCase("1 / 1")){
                 return concreteChecker.unoUno();
             }
@@ -409,7 +407,7 @@ public class MatchChecker {
             }
         }
 
-        if(betKind.equalsIgnoreCase("Under / Over primo tempo") && !noHiddenResult()){
+        if(betKind.equalsIgnoreCase("Under / Over primo tempo") && noHiddenResult()){
             if(bet.equalsIgnoreCase("Under 0,5")){
                 return concreteChecker.under05primo();
             }
@@ -449,7 +447,7 @@ public class MatchChecker {
 
         }
 
-        if(betKind.equalsIgnoreCase("Under / Over secondo tempo") && !noHiddenResult()){
+        if(betKind.equalsIgnoreCase("Under / Over secondo tempo") && noHiddenResult()){
             if(bet.equalsIgnoreCase("Under 0,5")){
                 return concreteChecker.under05secondo();
             }
@@ -572,7 +570,7 @@ public class MatchChecker {
             }
         }
 
-        if(betKind.equalsIgnoreCase("Goal / NoGoal primo tempo") && !noHiddenResult()){
+        if(betKind.equalsIgnoreCase("Goal / NoGoal primo tempo") && noHiddenResult()){
             if(bet.equalsIgnoreCase("Gol")){
                 return concreteChecker.goalPrimo();
             }
@@ -581,7 +579,7 @@ public class MatchChecker {
             }
         }
 
-        if(betKind.equalsIgnoreCase("Goal / NoGoal secondo tempo") && !noHiddenResult()){
+        if(betKind.equalsIgnoreCase("Goal / NoGoal secondo tempo") && noHiddenResult()){
             if(bet.equalsIgnoreCase("Gol")){
                 return concreteChecker.goalSecondo();
             }
@@ -590,7 +588,7 @@ public class MatchChecker {
             }
         }
 
-        if(betKind.equalsIgnoreCase("Tempo con piu gol") && !noHiddenResult()){
+        if(betKind.equalsIgnoreCase("Tempo con piu gol") && noHiddenResult()){
             if(bet.equalsIgnoreCase("Primo Tempo")){
                 return concreteChecker.primo();
             }
@@ -863,7 +861,7 @@ public class MatchChecker {
 
         }
 
-        if(betKind.equalsIgnoreCase("Multi Gol 1/2") && !noHiddenResult()){
+        if(betKind.equalsIgnoreCase("Multi Gol 1/2") && noHiddenResult()){
             if(bet.equalsIgnoreCase("1-2 Gol Primo Tempo")){
                 return concreteChecker.goal12primo();
             }
@@ -929,7 +927,7 @@ public class MatchChecker {
                 return concreteChecker.goal25trasferta();
             }
 
-            if(betKind.equalsIgnoreCase("Squadra in casa vince entrambi i tempi") && !noHiddenResult()){
+            if(betKind.equalsIgnoreCase("Squadra in casa vince entrambi i tempi") && noHiddenResult()){
                 if(bet.equalsIgnoreCase("Si")){
                     return concreteChecker.vinceCasaSi();
                 }
@@ -938,7 +936,7 @@ public class MatchChecker {
                 }
             }
 
-            if(betKind.equalsIgnoreCase("Squadra ospite vince entrambi i tempi") && !noHiddenResult()){
+            if(betKind.equalsIgnoreCase("Squadra ospite vince entrambi i tempi") && noHiddenResult()){
                 if(bet.equalsIgnoreCase("Si")){
                     return concreteChecker.vinceOspiteSi();
                 }
@@ -947,7 +945,7 @@ public class MatchChecker {
                 }
             }
 
-            if(betKind.equalsIgnoreCase("Squadra in casa segna entrambi i tempi") && !noHiddenResult()){
+            if(betKind.equalsIgnoreCase("Squadra in casa segna entrambi i tempi") && noHiddenResult()){
                 if(bet.equalsIgnoreCase("Si")){
                     return concreteChecker.casaSi();
                 }
@@ -956,7 +954,7 @@ public class MatchChecker {
                 }
             }
 
-            if(betKind.equalsIgnoreCase("Squadra ospite segna entrambi i tempi") && !noHiddenResult()){
+            if(betKind.equalsIgnoreCase("Squadra ospite segna entrambi i tempi") && noHiddenResult()){
                 if(bet.equalsIgnoreCase("Si")){
                     return concreteChecker.ospiteSi();
                 }
@@ -965,7 +963,7 @@ public class MatchChecker {
                 }
             }
 
-            if(betKind.equalsIgnoreCase("Doppia Chance primo tempo") && !noHiddenResult()){
+            if(betKind.equalsIgnoreCase("Doppia Chance primo tempo") && noHiddenResult()){
                 if(bet.equalsIgnoreCase("1X")){
                     return concreteChecker.unoXprimo();
                 }
@@ -977,7 +975,7 @@ public class MatchChecker {
                 }
             }
 
-            if(betKind.equalsIgnoreCase("Doppia Chance secondo tempo") && !noHiddenResult()){
+            if(betKind.equalsIgnoreCase("Doppia Chance secondo tempo") && noHiddenResult()){
                 if(bet.equalsIgnoreCase("1X")){
                     return concreteChecker.unoXsecondo();
                 }

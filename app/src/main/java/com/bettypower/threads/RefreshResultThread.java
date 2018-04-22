@@ -135,9 +135,7 @@ public class RefreshResultThread extends Thread{
                     awayTeamOne.equalsIgnoreCase(awayTeamTwo)) {
                 return true;
             } else if (commonHomeName > 0 || commonAwayName > 0) {
-                if (commonHomeName + commonAwayName >= 2) {
-                    return true;
-                }
+                return commonHomeName + commonAwayName >= 2;
             }
         }
         return false;
@@ -176,36 +174,16 @@ public class RefreshResultThread extends Thread{
         }
 
         boolean resultdate = false;
-        if(dateNow.after(dateOne) && dateTwo.after(dateNow)){
+        if (dateNow != null && dateNow.after(dateOne) && dateTwo.after(dateNow)) {
             resultdate = true;
         }
         return resultdate;
     }
 
-    public String giveDate() {
-       /* Calendar c = Calendar.getInstance();
-        SimpleDateFormat sdfh = new SimpleDateFormat("HH:mm",Locale.getDefault());
-        String getCurrentTime = sdfh.format(c.getTime());
-
-        String midnight = "00:00"; //TODO se la partita comincia a mezzanotte non funziona nulla fino all'una
-        //questo è dovuto al fatto che molte volte a mezzanotte segnano che le partite sono il giorno prima stronzi dimmmerda
-        String oneOclock = "02:00";
-
-        String date = "";
-        if (getCurrentTime.compareTo(midnight) >= 0 && getCurrentTime.compareTo(oneOclock) <= 0)
-        {
-            Calendar cal = Calendar.getInstance();
-            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM", Locale.getDefault());
-            cal.add(Calendar.DATE, -1);
-            date = sdf.format(cal.getTime());
-        }
-        else
-        {*/
-            Calendar cal = Calendar.getInstance();
-            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM", Locale.getDefault());
-            String date = sdf.format(cal.getTime());
-      //  }
-        return date;
+    private String giveDate() {
+        Calendar cal = Calendar.getInstance();
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM", Locale.getDefault());
+        return sdf.format(cal.getTime());
     }
 
     public interface LoadingListener{

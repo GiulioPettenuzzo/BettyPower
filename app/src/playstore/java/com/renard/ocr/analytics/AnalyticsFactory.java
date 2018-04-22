@@ -1,4 +1,4 @@
-package com.renard.ocr.analytics;
+package com.renard.betty.analytics;
 
 import android.content.Context;
 

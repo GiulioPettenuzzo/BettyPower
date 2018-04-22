@@ -13,7 +13,7 @@ import android.widget.Filterable;
 import android.widget.TextView;
 
 import com.bettypower.entities.PalimpsestMatch;
-import com.renard.ocr.R;
+import com.renard.betty.R;
 
 import java.util.ArrayList;
 import java.util.StringTokenizer;
@@ -235,8 +235,8 @@ public class DropDownAutoCompleteTextViewAdapter<M extends Parcelable> extends B
     }
 
     public static class ViewHolder {
-        public TextView homeTeam;
-        public TextView awayTeam;
+        TextView homeTeam;
+        TextView awayTeam;
         public TextView date;
     }
 

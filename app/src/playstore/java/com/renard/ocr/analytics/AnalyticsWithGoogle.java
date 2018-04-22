@@ -1,14 +1,14 @@
-package com.renard.ocr.analytics;
+package com.renard.betty.analytics;
 
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 
-import com.renard.ocr.BuildConfig;
-import com.renard.ocr.R;
-import com.renard.ocr.cropimage.image_processing.BlurDetectionResult;
-import com.renard.ocr.documents.creation.visualisation.LayoutQuestionDialog;
-import com.renard.ocr.main_menu.language.OcrLanguage;
+import com.renard.betty.BuildConfig;
+import com.renard.betty.R;
+import com.renard.betty.cropimage.image_processing.BlurDetectionResult;
+import com.renard.betty.documents.creation.visualisation.LayoutQuestionDialog;
+import com.renard.betty.main_menu.language.OcrLanguage;
 
 import android.app.Application;
 import android.content.Context;

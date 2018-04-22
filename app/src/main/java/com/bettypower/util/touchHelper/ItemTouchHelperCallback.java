@@ -3,8 +3,6 @@ package com.bettypower.util.touchHelper;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 
-import com.bettypower.adapters.SingleBetAdapter;
-
 /**
  * class used to swipe an element in recycler view
  * Created by giuliopettenuzzo on 21/01/18.

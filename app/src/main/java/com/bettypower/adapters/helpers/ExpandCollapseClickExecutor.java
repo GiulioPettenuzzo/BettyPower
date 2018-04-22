@@ -4,7 +4,6 @@ import android.animation.ValueAnimator;
 import android.content.Context;
 import android.os.Build;
 import android.support.constraint.ConstraintLayout;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.view.animation.AccelerateDecelerateInterpolator;
@@ -13,7 +12,7 @@ import android.view.animation.RotateAnimation;
 
 import com.bettypower.adapters.SingleBetAdapter;
 import com.bettypower.entities.PalimpsestMatch;
-import com.renard.ocr.R;
+import com.renard.betty.R;
 
 import java.util.ArrayList;
 
@@ -168,7 +167,6 @@ public class ExpandCollapseClickExecutor {
                 public void onAnimationUpdate(ValueAnimator animation) {
                     Integer value = (Integer) animation.getAnimatedValue();
                     holder.itemView.getLayoutParams().height = value;
-                    Log.i("rate", String.valueOf(value));
                     holder.hiddenResult.removeAllViews();
                     if(holder.itemView.getLayoutParams().height==originalHeight) {
                         holder.itemView.getLayoutParams().height = ConstraintLayout.LayoutParams.WRAP_CONTENT;

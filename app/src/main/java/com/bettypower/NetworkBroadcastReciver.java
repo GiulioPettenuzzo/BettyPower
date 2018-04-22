@@ -7,8 +7,8 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.widget.Toast;
 
-import com.renard.ocr.R;
-import com.renard.ocr.TextFairyApplication;
+import com.renard.betty.R;
+import com.renard.betty.TextFairyApplication;
 
 
 public class NetworkBroadcastReciver extends BroadcastReceiver {
@@ -34,7 +34,10 @@ public class NetworkBroadcastReciver extends BroadcastReceiver {
     public boolean isInternetConnected(Context context) {
         ConnectivityManager connectivityManager
                 = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        NetworkInfo activeNetworkInfo = null;
+        if (connectivityManager != null) {
+            activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        }
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 

@@ -1,6 +1,5 @@
 package com.bettypower.betMatchFinder;
 
-import android.util.Log;
 
 import com.bettypower.betMatchFinder.betFinderManagment.StaticBetUpdater;
 import com.bettypower.betMatchFinder.entities.ConcreteMatchToFind;
@@ -20,7 +19,6 @@ public class StaticUpdater {
 
     private ArrayList<PalimpsestMatch> allPalimpsestMatch;
     private ArrayList<MatchToFind> allMatchFoundByRealTimeOCR;
-    private ArrayList<OddsToFind> allQuoteFoundByRealTimeOCR;
     private Map<String,String> bookmakerAndMoney;
     private Validator validator;
     private Helper helper;
@@ -32,7 +30,6 @@ public class StaticUpdater {
     public StaticUpdater(ArrayList<PalimpsestMatch> allPalimpsestMatch,ArrayList<MatchToFind> allMatchFoundByRealTimeOCR,ArrayList<OddsToFind> allQuoteFoundByRealTimeOCR,Map<String,String> bookMakerAndMoney){
         this.allPalimpsestMatch = allPalimpsestMatch;
         this.allMatchFoundByRealTimeOCR = allMatchFoundByRealTimeOCR;
-        this.allQuoteFoundByRealTimeOCR = allQuoteFoundByRealTimeOCR;
         this.bookmakerAndMoney = bookMakerAndMoney;
         mainListOfMatches = new ArrayList<>();
         validator = new Validator();
@@ -108,34 +105,12 @@ public class StaticUpdater {
             }
             if (currentKey.equals(Finder.QUOTE)&& mainListOfMatches.size()!=0) {
                 staticBetUpdater.updateNewQuote(map.get(currentKey).toString(),mainListOfMatches);
-                /*
-                if(mainListOfMatches.get(pointer).getHour() != null && !mainListOfMatches.get(pointer).getHour().equals(map.get(currentKey).toString()) ||
-                        (map.containsKey(Finder.QUOTE) && !map.get(Finder.QUOTE).toString().equals(map.get(currentKey).toString())) ){
-                    mainListOfOdds.add(map.get(currentKey).toString());
-                }*/
             }
-          //  if (currentKey.equals(Finder.BOOKMAKER)) {
-
-
-         //   }
             if (currentKey.equals(Finder.BET)&& mainListOfMatches.size()!=0 && getCurrentMatch().getBet()==null) {
                 mainListOfMatches = staticBetUpdater.updateNewBet(map.get(currentKey).toString(),mainListOfMatches);
-               /* if(validator.isBetValidate(map.get(currentKey).toString(),getCurrentMatch().getBetKind(),
-                        getCurrentMatch().getOdds(),getCurrentMatch().getPalimpsestMatch())){
-                    getCurrentMatch().setBet(map.get(currentKey).toString());
-                }
-                else{
-                    getCurrentMatch().setBet(null);
-                }*/
             }
             if (currentKey.equals(Finder.BET_KIND)&& mainListOfMatches.size()!=0 && getCurrentMatch().getBetKind()==null) {
                 mainListOfMatches = staticBetUpdater.updateNewBetKind(map.get(currentKey).toString(),mainListOfMatches);
-               /* if(validator.isBetKindValidate(getCurrentMatch().getBet(),map.get(currentKey).toString())){
-                    getCurrentMatch().setBetKind(map.get(currentKey).toString());
-                }
-                else {
-                    getCurrentMatch().setBetKind(null);
-                }*/
             }
 
             if(currentKey.equals(Finder.VINCITA)){
@@ -167,17 +142,6 @@ public class StaticUpdater {
         getCurrentMatch().setPalimpsestMatch(allPalimpsestMatch);
     }
 
-    private boolean isMatchEmpty(MatchToFind matchToFind){
-        if(matchToFind.getPalimpsest()==null && matchToFind.getHomeName()==null && matchToFind.getAwayName()==null &&
-                matchToFind.getHour()==null && matchToFind.getDate() == null && matchToFind.getBet() == null &&
-                matchToFind.getBetKind() == null && matchToFind.getUnknownTeamName()==null){
-            return true;
-        }
-        else{
-            return false;
-        }
-    }
-
     private void resolveNameMethod(String name){
         if (mainListOfMatches.size() != 0) {
             if ((getCurrentMatch().getHomeName() != null && getCurrentMatch().getHomeName().contains(name)) ||
@@ -192,7 +156,6 @@ public class StaticUpdater {
 
         Map<String,ArrayList<PalimpsestMatch>> allPossibleMapMatches = validator.isNameValidate(name,getCurrentMatch().getPalimpsestMatch());
         if(allPossibleMapMatches==null){
-            //TODO
             updatePointerForNames(name);
             resolveNameMethod(name);
         }
@@ -273,10 +236,6 @@ public class StaticUpdater {
 
     public ArrayList<MatchToFind> getAllMatchRemainedFromRealTimeOCR(){
         return allMatchFoundByRealTimeOCR;
-    }
-
-    public Map<String,String> getBookmakerAndMoney(){
-        return bookmakerAndMoney;
     }
 
     public ArrayList<String> getAllQuote(){

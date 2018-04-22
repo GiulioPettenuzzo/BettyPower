@@ -4,14 +4,10 @@ import android.util.Log;
 
 import com.bettypower.betMatchFinder.entities.MatchToFind;
 import com.bettypower.betMatchFinder.entities.OddsToFind;
-import com.bettypower.betMatchFinder.labelSet.BetLabelSet;
 import com.bettypower.entities.PalimpsestMatch;
-import com.bettypower.entities.Team;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 import java.util.StringTokenizer;
 
 /**

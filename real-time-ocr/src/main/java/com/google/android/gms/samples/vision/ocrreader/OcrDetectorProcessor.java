@@ -22,7 +22,6 @@ import com.google.android.gms.samples.vision.ocrreader.ui.camera.GraphicOverlay;
 import com.google.android.gms.vision.Detector;
 import com.google.android.gms.vision.text.TextBlock;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 /**

@@ -1,7 +1,6 @@
 package com.bettypower.betMatchFinder;
 
 import android.content.Context;
-import android.util.Log;
 
 import com.bettypower.betMatchFinder.entities.MatchToFind;
 import com.bettypower.betMatchFinder.entities.OddsToFind;
@@ -13,7 +12,7 @@ import com.bettypower.betMatchFinder.threads.StaticThread;
 import com.bettypower.entities.Bet;
 import com.bettypower.entities.PalimpsestMatch;
 import com.bettypower.entities.SingleBet;
-import com.renard.ocr.TextFairyApplication;
+import com.renard.betty.TextFairyApplication;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -40,8 +39,6 @@ public class Resolver {
     private boolean realTimeExecutionFinish = false;
     private boolean staticExecutionFinish = false;
     private Finder finderForStatic;
-
-    private long init;
 
     /**
      * this constructor also sort the palimpsest match array list in order by the palimpsest number
@@ -74,7 +71,6 @@ public class Resolver {
      * @param staticResponse response from renard ocr
      */
     public void setNormalResponse(String staticResponse){
-        init = System.currentTimeMillis();
         this.staticResponse = staticResponse;
         checkExeguible();
     }
@@ -126,7 +122,6 @@ public class Resolver {
             puntata = puntata.replace(",",".");
             bet.setPuntata(puntata);
         }
-        Log.i("TEMPO DI ESECUZIONE",String.valueOf(System.currentTimeMillis()-init));
         completeElaborationListener.onElaborationComplete(bet);
     }
 
@@ -154,7 +149,6 @@ public class Resolver {
      */
     private void executeRealTimeResponse(){
         realTimeThread = new RealTimeThread(allPalimpsestMatch,realTimeResponse);
-        Log.i("REAL TIME RESPONSE",realTimeResponse);
         realTimeThread.start();
         realTimeThread.setRealTimeElaborationListener(new RealTimeElaborationListener() {
             @Override
@@ -173,7 +167,6 @@ public class Resolver {
      */
     private void executeStaticResponse(){
         staticThread = new StaticThread(allPalimpsestMatch,staticResponse,allMatchFoundByRealTimeOCR,allQuoteFoundByRealTimeOCR,finderForStatic,bookmakerAndMoney);
-        Log.i("STATIC RESPONSE",staticResponse);
         staticThread.start();
         staticThread.setStaticElaborationListener(new StaticElaborationListener() {
             @Override

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.renard.ocr"
+    package="com.renard.betty"
     android:installLocation="auto"
     android:versionName="3.0.10">
 
@@ -43,7 +43,7 @@
 
         <provider
             android:name="android.support.v4.content.FileProvider"
-            android:authorities="@string/config_share_file_auth"
+            android:authorities="com.renard.betty.fileprovider"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data
@@ -52,7 +52,7 @@
         </provider>
         <provider
             android:name=".documents.viewing.DocumentContentProvider"
-            android:authorities="com.renard.ocr"
+            android:authorities="com.renard.betty"
             android:exported="false" />
 
         <activity
@@ -116,7 +116,7 @@
         <activity android:name=".main_menu.LicenseActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.renard.ocr.main_menu.AboutActivity" />
+                android:value="com.renard.betty.main_menu.AboutActivity" />
         </activity>
         <activity android:name=".main_menu.FeedbackActivity">
             <meta-data

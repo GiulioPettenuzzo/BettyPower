@@ -1,7 +1,6 @@
 package com.bettypower.unpacker;
 
 import android.os.AsyncTask;
-import android.util.Log;
 
 import com.bettypower.entities.HiddenResult;
 import com.bettypower.entities.PalimpsestMatch;
@@ -36,7 +35,6 @@ public class AllPalimpsestDBJsonParser extends AsyncTask<String,String,ArrayList
          * */
         protected ArrayList<PalimpsestMatch> doInBackground(String... args) {
             // Building Parameters
-            long init = System.currentTimeMillis();
             List<NameValuePair> params = new ArrayList<>();
             // getting JSON string from URL
             JSONArray json = jParser.makeHttpRequest(url_all_products, "GET", params);
@@ -108,16 +106,13 @@ public class AllPalimpsestDBJsonParser extends AsyncTask<String,String,ArrayList
             catch (JSONException e) {
                 e.printStackTrace();
             }
-            Log.i("All Products: ", json.toString());
-            Log.i("finish in time",String.valueOf(System.currentTimeMillis()-init)+" size "+json.length());
-
             return allPalimpsestMatch;
         }
 
         /**
          * After completing background task Dismiss the progress dialog
          * **/
-        protected void onPostExecute(PalimpsestMatch allMatch) {
+        protected void onPostExecute() {
             // dismiss the dialog after getting all products
 
         }

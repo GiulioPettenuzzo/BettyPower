@@ -3,9 +3,6 @@ package com.bettypower.entities;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.google.gson.InstanceCreator;
-
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.StringTokenizer;
@@ -187,10 +184,7 @@ public class ParcelablePalimpsestMatch implements PalimpsestMatch {
 
     @Override
     public boolean compareTo(PalimpsestMatch match) {
-        if (palimpsest.equals(match.getPalimpsest())) {
-            return true;
-        }
-        return false;
+        return palimpsest.equals(match.getPalimpsest());
     }
 
     @Override
@@ -236,11 +230,7 @@ public class ParcelablePalimpsestMatch implements PalimpsestMatch {
                 paramAwayTeam.append(" ").append(word);
             }
         }
-        if (getTime().equalsIgnoreCase(paramPalimpsestMatch.getTime())) {
-            return homeTeam.toString().equalsIgnoreCase(paramHomeTeam.toString()) || awayTeam.toString().equalsIgnoreCase(paramAwayTeam.toString());
-        } else {
-            return false;
-        }
+        return getTime().equalsIgnoreCase(paramPalimpsestMatch.getTime()) && (homeTeam.toString().equalsIgnoreCase(paramHomeTeam.toString()) || awayTeam.toString().equalsIgnoreCase(paramAwayTeam.toString()));
     }
 
     public static final Parcelable.Creator<ParcelablePalimpsestMatch> CREATOR = new Parcelable.Creator<ParcelablePalimpsestMatch>() {
@@ -261,7 +251,7 @@ public class ParcelablePalimpsestMatch implements PalimpsestMatch {
         return 0;
     }
 
-    public ParcelablePalimpsestMatch(Parcel source) {
+    private ParcelablePalimpsestMatch(Parcel source) {
         this(new ParcelableTeam(source.readString()), new ParcelableTeam(source.readString()), source.readString(), source.readString());
         this.bet = source.readString();
         this.betKind = source.readString();

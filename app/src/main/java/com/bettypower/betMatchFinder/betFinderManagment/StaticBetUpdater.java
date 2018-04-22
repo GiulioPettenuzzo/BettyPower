@@ -1,22 +1,18 @@
 package com.bettypower.betMatchFinder.betFinderManagment;
 
-import android.support.v7.util.AsyncListUtil;
-
 import com.bettypower.betMatchFinder.entities.ConcreteOddsToFind;
 import com.bettypower.betMatchFinder.entities.MatchToFind;
 import com.bettypower.betMatchFinder.entities.OddsToFind;
 import com.bettypower.betMatchFinder.labelSet.BetLabelSet;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.stream.Stream;
 
 public class StaticBetUpdater {
     private ArrayList<String> allQuoteFoundByRealTimeOCR = new ArrayList<>();
-    private ArrayList<OddsToFind> allOddsFoundByRealTimeOCR = new ArrayList<>();
+    private ArrayList<OddsToFind> allOddsFoundByRealTimeOCR;
     private ArrayList<String> allQuoteFoundByStaticOCR = new ArrayList<>();
     private TreeMap<String, ArrayList<String>> hashBetAndBetKind;
 

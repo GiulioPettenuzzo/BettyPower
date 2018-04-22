@@ -14,7 +14,6 @@ import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -24,10 +23,8 @@ import android.widget.Toast;
 
 import com.bettypower.entities.Bet;
 import com.bettypower.threads.sharing.ShareBetThread;
-import com.renard.ocr.R;
-import com.renard.ocr.documents.viewing.DocumentContentProvider;
-
-import java.io.File;
+import com.renard.betty.R;
+import com.renard.betty.documents.viewing.DocumentContentProvider;
 
 public class SingleBetImageActivity extends AppCompatActivity {
 
@@ -75,12 +72,6 @@ public class SingleBetImageActivity extends AppCompatActivity {
                     });
                 }
                 else{
-                    File file = new File(uri.toString());
-                    if(file.exists())
-                        Log.i("esiste",uri.toString());
-                    else{
-                        Log.i("non esiste",uri.toString());
-                    }
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {

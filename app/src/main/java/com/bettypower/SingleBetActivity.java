@@ -24,7 +24,6 @@ import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.format.DateFormat;
 import android.util.Base64;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -62,10 +61,10 @@ import com.bettypower.util.ImageHelper;
 import com.bettypower.util.touchHelper.ItemTouchHelperCallback;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.renard.ocr.R;
-import com.renard.ocr.TextFairyApplication;
-import com.renard.ocr.documents.viewing.DocumentContentProvider;
-import com.renard.ocr.util.Util;
+import com.renard.betty.R;
+import com.renard.betty.TextFairyApplication;
+import com.renard.betty.documents.viewing.DocumentContentProvider;
+import com.renard.betty.util.Util;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -642,7 +641,6 @@ public class SingleBetActivity extends AppCompatActivity {
     private void startImageThreadIfImageNotFound(final PalimpsestMatch currentMatch){
         File fHome=new File(getDir("logo_images", Context.MODE_PRIVATE).getPath()+"/"+currentMatch.getHomeTeam().getName() + ".png");
         if(!fHome.exists()) {
-            Log.i("thread image", "start");
             LoadLogoThread homeThread = new LoadLogoThread(currentMatch.getHomeTeam().getName(), new LoadLogoThread.LoadLogoListener() {
                 @Override
                 public void onLoadLogoFinish(Bitmap bitmap) {
@@ -654,7 +652,6 @@ public class SingleBetActivity extends AppCompatActivity {
         }
         File fAway=new File(getDir("logo_images", Context.MODE_PRIVATE).getPath()+"/"+currentMatch.getAwayTeam().getName() + ".png");
         if(!fAway.exists()) {
-            Log.i("thread image", "start");
             LoadLogoThread awayThread = new LoadLogoThread(currentMatch.getAwayTeam().getName(), new LoadLogoThread.LoadLogoListener() {
                 @Override
                 public void onLoadLogoFinish(Bitmap bitmap) {
@@ -697,7 +694,6 @@ public class SingleBetActivity extends AppCompatActivity {
                     new Response.Listener<String>() {
                         @Override
                         public void onResponse(String response) {
-                            Log.i("response = ", response);
                             RefreshResultThread refreshResultThread = new RefreshResultThread(response, bet.getArrayMatch(), new RefreshResultThread.LoadingListener() {
                                 @Override
                                 public void onFinishLoading(final ArrayList<PalimpsestMatch> allMatches) {
@@ -784,7 +780,6 @@ public class SingleBetActivity extends AppCompatActivity {
                         currentMatch.setAwayResult(currentResultMatch.getAwayResult());
                         currentMatch.setResultTime(currentResultMatch.getResultTime());
                         currentMatch.setAllHiddenResult(currentResultMatch.getAllHiddenResult());
-                        Log.i("match", "match trovato!!");
                         break;
                     }
                 }
@@ -793,7 +788,6 @@ public class SingleBetActivity extends AppCompatActivity {
         }
         long normalFin = System.currentTimeMillis();
         long timeNormal = normalFin - normalInit;
-        Log.i("time check for result",String.valueOf(timeNormal));
     }
 
     //********************************** SHOW - HIDE TOOLBAR ***************************************
@@ -840,7 +834,6 @@ public class SingleBetActivity extends AppCompatActivity {
                     new Response.Listener<String>() {
                         @Override
                         public void onResponse(final String response) {
-                            Log.i("response=",response);
                             GsonBuilder gsonBuilder = new GsonBuilder();
                             gsonBuilder.registerTypeAdapter(HiddenResult.class,new HiddenResultDeserialized());
                             gsonBuilder.registerTypeAdapter(Team.class,new TeamDeserialized());
@@ -953,10 +946,8 @@ public class SingleBetActivity extends AppCompatActivity {
                 ret = stringBuilder.toString();
             }
         }
-        catch (FileNotFoundException e) {
-            Log.e("login activity", "File not found: " + e.toString());
-        } catch (IOException e) {
-            Log.e("login activity", "Can not read file: " + e.toString());
+        catch (FileNotFoundException ignored) {
+        } catch (IOException ignored) {
         }
 
         return ret;
@@ -970,8 +961,7 @@ public class SingleBetActivity extends AppCompatActivity {
             outputStreamWriter.write(text);
             outputStreamWriter.close();
         }
-        catch (IOException e) {
-            Log.e("Exception", "File write failed: " + e.toString());
+        catch (IOException ignored) {
         }
     }
 

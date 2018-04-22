@@ -23,7 +23,6 @@ import android.graphics.ImageFormat;
 import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
 import android.hardware.Camera.CameraInfo;
-import android.hardware.camera2.CameraManager;
 import android.os.Build;
 import android.os.SystemClock;
 import android.support.annotation.Nullable;

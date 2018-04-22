@@ -1,7 +1,5 @@
 package com.bettypower.unpacker;
 
-import android.graphics.Matrix;
-
 import com.bettypower.entities.HiddenResult;
 import com.bettypower.entities.PalimpsestMatch;
 import com.bettypower.entities.ParcelablePalimpsestMatch;
@@ -33,40 +31,39 @@ public class goalServeUnpacker implements Unpacker {
         this.response = response;
         String[][] allMatchInHtml = getAllMatchesInHtml();
         allMatchInHtml.clone();
-        for(int i = 0; i<allMatchInHtml.length;i++){
-            if(allMatchInHtml[i][0]!=null) {
+        for (String[] anAllMatchInHtml : allMatchInHtml) {
+            if (anAllMatchInHtml[0] != null) {
                 ArrayList<HiddenResult> allHiddenResult = new ArrayList<>();
-                for(int j = 1;j<allMatchInHtml.length;j++){
-                    if(allMatchInHtml[i][j]!=null){
-                        HiddenResultUnpacker unpackHiddenResult = new HiddenResultUnpacker(allMatchInHtml[i][j]);
+                for (int j = 1; j < allMatchInHtml.length; j++) {
+                    if (anAllMatchInHtml[j] != null) {
+                        HiddenResultUnpacker unpackHiddenResult = new HiddenResultUnpacker(anAllMatchInHtml[j]);
                         allHiddenResult.add(unpackHiddenResult.getHiddenResult());
-                    }
-                    else{
+                    } else {
                         break;
                     }
                 }
-                String currentTeam = allMatchInHtml[i][0];
+                String currentTeam = anAllMatchInHtml[0];
                 Team homeTeam = getHomeTeam(currentTeam);
                 //remove the space from the beginning of the word if they exist
-                    while (homeTeam.getName().startsWith(" ")) {
-                        homeTeam.setName(homeTeam.getName().substring(1));
-                    }
+                while (homeTeam.getName().startsWith(" ")) {
+                    homeTeam.setName(homeTeam.getName().substring(1));
+                }
                 Team awayTeam = getAwayTeam(currentTeam);
-                    while (awayTeam.getName().startsWith(" ")) {
-                        awayTeam.setName(awayTeam.getName().substring(1));
-                    }
+                while (awayTeam.getName().startsWith(" ")) {
+                    awayTeam.setName(awayTeam.getName().substring(1));
+                }
                 String homeTeamS = Normalizer.normalize(homeTeam.getName(), Normalizer.Form.NFD);
                 homeTeam.setName(homeTeamS.replaceAll("[^\\p{ASCII}]", "").toUpperCase());
                 String awayTeamS = Normalizer.normalize(awayTeam.getName(), Normalizer.Form.NFD);
                 awayTeam.setName(awayTeamS.replaceAll("[^\\p{ASCII}]", "").toUpperCase());
                 String resultTime = getTime(currentTeam);
-                if(resultTime.equalsIgnoreCase("ht")){
+                if (resultTime.equalsIgnoreCase("ht")) {
                     resultTime = "Intervallo";
                 }
-                if(resultTime.equalsIgnoreCase("ft")){
+                if (resultTime.equalsIgnoreCase("ft")) {
                     resultTime = "Terminata";
                 }
-                if(resultTime.equalsIgnoreCase("postp.")){
+                if (resultTime.equalsIgnoreCase("postp.")) {
                     resultTime = "Posticipata";
                 }
                 String result = getResult(currentTeam);
@@ -78,8 +75,7 @@ public class goalServeUnpacker implements Unpacker {
                 allMatches.add(match);
                 allHomeTeams.add(homeTeam);
                 allAwayTeams.add(awayTeam);
-            }
-            else{
+            } else {
                 break;
             }
         }
@@ -88,14 +84,8 @@ public class goalServeUnpacker implements Unpacker {
 
     @Override
     public ArrayList<Team> getAllTeams() {
-        for (Team currTeam:allHomeTeams
-             ) {
-            allTeams.add(currTeam);
-        }
-        for (Team currTeam:allAwayTeams
-             ) {
-            allTeams.add(currTeam);
-        }
+        allTeams.addAll(allHomeTeams);
+        allTeams.addAll(allAwayTeams);
         return allTeams;
     }
 
@@ -113,9 +103,9 @@ public class goalServeUnpacker implements Unpacker {
      */
     private String[][] getAllMatchesInHtml(){
         String[][] allMatchesInHtml = new String[100][100];
-        String matchInString = "";
+        StringBuilder matchInString = new StringBuilder();
         String word = "";
-        String singleHidden = "";
+        StringBuilder singleHidden = new StringBuilder();
         StringTokenizer tokenizer = new StringTokenizer(response);
         int i = 0;
 
@@ -126,14 +116,14 @@ public class goalServeUnpacker implements Unpacker {
                 if(word.startsWith("style=\"background:")){
                     word = tokenizer.nextToken();
                     while(word.compareTo("</tr>")!=0){
-                        matchInString = matchInString + " " + word;
+                        matchInString.append(" ").append(word);
                         word = tokenizer.nextToken();
                         if(word.compareTo("</tr>")==0){
                             if(i>=allMatchesInHtml.length-1){
                                 allMatchesInHtml = resize(allMatchesInHtml,i*2,i*2);
                             }
-                            allMatchesInHtml[i][0]  = matchInString;
-                            matchInString = "";
+                            allMatchesInHtml[i][0]  = matchInString.toString();
+                            matchInString = new StringBuilder();
                             i++;
                         }
                     }
@@ -143,15 +133,15 @@ public class goalServeUnpacker implements Unpacker {
                     word = tokenizer.nextToken();
                     if(word.compareTo("class=\"hidden-result\"")==0){
                         while (word.compareTo("</tr>") != 0) {
-                            singleHidden = singleHidden + " " + word;
+                            singleHidden.append(" ").append(word);
                             word = tokenizer.nextToken();
                             if (word.compareTo("</tr>") == 0) {
                                 if(i>=allMatchesInHtml[0].length-1){
                                     allMatchesInHtml = resize(allMatchesInHtml,i*2,i*2);
                                 }
-                                allMatchesInHtml[i-1][j] = singleHidden;
+                                allMatchesInHtml[i-1][j] = singleHidden.toString();
                                 j++;
-                                singleHidden = "";
+                                singleHidden = new StringBuilder();
                             }
                         }
                     }
@@ -175,7 +165,7 @@ public class goalServeUnpacker implements Unpacker {
 */
     private Team getHomeTeam(String oneMatchResponse){
         //title="Football" />  Team Name</td>
-        String teamName = "";
+        StringBuilder teamName = new StringBuilder();
         Team homeTeam;
         StringTokenizer tokenizer = new StringTokenizer(oneMatchResponse);
         while(tokenizer.hasMoreTokens()){
@@ -188,21 +178,21 @@ public class goalServeUnpacker implements Unpacker {
                         int wordLength = word.length() - 5; // -5 is size of </td>
                         word = word.substring(0,wordLength);
                         if(!word.isEmpty()) {
-                            teamName = word;
-                            homeTeam = new ParcelableTeam(teamName);
+                            teamName = new StringBuilder(word);
+                            homeTeam = new ParcelableTeam(teamName.toString());
                             return homeTeam;
                         }
                     }
 
                     while(!word.endsWith("</td>")){
-                        teamName = teamName + " " + word;
+                        teamName.append(" ").append(word);
                         word = tokenizer.nextToken();       // Name</td>
                         if(word.endsWith("</td>")){
                             int wordLength = word.length() - 5; // -5 is size of </td>
                             word = word.substring(0,wordLength); //Name
                             if(!word.isEmpty()) {
-                                teamName = teamName + " " + word;
-                                homeTeam = new ParcelableTeam(teamName);
+                                teamName.append(" ").append(word);
+                                homeTeam = new ParcelableTeam(teamName.toString());
                                 return homeTeam;
                             }
                         }
@@ -215,7 +205,7 @@ public class goalServeUnpacker implements Unpacker {
 
     private Team getAwayTeam(String oneMatchResponse){
         //width="160px">Almagro <img src
-        String teamName = "";
+        StringBuilder teamName = new StringBuilder();
         Team awayTeam;
         StringTokenizer tokenizer = new StringTokenizer(oneMatchResponse);
         while(tokenizer.hasMoreTokens()){
@@ -223,10 +213,10 @@ public class goalServeUnpacker implements Unpacker {
             if(esamination.startsWith("width=\"160px\">")){
                 String word = esamination.substring(14);
                 while(word.compareTo("<img")!=0){
-                    teamName = teamName + " " + word;
+                    teamName.append(" ").append(word);
                     word = tokenizer.nextToken();
                     if (word.compareTo("<img")==0){
-                        awayTeam = new ParcelableTeam(teamName);
+                        awayTeam = new ParcelableTeam(teamName.toString());
                         return awayTeam;
                     }
                 }
@@ -237,7 +227,6 @@ public class goalServeUnpacker implements Unpacker {
 
     private String getTime(String oneMatchResponse){
         //<td width="33" style="background:dedfde;">18:00</td>
-        String time = "";
         StringTokenizer tokenizer = new StringTokenizer(oneMatchResponse);
         while(tokenizer.hasMoreTokens()){
             String esamination = tokenizer.nextToken();
@@ -245,7 +234,7 @@ public class goalServeUnpacker implements Unpacker {
                 String word = tokenizer.nextToken();    //style="background:dedfde;">18:00</td>
                 word = word.substring(0,word.length()-5);   //style="background:dedfde;">18:00
                 char[] charArray = word.toCharArray();
-                int firstIndex = 0;
+                int firstIndex;
                 for(int current = 0; current<charArray.length;current++){
                     if(charArray[current]=='>'){
                         firstIndex = current+1;
@@ -260,7 +249,6 @@ public class goalServeUnpacker implements Unpacker {
 
     private String getResult(String oneMatchResponse){
         //width="30px">[?-?]</td>
-        String result = "";
         StringTokenizer tokenizer = new StringTokenizer(oneMatchResponse);
         while(tokenizer.hasMoreTokens()){
             String word = tokenizer.nextToken();
@@ -276,7 +264,7 @@ public class goalServeUnpacker implements Unpacker {
     private String getAwayScore(String result){     //result =  [?-?]
         String score = result.substring(1,result.length()-1);   // ?-?
         char[] charArray = score.toCharArray();
-        int indexOfSeparator = 0; //index of -
+        int indexOfSeparator; //index of -
         for(int current = 0; current<charArray.length;current++){
             if(charArray[current]=='-'){
                 indexOfSeparator = current;
@@ -289,7 +277,7 @@ public class goalServeUnpacker implements Unpacker {
     private String getHomeScore(String result){     //result =  [?-?]
         String score = result.substring(1,result.length()-1);   // ?-?
         char[] charArray = score.toCharArray();
-        int indexOfSeparator = 0; //index of -
+        int indexOfSeparator; //index of -
         for(int current = 0; current<charArray.length;current++){
             if(charArray[current]=='-'){
                 indexOfSeparator = current;

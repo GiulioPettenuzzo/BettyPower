@@ -8,11 +8,10 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.support.annotation.Nullable;
 import android.util.Base64;
-import android.util.Log;
 
 import com.bettypower.entities.Bet;
 import com.google.gson.Gson;
-import com.renard.ocr.documents.viewing.DocumentContentProvider;
+import com.renard.betty.documents.viewing.DocumentContentProvider;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -80,11 +79,6 @@ public class UploadBitmapService extends IntentService {
                 OutputStream os = conn.getOutputStream();
                 os.write(jsonBet.getBytes("UTF-8"));
                 os.close();
-
-                int code = conn.getResponseCode();
-                Log.i("response code = ",String.valueOf(code));
-
-
             } catch (MalformedURLException e) {
                 e.printStackTrace();
             } catch (ProtocolException e) {

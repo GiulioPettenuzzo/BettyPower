@@ -9,7 +9,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.bettypower.entities.HiddenResult;
-import com.renard.ocr.R;
+import com.renard.betty.R;
 
 /**
  * Created by giuliopettenuzzo on 30/06/17.
@@ -27,7 +27,6 @@ public class HiddenResultLayout extends RelativeLayout {
     TextView time;
     ImageView homeAction;
     ImageView awayAction;
-    TextView noMatchFound;
 
     private static final int HOME_TEAM = 0;
     private static final int AWAY_TEAM = 1;

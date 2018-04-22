@@ -5,13 +5,6 @@ import android.content.Context;
 import com.bettypower.entities.Bet;
 import com.bettypower.entities.PalimpsestMatch;
 import com.bettypower.util.Helper;
-import com.renard.ocr.R;
-
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Locale;
-
 /**
  * Created by giuliopettenuzzo on 18/03/18.
  */

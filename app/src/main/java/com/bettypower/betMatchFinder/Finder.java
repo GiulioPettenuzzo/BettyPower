@@ -1,6 +1,5 @@
 package com.bettypower.betMatchFinder;
 
-import android.util.ArrayMap;
 
 import com.bettypower.betMatchFinder.entities.Date;
 import com.bettypower.betMatchFinder.fixers.DateFixer;
@@ -13,10 +12,8 @@ import com.bettypower.entities.PalimpsestMatch;
 import com.bettypower.util.Helper;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.StringTokenizer;
 
@@ -250,7 +247,7 @@ public class Finder {
     private boolean isPossiblePuntata = false;
     private boolean isThereEuro = false;
 
-    public String isVincita(){
+    private String isVincita(){
         String lowerWord = word.toLowerCase();
         if(isPossibleVincita && isMoney(lowerWord)!=null){
             return isMoney(lowerWord);
@@ -314,7 +311,7 @@ public class Finder {
         return null;
     }
 
-    public String isMoney(String currentWord){
+    private String isMoney(String currentWord){
 
         if(currentWord.equalsIgnoreCase("€")){
             try {
@@ -477,35 +474,11 @@ public class Finder {
         return null;
     }
 
-    //qui perdo tre secondi
-    public String isName(String word){
-        String pattern; //use because I want start with the same word in every cycle
-        for (String currentString:allTeamsWord
-                ) {
-            String nameFound = "";
-            pattern = word;
-           if(isWordContainedInTeamNameWithoutOcrError(currentString,pattern)){
-                nameFound = nameFound + pattern;
-                if(currentString.length() == nameFound.length()){
-                    return currentString;
-                }
-                if(getNumberOfTokens(currentString)>1 && !nameFound.isEmpty()) {
-                    for (int i = 1; i <= lastWords.size(); i++) {
-                        pattern = removeSeparator(lastWords.get(lastWords.size() - i),currentString);
-                        if (isWordContainedInTeamNameWithoutOcrError(currentString, pattern)) {
-                            nameFound = nameFound + " " + pattern;
-                            if (currentString.length() == nameFound.length()) {
-                                return currentString;
-                            }
-                        } else {
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-        return null;
-    }
+    /* *********************************************************************************************
+     *********************************   AUSILIAR METHODS   ****************************************
+     **********************************************************************************************/
+
+    /* *************************************  FOR NAMES   ******************************************/
 
     private String isNameBinaryBig(String word){
         String wordToCompare = removeSeparatorTwo(word);
@@ -593,105 +566,6 @@ public class Finder {
         word = word.replaceAll("I", "");
         word = word.replaceAll("L", "");
         return word;
-    }
-
-    /* *********************************************************************************************
-     *********************************   AUSILIAR METHODS   ****************************************
-     **********************************************************************************************/
-
-    /**************************************  FOR NAMES   ******************************************/
-
-    private ArrayList<String> getAllCompleteStringNames(){
-        ArrayList<String> completeStringNames = new ArrayList<>();
-        for (PalimpsestMatch currentPalimpsestMatch:allPalimpsestMatch
-             ) {
-            String homeName = currentPalimpsestMatch.getHomeTeam().getName();
-            if(!stringAlreadyInList(completeStringNames,homeName)){
-                completeStringNames.add(homeName);
-            }
-            String awayName = currentPalimpsestMatch.getAwayTeam().getName();
-            if(!stringAlreadyInList(completeStringNames,awayName)){
-                completeStringNames.add(awayName);
-            }
-        }
-        //Collection<String> userCollection = new HashSet<String>(completeStringNames);
-        Collections.sort(completeStringNames);
-        //Collections.binarySearch(completeStringNames,"ciao");
-        return completeStringNames;
-    }
-
-    private boolean stringAlreadyInList(ArrayList<String> list,String word){
-        for (String currentString:list
-             ) {
-            if(currentString.equalsIgnoreCase(word)){
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private String removeSeparator(String word,String totalName){
-        for (String currentSepartor:nameSeparatorLabelSet
-             ) {
-            if(word.contains(currentSepartor)){
-                String wordFixed = word.replaceAll(currentSepartor, "");
-                if(!isWordContainedInTeamNameWithoutOcrError(totalName, wordFixed)) {
-                    wordFixed = word.replaceAll(currentSepartor, " ");
-                    StringTokenizer token = new StringTokenizer(wordFixed);
-                    while(token.hasMoreTokens()){
-                        wordFixed = token.nextToken();
-                        if(isWordContainedInTeamNameWithoutOcrError(totalName, wordFixed)) {
-                            word = wordFixed;
-                        }
-                    }
-                }
-                else{
-                    word = wordFixed;
-                }
-            }
-        }
-        return word;
-    }
-
-    /**
-     * this method compare two string given in param without the character that are more likely to be read
-     * wrong from ocr. usually those character are 'i' and 'l'
-     * @return true if wordOne is equals Ignoring Case with wordTwo, false otherwise
-     */
-    private boolean compareNamesWithoutOCRError(String wordOne, String wordTwo){
-        wordOne = wordOne.toUpperCase();
-        wordTwo = wordTwo.toUpperCase();
-        if(wordOne.length() == wordTwo.length()){
-            for(int i = 0;i<wordOne.length();i++){
-                if((wordOne.charAt(i) != wordTwo.charAt(i)) && (
-                        (wordOne.charAt(i) != 'L' && wordOne.charAt(i) != 'I') ||
-                                (wordTwo.charAt(i) != 'L' && wordTwo.charAt(i) != 'I'))){
-                    return false;
-                }
-            }
-        }
-        else{
-            return false;
-        }
-        return true;
-    }
-
-    /**
-     * this metod do the same work of word1.contains(word2) but using the method that comapre the two word
-     * without take care about the difference between 'i' and 'l'
-     * @param teamName has more than one word
-     * @param word has only one word
-     * @return true if teamName contains word, false otherwise
-     */
-    private boolean isWordContainedInTeamNameWithoutOcrError(String teamName, String word){
-        StringTokenizer token = new StringTokenizer(teamName);
-        while(token.hasMoreTokens()){
-            String singleTeamName = token.nextToken();
-            if(compareNamesWithoutOCRError(singleTeamName,word)){
-                return true;
-            }
-        }
-        return false;
     }
 
     /************************************  FOR PALIMPSESTS   ****************************************/

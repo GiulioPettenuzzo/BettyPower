@@ -8,7 +8,6 @@ import android.support.constraint.ConstraintLayout;
 import android.support.constraint.ConstraintSet;
 import android.support.v7.widget.RecyclerView;
 import android.text.InputFilter;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -37,7 +36,7 @@ import com.bettypower.entities.PalimpsestMatch;
 import com.bettypower.entities.ParcelableHiddenResult;
 import com.bettypower.util.Helper;
 import com.bettypower.util.touchHelper.ItemTouchHelperAdapter;
-import com.renard.ocr.R;
+import com.renard.betty.R;
 import com.squareup.picasso.Picasso;
 
 import java.text.ParseException;
@@ -225,7 +224,6 @@ public class SingleBetAdapter extends RecyclerView.Adapter implements ItemTouchH
     @Override
     public void onItemSwiped(final int position) {
         final DeleteMatchDialog deleteMatchDialog = new DeleteMatchDialog(context, singleBet.getArrayMatch().get(position));
-        Log.i("position" , String.valueOf(position));
         deleteMatchDialog.setDeleteMatchDialogListener(new DeleteMatchDialog.DeleteMatchDialogListener() {
             @Override
             public void onDeleteMatchConfirm() {

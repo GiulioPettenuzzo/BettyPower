@@ -6,7 +6,6 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 import android.text.InputFilter;
-import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
@@ -17,15 +16,14 @@ import android.widget.Toast;
 import com.bettypower.adapters.DropDownAutoCompleteTextViewAdapter;
 import com.bettypower.entities.PalimpsestMatch;
 import com.bettypower.threads.LoadLogoThread;
-import com.renard.ocr.R;
-import com.renard.ocr.TextFairyApplication;
+import com.renard.betty.R;
+import com.renard.betty.TextFairyApplication;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.StringTokenizer;
 
 /**
  * Created by giuliopettenuzzo on 27/01/18.

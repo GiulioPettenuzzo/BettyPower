@@ -8,7 +8,7 @@ LOCAL_LDLIBS := \
   -lz \
   -llog
   
-  
+
 LOCAL_CPP_EXTENSION :=.cc
 
 LOCAL_SRC_FILES := \

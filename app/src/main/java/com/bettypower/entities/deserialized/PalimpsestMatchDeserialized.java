@@ -15,7 +15,6 @@ import com.google.gson.JsonParseException;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 /**
  * Created by giuliopettenuzzo on 12/03/18.
@@ -33,7 +32,6 @@ public class PalimpsestMatchDeserialized implements JsonDeserializer<PalimpsestM
      *
      * @param json    The Json data being deserialized
      * @param typeOfT The type of the Object to deserialize to
-     * @param context
      * @return a deserialized object of the specified type typeOfT which is a subclass of {@code T}
      * @throws JsonParseException if json is not in the expected format of {@code typeofT}
      */
@@ -46,55 +44,55 @@ public class PalimpsestMatchDeserialized implements JsonDeserializer<PalimpsestM
         Team awayTeam = new ParcelableTeam(JAwayteam.get("name").getAsString());
         PalimpsestMatch palimpsestMatch = new ParcelablePalimpsestMatch(homeTeam,awayTeam);
 
-        String time = "";
+        String time;
         if(jobject.get("matchTime")!=null) {
             time = jobject.get("matchTime").getAsString();
             palimpsestMatch.setTime(time);
         }
 
-        String palimpsest = "";
+        String palimpsest;
         if(jobject.get("palimpsest")!=null) {
             palimpsest = jobject.get("palimpsest").getAsString();
             palimpsestMatch.setPalimpsest(palimpsest);
         }
 
-        String bet = "";
+        String bet;
         if(jobject.get("bet")!=null) {
             bet = jobject.get("bet").getAsString();
             palimpsestMatch.setBet(bet);
         }
 
-        String betKind = "";
+        String betKind;
         if(jobject.get("betKind")!=null) {
             betKind = jobject.get("betKind").getAsString();
             palimpsestMatch.setBetKind(betKind);
         }
 
-        String quote = "";
+        String quote;
         if(jobject.get("finalQuote")!=null) {
             quote = jobject.get("finalQuote").getAsString();
             palimpsestMatch.setQuote(quote);
         }
 
-        boolean fissa = false;
+        boolean fissa;
         if(jobject.get("fissa")!=null) {
             fissa = jobject.get("fissa").getAsBoolean();
             palimpsestMatch.setFissa(fissa);
         }
 
-        String resultHomeTeam = "";
+        String resultHomeTeam;
         if(jobject.get("resultHomeTeam")!=null) {
             resultHomeTeam = jobject.get("resultHomeTeam").getAsString();
             palimpsestMatch.setHomeResult(resultHomeTeam);
         }
 
-        String resultAwayTeam = "";
+        String resultAwayTeam;
         if(jobject.get("resultAwayTeam")!=null) {
             resultAwayTeam = jobject.get("resultAwayTeam").getAsString();
             palimpsestMatch.setAwayResult(resultAwayTeam);
         }
 
-        String resultTime = "";
+        String resultTime;
         if(jobject.get("resultTime")!=null) {
             resultTime = jobject.get("resultTime").getAsString();
             palimpsestMatch.setResultTime(resultTime);
@@ -128,6 +126,5 @@ public class PalimpsestMatchDeserialized implements JsonDeserializer<PalimpsestM
         palimpsestMatch.setAllHiddenResult(allHiddenResult);
         return palimpsestMatch;
 
-        //TODO l'unica cosa rimasta sarebbe allOdds ma non ha molto senso!
     }
 }

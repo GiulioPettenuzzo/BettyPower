@@ -24,17 +24,13 @@ import android.support.annotation.RequiresPermission;
 import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.view.Display;
-import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 
 import com.google.android.gms.common.images.Size;
 
 import java.io.IOException;
-import java.security.Policy;
 import java.util.List;
 
 public class CameraSourcePreview extends ViewGroup {

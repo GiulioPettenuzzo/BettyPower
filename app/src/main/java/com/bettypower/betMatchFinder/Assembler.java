@@ -8,6 +8,7 @@ import java.util.Map;
 
 /**
  * Created by giuliopettenuzzo on 17/11/17.
+ * Check if the predictors doesn't recognize that two match where the same
  */
 
 public class Assembler {
@@ -18,10 +19,6 @@ public class Assembler {
     public Assembler(ArrayList<MatchToFind> allMatchToAssemble){
         this.allMatchToAssemble = allMatchToAssemble;
         validator = new Validator();
-    }
-
-    public void setAllMatchToAssemble(ArrayList<MatchToFind> allMatchToAssemble){
-        this.allMatchToAssemble = allMatchToAssemble;
     }
 
     public ArrayList<MatchToFind> getAllMatchReassembled(){
@@ -41,7 +38,6 @@ public class Assembler {
     }
 
     private MatchToFind isTheSameMatch(MatchToFind match,MatchToFind matchToCompare){
-        MatchToFind result = match;
         ArrayList<PalimpsestMatch> allMatchValidate;
         if(match.getPalimpsest()!=null && matchToCompare.getPalimpsest()!=null ){
             return null;
@@ -49,8 +45,8 @@ public class Assembler {
         else if(match.getPalimpsest()==null && matchToCompare.getPalimpsest()!=null){
             allMatchValidate = validator.isPalimpsestValidate(matchToCompare.getPalimpsest(),match.getPalimpsestMatch());
             if(allMatchValidate!=null){
-                result.setPalimpsest(matchToCompare.getPalimpsest());
-                result.setPalimpsestMatch(allMatchValidate);
+                match.setPalimpsest(matchToCompare.getPalimpsest());
+                match.setPalimpsestMatch(allMatchValidate);
             }
             else{
                 return null;
@@ -61,10 +57,10 @@ public class Assembler {
             return null;
         }
         else if(match.getHomeName()==null && matchToCompare.getHomeName()!=null){
-            allMatchValidate = validator.isHomeNameValidate(matchToCompare.getHomeName(),result.getPalimpsestMatch());
+            allMatchValidate = validator.isHomeNameValidate(matchToCompare.getHomeName(), match.getPalimpsestMatch());
             if(allMatchValidate!=null){
-                result.setHomeTeamName(matchToCompare.getHomeName());
-                result.setPalimpsestMatch(allMatchValidate);
+                match.setHomeTeamName(matchToCompare.getHomeName());
+                match.setPalimpsestMatch(allMatchValidate);
             }
             else{
                 return null;
@@ -75,10 +71,10 @@ public class Assembler {
             return null;
         }
         else if(match.getAwayName()==null && matchToCompare.getAwayName()!=null){
-            allMatchValidate = validator.isAwayNameValidate(matchToCompare.getAwayName(),result.getPalimpsestMatch());
+            allMatchValidate = validator.isAwayNameValidate(matchToCompare.getAwayName(), match.getPalimpsestMatch());
             if(allMatchValidate!=null){
-                result.setAwayTeamName(matchToCompare.getAwayName());
-                result.setPalimpsestMatch(allMatchValidate);
+                match.setAwayTeamName(matchToCompare.getAwayName());
+                match.setPalimpsestMatch(allMatchValidate);
             }
             else{
                 return null;
@@ -93,10 +89,10 @@ public class Assembler {
             if(match.getUnknownTeamName()!=null){
                 return null;
             }
-            allMatchValidate = validator.isHomeNameValidate(matchToCompare.getUnknownTeamName(),result.getPalimpsestMatch());
+            allMatchValidate = validator.isHomeNameValidate(matchToCompare.getUnknownTeamName(), match.getPalimpsestMatch());
             if(allMatchValidate!=null){
-                result.setHomeTeamName(matchToCompare.getUnknownTeamName());
-                result.setPalimpsestMatch(allMatchValidate);
+                match.setHomeTeamName(matchToCompare.getUnknownTeamName());
+                match.setPalimpsestMatch(allMatchValidate);
             }
             else{
                 return null;
@@ -106,28 +102,25 @@ public class Assembler {
             if(match.getUnknownTeamName()!=null){
                 return null;
             }
-            allMatchValidate = validator.isAwayNameValidate(matchToCompare.getUnknownTeamName(),result.getPalimpsestMatch());
+            allMatchValidate = validator.isAwayNameValidate(matchToCompare.getUnknownTeamName(), match.getPalimpsestMatch());
             if(allMatchValidate!=null){
-                result.setAwayTeamName(matchToCompare.getUnknownTeamName());
-                result.setPalimpsestMatch(allMatchValidate);
+                match.setAwayTeamName(matchToCompare.getUnknownTeamName());
+                match.setPalimpsestMatch(allMatchValidate);
             }
             else{
                 return null;
             }
         }
         else if(match.getUnknownTeamName()!=null && matchToCompare.getUnknownTeamName()!=null){
-            Map<String,ArrayList<PalimpsestMatch>> map = validator.isNameValidate(matchToCompare.getUnknownTeamName(),result.getPalimpsestMatch());
+            Map<String,ArrayList<PalimpsestMatch>> map = validator.isNameValidate(matchToCompare.getUnknownTeamName(), match.getPalimpsestMatch());
             if(map == null){
                 return null;
             }
-            else if(map.containsKey(Validator.HOME_TEAM) && map.containsKey(Validator.AWAY_TEAM)){
-                //TODO
-            }
             else if(map.containsKey(Validator.HOME_TEAM)){
-                result.setHomeTeamName(matchToCompare.getUnknownTeamName());
+                match.setHomeTeamName(matchToCompare.getUnknownTeamName());
             }
             else if(map.containsKey(Validator.AWAY_TEAM)){
-                result.setAwayTeamName(matchToCompare.getUnknownTeamName());
+                match.setAwayTeamName(matchToCompare.getUnknownTeamName());
             }
             else{
                 return null;
@@ -138,10 +131,10 @@ public class Assembler {
             return null;
         }
         else if(match.getDate()==null && matchToCompare.getDate()!=null){
-            allMatchValidate = validator.isDateValidate(matchToCompare.getDate(),result.getPalimpsestMatch());
+            allMatchValidate = validator.isDateValidate(matchToCompare.getDate(), match.getPalimpsestMatch());
             if(allMatchValidate!=null){
-                result.setDate(matchToCompare.getDate());
-                result.setPalimpsestMatch(allMatchValidate);
+                match.setDate(matchToCompare.getDate());
+                match.setPalimpsestMatch(allMatchValidate);
             }
             else{
                 return  null;
@@ -152,10 +145,10 @@ public class Assembler {
             return null;
         }
         else if(match.getHour()==null && matchToCompare.getHour()!=null){
-            allMatchValidate = validator.isHourValidate(matchToCompare.getHour(),result.getPalimpsestMatch());
+            allMatchValidate = validator.isHourValidate(matchToCompare.getHour(), match.getPalimpsestMatch());
             if(allMatchValidate!=null){
-                result.setHour(matchToCompare.getHour());
-                result.setPalimpsestMatch(matchToCompare.getPalimpsestMatch());
+                match.setHour(matchToCompare.getHour());
+                match.setPalimpsestMatch(matchToCompare.getPalimpsestMatch());
             }
             else{
                 return null;
@@ -186,6 +179,6 @@ public class Assembler {
             }
         }*/
 
-        return result;
+        return match;
     }
 }

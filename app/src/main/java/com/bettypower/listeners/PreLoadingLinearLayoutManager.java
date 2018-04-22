@@ -29,14 +29,6 @@ public class PreLoadingLinearLayoutManager extends LinearLayoutManager {
         //Similarly you can customize "canScrollHorizontally()" for managing horizontal scroll
         return isScrollEnabled && super.canScrollVertically();
     }
-    public PreLoadingLinearLayoutManager(final Context context, final int pages) {
-        super(context);
-        this.mPages = pages;
-    }
-
-    public PreLoadingLinearLayoutManager(final Context context, final int orientation, final boolean reverseLayout) {
-        super(context, orientation, reverseLayout);
-    }
 
     @Override
     public void setOrientation(final int orientation) {

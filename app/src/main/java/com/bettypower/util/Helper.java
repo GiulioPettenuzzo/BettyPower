@@ -4,14 +4,13 @@ import android.content.Context;
 
 import com.bettypower.entities.PalimpsestMatch;
 import com.bettypower.entities.Team;
-import com.renard.ocr.R;
+import com.renard.betty.R;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Locale;
-import java.util.StringTokenizer;
 
 /**
  * Created by giuliopettenuzzo on 21/10/17.

@@ -16,7 +16,6 @@ public interface HiddenResult extends Parcelable{
 
     /**
      * the time of the action
-     * @return
      */
     String getTime();
     void setTime(String time);

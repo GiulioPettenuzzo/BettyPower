@@ -74,7 +74,6 @@ public class LoadLogoThread extends Thread {
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Log.i("errore", error.toString());
             }
         });
         imageRequest.setShouldCache(false);

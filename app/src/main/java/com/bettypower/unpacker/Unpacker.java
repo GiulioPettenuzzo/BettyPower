@@ -14,12 +14,10 @@ public interface Unpacker {
 
     /**
      * basic method to recive the whole teams found in web
-     * @return
      */
     public ArrayList<Team> getAllTeams();
     /**
      * basic method to recive the whole matches found in web
-     * @return
      */
     public ArrayList<PalimpsestMatch> getAllMatches();
 

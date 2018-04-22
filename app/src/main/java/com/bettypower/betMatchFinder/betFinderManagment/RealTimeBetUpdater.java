@@ -1,6 +1,5 @@
 package com.bettypower.betMatchFinder.betFinderManagment;
 
-import android.util.Log;
 
 import com.bettypower.betMatchFinder.entities.ConcreteOddsToFind;
 import com.bettypower.betMatchFinder.entities.MatchToFind;
@@ -8,72 +7,7 @@ import com.bettypower.betMatchFinder.entities.OddsToFind;
 import com.bettypower.betMatchFinder.labelSet.BetLabelSet;
 
 import java.util.ArrayList;
-import java.util.Map;
 import java.util.TreeMap;
-
-/*
-  TEST
-  I/realTime + date: 31/03
-I/realTime + hour: 12:30
-I/BET KIND DEBUG =: 1x2
-I/realTime + betkind: 1x2
-I/realTime + date: 31/03
-I/realTime + betkind: goal/nogoal
-I/realTime + date: 31/03
-I/realTime + betkind: goal/nogoal
-I/realTime + date: 31/03
-I/realTime + hour: 15:00
-I/realTime + bet: 2
-I/realTime + quote: 2,32
-I/realTime + quote: 2,25
-I/realTime + hour: 02:25
-I/NewDocumentActivity: onTakePhotoActivityResult
-I/NewDocumentActivity: registerImageLoaderReceiver com.renard.ocr.documents.creation.NewDocumentActivity$1@c040296
-I/ImageLoadAsyncTask: onPreExecute
-I/NewDocumentActivity: onReceive com.renard.ocr.documents.viewing.grid.DocumentGridActivity@1f7efc4
-                       showLoadingImageProgressDialog
-I/realTime + betkind: 1x2
-I/realTime + date: 31/03
-I/realTime + hour: 15:00
-I/realTime + betkind: 1x2
-I/realTime + quote: 1,50
-I/realTime + hour: 01:50
-I/realTime + quote: 1,90
-I/realTime + quote: 2,00
-I/realTime + hour: 02:00
-I/realTime + quote: 2,49
-I/ExifInterface_JNI: Raw image not detected
-I/realTime + quote: 52,17
-I/realTime + bet: 1
-I/BET KIND ===: 1x2
-I/---------: ----------
-I/BET KIND ===: goal/nogoal
-I/---------: ----------
-I/BET KIND ===: goal/nogoal
-I/---------: ----------
-I/BET ===: 2
-I/---------: ----------
-I/BET KIND ===: 1x2
-I/---------: ----------
-I/BET ===: 1
-I/BET KIND ===: 1x2
-I/---------: ----------
-             ----------
-I/QUOTE ===: 2,32
-I/---------: ----------
-I/QUOTE ===: 2,25
-I/---------: ----------
-I/QUOTE ===: 1,50
-I/---------: ----------
-I/QUOTE ===: 1,90
-I/---------: ----------
-I/QUOTE ===: 2,00
-I/---------: ----------
-I/QUOTE ===: 2,49
-I/---------: ----------
-I/QUOTE ===: 52,17
-I/---------: ----------
- */
 
 public class RealTimeBetUpdater {
     private ArrayList<OddsToFind> mainListOfOdds = new ArrayList<>();
@@ -86,7 +20,6 @@ public class RealTimeBetUpdater {
         mainListOfOdds.add(oddsToFind);
     }
 
-    //TODO potrei fare un controllo anche sull'indice
     public ArrayList<MatchToFind> updateNewBet(String bet, ArrayList<MatchToFind> matchToFind){
         if(mainListOfOdds.get(mainListOfOdds.size()-1).getBet()==null){
             if(isBetValidate(bet)){
@@ -117,7 +50,7 @@ public class RealTimeBetUpdater {
     }
 
     public ArrayList<MatchToFind> updateNewQuote(String quote,ArrayList<MatchToFind> matchToFind){
-        mainListOfQuote.add(quote); //TODO validator
+        mainListOfQuote.add(quote);
         return matchToFind;
     }
 
@@ -179,7 +112,6 @@ public class RealTimeBetUpdater {
      */
     private boolean isBetKindValidate(String betKind){
         String bet = mainListOfOdds.get(mainListOfOdds.size()-1).getBet();
-        Log.i("BET KIND DEBUG = ",betKind);
         if(bet!=null){
             for (String currentBet:hashBetAndBetKind.get(betKind)
                  ) {
@@ -221,13 +153,6 @@ public class RealTimeBetUpdater {
             oddsToFind.setBetKind(betKind);
             mainListOfOdds.add(oddsToFind);
         }
-        return true;
-    }
-
-    /*
-     * TODO devo ancora pensarla bene
-     */
-    private  boolean isQuoteValidate(){
         return true;
     }
 

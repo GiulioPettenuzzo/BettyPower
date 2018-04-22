@@ -24,7 +24,7 @@
             android:layout_below="@+id/toolbar" />
 
 
-        <com.renard.ocr.documents.viewing.grid.FancyGridView
+        <com.renard.betty.documents.viewing.grid.FancyGridView
             android:id="@+id/gridview"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"

@@ -8,7 +8,6 @@ import android.support.annotation.NonNull;
 import android.text.Editable;
 import android.text.InputFilter;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
@@ -18,7 +17,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import com.bettypower.betMatchFinder.labelSet.BetLabelSet;
 import com.bettypower.entities.PalimpsestMatch;
-import com.renard.ocr.R;
+import com.renard.betty.R;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -40,7 +39,6 @@ public class SetBetDialog extends Dialog {
     private com.shawnlin.numberpicker.NumberPicker selectBetPicker;
     private com.shawnlin.numberpicker.NumberPicker selectQuotePicker;
 
-    private BetLabelSet betLabelSet = new BetLabelSet();
     private Map<String,ArrayList<String>> hashBetAndBetKind = new BetLabelSet().hashBetAndBetKind();
     private Object[] betKindArray;
     private Object[] allBet;
@@ -196,7 +194,6 @@ public class SetBetDialog extends Dialog {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if(actionId == EditorInfo.IME_ACTION_DONE){
-                    Log.i("TYPE","TYPE");
                     InputMethodManager imm = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
                     if (imm != null) {
                         imm.hideSoftInputFromWindow(showQuote.getWindowToken(), 0);

@@ -14,15 +14,11 @@ public class HiddenResultUnpacker {
 
     private String response;
 
-    public static final String ACTION_GOAL = "\"Goal\"";
+    private static final String ACTION_GOAL = "\"Goal\"";
     private static final String ACTION_YELLOWCARD = "\"Yellowcard\"";
     private static final String ACTION_REDCARD = "\"Redcard\"";
-    public static final String NO_ACTION = "no_action";
+    private static final String NO_ACTION = "no_action";
 
-
-    public HiddenResultUnpacker(){
-
-    }
     public HiddenResultUnpacker(String response){
         this.response = response;
     }
@@ -98,9 +94,6 @@ public class HiddenResultUnpacker {
         StringTokenizer tokenizer = new StringTokenizer(response,">");
         while (tokenizer.hasMoreTokens()){
             String word = tokenizer.nextToken();
-            if(word.equals("46</td")){
-                String x = "";
-            }
             if(word.endsWith("</td")){
                 word = word.substring(0,word.length()-4);
                 try{
@@ -121,8 +114,8 @@ public class HiddenResultUnpacker {
         return actionTeam;
     }
 
-    public String findHomePlayer(){
-        String homePlayer = "";
+    private String findHomePlayer(){
+        StringBuilder homePlayer = new StringBuilder();
 
         StringTokenizer tokenizer = new StringTokenizer(response);
         while(tokenizer.hasMoreTokens()){
@@ -136,22 +129,22 @@ public class HiddenResultUnpacker {
                             word = tokenizer.nextToken();
                             if(word.endsWith("</td>")){
                                 word = word.substring(0,word.length()-5);
-                                homePlayer = homePlayer + " " + word;
-                                return homePlayer;
+                                homePlayer.append(" ").append(word);
+                                return homePlayer.toString();
                             }
-                            homePlayer = homePlayer + " " +word;
+                            homePlayer.append(" ").append(word);
                     }
                 }
             }
         }
 
-        return  homePlayer;
+        return homePlayer.toString();
     }
 
-    public String findAwayPlayer(){
+    private String findAwayPlayer(){
         //width="150">T. Kajiyama <img src="/images/football.gif"
-        String awayPlayer = "";
-        String firstPart = "";
+        StringBuilder awayPlayer = new StringBuilder();
+        StringBuilder firstPart = new StringBuilder();
         StringTokenizer tokenizer = new StringTokenizer(response);
         boolean isResult = false;
         while(tokenizer.hasMoreTokens()){
@@ -162,26 +155,26 @@ public class HiddenResultUnpacker {
                 break;
             }
             else{
-                firstPart = firstPart + " " + toCompare;
+                firstPart.append(" ").append(toCompare);
             }
         }
-        if(isResult==false){
+        if(!isResult){
             return "no_result";
         }
 
-        StringTokenizer token = new StringTokenizer(firstPart);
+        StringTokenizer token = new StringTokenizer(firstPart.toString());
         while(token.hasMoreTokens()){
             String word = token.nextToken();
             if((word.startsWith("width=\"150\">"))&&!word.endsWith("</td>")){
                 word = word.substring(12);
-                awayPlayer = awayPlayer + " " + word;
+                awayPlayer.append(" ").append(word);
                 while(token.hasMoreTokens()) {
                     word = token.nextToken();
-                    awayPlayer = awayPlayer + " " + word;
+                    awayPlayer.append(" ").append(word);
                 }
             }
         }
-        return awayPlayer;
+        return awayPlayer.toString();
     }
 
     private String findResult(){
@@ -196,7 +189,6 @@ public class HiddenResultUnpacker {
             }
         }
         char[] charArray = result.toCharArray();
-        int index;
         for(int currentChar = 0;currentChar<result.length();currentChar++){
             if(charArray[currentChar]=='-'){
                 charArray[currentChar] = ':';

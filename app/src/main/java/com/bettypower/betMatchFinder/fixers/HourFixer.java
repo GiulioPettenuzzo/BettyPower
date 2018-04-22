@@ -19,11 +19,6 @@ public class HourFixer implements Fixer {
 
     private static final int HOUR_WORD_NUMBER = 2;
 
-    public HourFixer(String word){
-        hourLabelSet = new HourLabelSet();
-        this.word = word;
-    }
-
     public HourFixer(){
         hourLabelSet = new HourLabelSet();
     }
