@@ -1,4 +1,4 @@
 Betty Power
 =========
 
-this application will be the shazam of the bet tickets
+this application will be the sport soccer results
